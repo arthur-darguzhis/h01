@@ -1,6 +1,6 @@
 export type VideoIdDto = {
     /**
-     * id of course
+     * id of video
      */
     id: string;
 }
