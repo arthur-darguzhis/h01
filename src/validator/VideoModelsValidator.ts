@@ -32,7 +32,7 @@ export const validateUpdateVideoModel = (body: UpdateVideoInputModel): APIErrorR
 }
 
 const validateTitleField = (title: string, APIErrorResult: APIErrorResultType): void => {
-    if (!title) {
+    if (!title || typeof title !== "string") {
         const titleFieldError: FieldErrorType = {
             message: 'should not be blank',
             field: 'title'
@@ -48,7 +48,7 @@ const validateTitleField = (title: string, APIErrorResult: APIErrorResultType): 
 }
 
 const validateAuthorField = (author: string, APIErrorResult: APIErrorResultType): void => {
-    if (!author) {
+    if (!author || typeof author !== "string") {
         const authorFieldError: FieldErrorType = {
             message: 'should not be blank',
             field: 'author'

@@ -5,7 +5,6 @@ import {convertVideoToOutputModel, VideoOutputModel} from "../model/video/dto/Vi
 import {videosRepository} from "../repository/videosRepository";
 import {CreateVideoInputModel} from "../model/video/dto/CreateVideoInputModel";
 import {isValid, validateCreateVideoModel, validateUpdateVideoModel} from "../validator/VideoModelsValidator";
-import {VideoType} from "../model/video/VideoType";
 import {UpdateVideoInputModel} from "../model/video/dto/UpdateVideoInputModel";
 
 export const videosRouter = Router({})
@@ -29,22 +28,7 @@ videosRouter.post('/', (req: RequestWithBody<CreateVideoInputModel>, res) => {
         return;
     }
 
-    const today = new Date();
-    const tomorrow = new Date();
-    tomorrow.setDate(today.getDate() + 1);
-
-    const newVideo: VideoType = {
-        id: new Date().getTime(),
-        title: req.body.title,
-        author: req.body.author,
-        canBeDownloaded: false,
-        minAgeRestriction: null,
-        createdAt: today.toISOString(),
-        publicationDate: tomorrow.toISOString(),
-        availableResolutions: req.body.availableResolutions
-    }
-
-    videosRepository.addVideo(newVideo);
+    const newVideo = videosRepository.createVideo(req.body);
     res.status(HTTP_STATUSES.CREATED_201).json(convertVideoToOutputModel(newVideo));
 })
 videosRouter.put('/:id', (req: RequestWithParamsAndBody<VideoIdDto, UpdateVideoInputModel>, res) => {

@@ -1,9 +1,26 @@
 import {VideoType} from "../model/video/VideoType";
 import {db} from "../db";
+import {CreateVideoInputModel} from "../model/video/dto/CreateVideoInputModel";
 
 export const videosRepository = {
-    addVideo(newVideo: VideoType): void {
+    createVideo(createVideoInputModel: CreateVideoInputModel): VideoType {
+        const today = new Date();
+        const tomorrow = new Date();
+        tomorrow.setDate(today.getDate() + 1);
+
+        const newVideo: VideoType = {
+            id: new Date().getTime(),
+            title: createVideoInputModel.title,
+            author: createVideoInputModel.author,
+            canBeDownloaded: false,
+            minAgeRestriction: null,
+            createdAt: today.toISOString(),
+            publicationDate: tomorrow.toISOString(),
+            availableResolutions: createVideoInputModel.availableResolutions
+        }
+
         db.videos.push(newVideo)
+        return newVideo;
     },
 
     getVideos(): VideoType[] {

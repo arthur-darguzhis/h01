@@ -26,7 +26,7 @@ describe('/videos', () => {
         const createVideoInputModel: CreateVideoInputModel = {
             title: '',
             author: '',
-            availableResolutions: []
+            availableResolutions: ["P147" as ResolutionType]
         }
 
         const createVideoBadResponse = await request(app)
