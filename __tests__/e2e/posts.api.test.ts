@@ -49,12 +49,12 @@ describe('/posts', () => {
     it('should create blog to assign posts ', async () => {
         const blogInputModel: BlogInputModel = {
             name: 'first blog',
-            description: 'the first blog description',
+            description: 'the first blog',
             websiteUrl: 'https://habr.com/ru/users/AlekDikarev/'
         }
 
         const createBlogResponse = await request(app)
-            .post('/posts')
+            .post('/blogs')
             .send(blogInputModel)
             .expect(HTTP_STATUSES.CREATED_201)
 
@@ -62,7 +62,7 @@ describe('/posts', () => {
         expect(firstBlog).toEqual({
             id: expect.any(String),
             name: 'first blog',
-            description: 'the first blog description',
+            description: 'the first blog',
             websiteUrl: 'https://habr.com/ru/users/AlekDikarev/'
         })
     })
@@ -70,8 +70,8 @@ describe('/posts', () => {
     let firstPost: any = null;
     it('should create post with correct data', async () => {
         const PostInputModel: PostInputModel = {
-            title: 'Управление состоянием в React приложения',
-            shortDescription: 'Все мы прекрасно знаем что построить полноценный стор на react context достаточно тяжело, а оптимизировать его ещё тяжелее.',
+            title: 'Управление состоянием в React',
+            shortDescription: 'Все мы прекрасно знаем что построить полноценный стор на react context достаточно тяжело',
             content: 'Буквально каждую конференцию мы слышим от спикеров, а вы знаете как работают контексты? а вы знаете что каждый ваш слушатель перерисовывает ваш умный компонент (useContext) Пора решить эту проблему раз и на всегда!',
             blogId: firstBlog.id,
         }
@@ -84,8 +84,8 @@ describe('/posts', () => {
         firstPost = createPostResponse.body;
         expect(firstPost).toEqual({
             id: expect.any(String),
-            title: 'Управление состоянием в React приложения',
-            shortDescription: 'Все мы прекрасно знаем что построить полноценный стор на react context достаточно тяжело, а оптимизировать его ещё тяжелее.',
+            title: 'Управление состоянием в React',
+            shortDescription: 'Все мы прекрасно знаем что построить полноценный стор на react context достаточно тяжело',
             content: 'Буквально каждую конференцию мы слышим от спикеров, а вы знаете как работают контексты? а вы знаете что каждый ваш слушатель перерисовывает ваш умный компонент (useContext) Пора решить эту проблему раз и на всегда!',
             blogId: firstBlog.id,
             blogName: firstBlog.name
@@ -95,8 +95,8 @@ describe('/posts', () => {
     let secondPost: any = null;
     it('create one more post', async () => {
         const postInputModel: PostInputModel = {
-            title: 'Экстремально уменьшаем размер NPM пакета',
-            shortDescription: 'Однажды я захотел создать небольшую NPM библиотеку по всем “best practices” - с покрытием тестами, написанием документации, ведением нормального версионирования и changelog\'а и т.п.',
+            title: 'Уменьшаем размер NPM пакета',
+            shortDescription: 'Однажды я захотел создать небольшую NPM библиотеку по всем “best practices”',
             content: 'И одной из интересных для меня меня задач при создании библиотеки была задача по максимальному уменьшению размера выходного NPM пакета - того, что в конечном итоге в теории будет использовать другой программист. И в этой статье я бы хотел описать, к каким методам я прибегал для того, чтобы достигнуть желанной цели.',
             blogId: firstBlog.id,
         }
@@ -109,8 +109,8 @@ describe('/posts', () => {
         secondPost = createPostResponse.body
         expect(secondPost).toEqual({
             id: expect.any(String),
-            title: 'Экстремально уменьшаем размер NPM пакета',
-            shortDescription: 'Однажды я захотел создать небольшую NPM библиотеку по всем “best practices” - с покрытием тестами, написанием документации, ведением нормального версионирования и changelog\'а и т.п.',
+            title: 'Уменьшаем размер NPM пакета',
+            shortDescription: 'Однажды я захотел создать небольшую NPM библиотеку по всем “best practices”',
             content: 'И одной из интересных для меня меня задач при создании библиотеки была задача по максимальному уменьшению размера выходного NPM пакета - того, что в конечном итоге в теории будет использовать другой программист. И в этой статье я бы хотел описать, к каким методам я прибегал для того, чтобы достигнуть желанной цели.',
             blogId: firstBlog.id,
             blogName: firstBlog.name
@@ -138,9 +138,10 @@ describe('/posts', () => {
 
     it('should not update post that is not exists', async () => {
         const updatePostInputModel = {
-            name: 'second blog',
-            description: 'the second blog description',
-            websiteUrl: 'https://habr.com/ru/users/3Dvideo/'
+            title: 'some Title',
+            shortDescription: 'some Description',
+            content: 'some Content',
+            blogId: '1'
         };
         await request(app)
             .put('/posts/1000')
@@ -150,9 +151,8 @@ describe('/posts', () => {
 
     it('should update post with correct input data', async () => {
         const postInputModel: PostInputModel = {
-            title: 'Мощь декораторов TypeScript на живых примерах. Декорирование методов класса',
-            shortDescription: 'В рамках этой статьи разбирается несколько примеров из реальных проектов, где применение декораторов сильно упростило код для понимания и исключило его дублирование.\n' +
-                '\n',
+            title: 'Мощь декораторов TypeScript',
+            shortDescription: 'В рамках этой статьи разбирается несколько примеров из реальных проектов',
             content: 'С помощью декораторов мы можем избежать “дублирования” кода, инкапсулировав сквозную функциональность в отдельный модуль. Убрать лишний “шум” в коде, что позволит сфокусироваться автору на бизнес логике приложения.',
             blogId: firstBlog.id
         }

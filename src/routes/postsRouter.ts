@@ -4,8 +4,28 @@ import {postRepository} from "../repository/postRepository";
 import {PostViewModel} from "../model/post/PostViewModel";
 import {convertPostToViewModel} from "../types/PostType";
 import {PostInputModel} from "../model/post/PostInputModel";
+import {body} from "express-validator";
+import {checkErrorsInRequestDataMiddleware} from "../middlewares/checkErrorsInRequestDataMiddleware";
+import {APIErrorResultType} from "../model/apiError/APIErrorResultType";
 
 export const postsRouter = Router({})
+
+const validateTitleField = body('title').trim().isLength({
+    min: 1,
+    max: 30
+}).withMessage('"title" length should be from 1 to 30');
+
+const validationShortDescriptionField = body('shortDescription').trim().isLength({
+    min: 1,
+    max: 100
+}).withMessage('"shortDescription" length should be from 1 to 100');
+
+const validationContentField = body('content').trim().isLength({
+    min: 1,
+    max: 1000
+}).withMessage('"content" length should be from 1 to 1000');
+
+const validationBlogIdField = body('blogId').trim().notEmpty();
 
 postsRouter.get('/', (req: Request, res: Response<PostViewModel[]>) => {
     res
@@ -22,39 +42,69 @@ postsRouter.get('/:id', (req: RequestWithParams<{ id: string }>, res) => {
         : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
 })
 
-postsRouter.post('/', (req: RequestWithBody<PostInputModel>, res) => {
-    // const APIErrorResult = validateCreateVideoModel(req.body);
+postsRouter.post('/',
+    validateTitleField,
+    validationShortDescriptionField,
+    validationContentField,
+    validationBlogIdField,
+    checkErrorsInRequestDataMiddleware,
+    (req: RequestWithBody<PostInputModel>, res) => {
 
-    // if (!isValid(APIErrorResult)) {
-    //     res.status(HTTP_STATUSES.BAD_REQUEST_400).json(APIErrorResult);
-    //     return;
-    // }
+        let newPost;
+        try {
+            newPost = postRepository.createPost(req.body);
+        } catch (e) {
+            if (e instanceof Error) {
+                const apiErrorResult: APIErrorResultType = {
+                    errorsMessages: [{
+                        field: req.body.blogId,
+                        message: e.message
+                    }]
+                }
+                res.status(HTTP_STATUSES.BAD_REQUEST_400).json(apiErrorResult)
+                return
+            }
 
-    const newPost = postRepository.createPost(req.body);
-    if(!newPost){
-        //TODO вот этот кусок надо как то по умному в валидацию засунуть с проверкой что blog с id существует.
-        res.status(HTTP_STATUSES.BAD_REQUEST_400)
-        return
-    }
-    res.status(HTTP_STATUSES.CREATED_201).json(convertPostToViewModel(newPost));
-})
+            res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400)
+            return
+        }
 
-postsRouter.put('/:id', (req: RequestWithParamsAndBody<{ id: string }, PostInputModel>, res) => {
-    const blog = postRepository.getPostsById(req.params.id);
-    if (!blog) {
-        res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
-        return;
-    }
+        res.status(HTTP_STATUSES.CREATED_201).json(convertPostToViewModel(newPost));
+    })
 
-    // const APIErrorResult = validateUpdateVideoModel(req.body);
-    // if (!isValid(APIErrorResult)) {
-    //     res.status(HTTP_STATUSES.BAD_REQUEST_400).json(APIErrorResult);
-    //     return;
-    // }
+postsRouter.put('/:id',
+    validateTitleField,
+    validationShortDescriptionField,
+    validationContentField,
+    validationBlogIdField,
+    checkErrorsInRequestDataMiddleware,
+    (req: RequestWithParamsAndBody<{ id: string }, PostInputModel>, res) => {
 
-    postRepository.updatePostById(req.params.id, req.body)
-    res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
-})
+        const post = postRepository.getPostsById(req.params.id);
+        if (!post) {
+            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+            return;
+        }
+
+        try {
+            postRepository.updatePostById(req.params.id, req.body)
+        } catch (e) {
+            if (e instanceof Error) {
+                const apiErrorResult: APIErrorResultType = {
+                    errorsMessages: [{
+                        field: req.body.blogId,
+                        message: e.message
+                    }]
+                }
+                res.status(HTTP_STATUSES.BAD_REQUEST_400).json(apiErrorResult)
+                return
+            }
+
+            res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400)
+            return
+        }
+        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
+    })
 
 postsRouter.delete('/:id', (req: RequestWithParams<{ id: string }>, res) => {
     postRepository.deletePostById(req.params.id)

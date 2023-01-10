@@ -4,10 +4,10 @@ import {PostType} from "../types/PostType";
 import {blogRepository} from "./blogRepository";
 
 export const postRepository = {
-    createPost(postInputModel: PostInputModel): PostType | false {
+    createPost(postInputModel: PostInputModel): PostType | never {
         const blog = blogRepository.getBlogById(postInputModel.blogId);
         if (!blog) {
-            return false;
+            throw new Error(`Blog with ID: ${postInputModel.blogId} is not exists`);
         }
 
         const newPost: PostType = {
@@ -33,9 +33,13 @@ export const postRepository = {
 
     updatePostById(id: string, postInputModel: PostInputModel): boolean {
         const postIndex = db.posts.findIndex(b => b.id === id);
+        if (postIndex === -1) {
+            throw new Error(`Post with ID: ${id} is not exists`)
+        }
+
         const blog = blogRepository.getBlogById(postInputModel.blogId);
-        if (postIndex === -1 || !blog) {
-            return false;
+        if (!blog) {
+            throw new Error(`Blog with ID: ${id} is not exists`)
         }
 
         db.posts[postIndex] = {
