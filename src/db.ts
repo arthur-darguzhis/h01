@@ -1,7 +1,14 @@
 import {PostType} from "./types/PostType";
 import {BlogType} from "./types/BlogType";
+import {UserType} from "./types/UserType";
 
-export const db: { blogs: BlogType[], posts: PostType[] } = {
+export const db: { users: UserType[], blogs: BlogType[], posts: PostType[] } = {
+    users: [
+        {
+            login: 'admin',
+            password: 'qwerty',
+        }
+    ],
     blogs: [
         {
             id: '1',

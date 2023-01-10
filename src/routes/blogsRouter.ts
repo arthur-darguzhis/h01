@@ -6,6 +6,7 @@ import {convertBlogToViewModel} from "../types/BlogType";
 import {BlogInputModel} from "../model/blog/BlogInputModel";
 import {body} from "express-validator";
 import {checkErrorsInRequestDataMiddleware} from "../middlewares/checkErrorsInRequestDataMiddleware";
+import {authGuardMiddleware} from "../middlewares/authGuardMiddleware";
 
 export const blogsRouter = Router({})
 
@@ -39,6 +40,7 @@ blogsRouter.get('/:id', (req: RequestWithParams<{ id: string }>, res) => {
 })
 
 blogsRouter.post('/',
+    authGuardMiddleware,
     validateNameField,
     validateDescriptionField,
     validateWebsiteUrlField,
@@ -49,6 +51,7 @@ blogsRouter.post('/',
     })
 
 blogsRouter.put('/:id',
+    authGuardMiddleware,
     validateNameField,
     validateDescriptionField,
     validateWebsiteUrlField,
@@ -64,7 +67,7 @@ blogsRouter.put('/:id',
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     })
 
-blogsRouter.delete('/:id', (req: RequestWithParams<{ id: string }>, res) => {
+blogsRouter.delete('/:id', authGuardMiddleware, (req: RequestWithParams<{ id: string }>, res) => {
     blogRepository.deleteBlogById(req.params.id)
         ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
         : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);

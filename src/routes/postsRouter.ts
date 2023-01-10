@@ -7,6 +7,7 @@ import {PostInputModel} from "../model/post/PostInputModel";
 import {body} from "express-validator";
 import {checkErrorsInRequestDataMiddleware} from "../middlewares/checkErrorsInRequestDataMiddleware";
 import {APIErrorResultType} from "../model/apiError/APIErrorResultType";
+import {authGuardMiddleware} from "../middlewares/authGuardMiddleware";
 
 export const postsRouter = Router({})
 
@@ -43,6 +44,7 @@ postsRouter.get('/:id', (req: RequestWithParams<{ id: string }>, res) => {
 })
 
 postsRouter.post('/',
+    authGuardMiddleware,
     validateTitleField,
     validationShortDescriptionField,
     validationContentField,
@@ -73,6 +75,7 @@ postsRouter.post('/',
     })
 
 postsRouter.put('/:id',
+    authGuardMiddleware,
     validateTitleField,
     validationShortDescriptionField,
     validationContentField,
@@ -106,7 +109,7 @@ postsRouter.put('/:id',
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     })
 
-postsRouter.delete('/:id', (req: RequestWithParams<{ id: string }>, res) => {
+postsRouter.delete('/:id', authGuardMiddleware, (req: RequestWithParams<{ id: string }>, res) => {
     postRepository.deletePostById(req.params.id)
         ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
         : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
