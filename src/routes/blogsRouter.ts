@@ -4,8 +4,24 @@ import {HTTP_STATUSES, RequestWithBody, RequestWithParams, RequestWithParamsAndB
 import {blogRepository} from "../repository/blogRepository";
 import {convertBlogToViewModel} from "../types/BlogType";
 import {BlogInputModel} from "../model/blog/BlogInputModel";
+import {body} from "express-validator";
+import {checkErrorsInRequestDataMiddleware} from "../middlewares/checkErrorsInRequestDataMiddleware";
 
 export const blogsRouter = Router({})
+
+const validateNameField = body('name').trim().isLength({
+    min: 1,
+    max: 15
+}).withMessage('"name" length should be from 1 to 15');
+
+const validateDescriptionField = body('description').trim().isLength({
+    min: 1,
+    max: 500
+}).withMessage('"description" length should be from 1 to 500');
+
+const validateWebsiteUrlField = body('websiteUrl').trim()
+    .isURL({protocols: ['https']}).withMessage('"websiteUrl" value is not URL')
+    .isLength({min: 13, max: 100}).withMessage('"websiteUrl" length should be from 13 to 100');
 
 blogsRouter.get('/', (req: Request, res: Response<BlogViewModel[]>) => {
     res
@@ -22,36 +38,33 @@ blogsRouter.get('/:id', (req: RequestWithParams<{ id: string }>, res) => {
         : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
 })
 
-blogsRouter.post('/', (req: RequestWithBody<BlogInputModel>, res) => {
-    // const APIErrorResult = validateCreateVideoModel(req.body);
+blogsRouter.post('/',
+    validateNameField,
+    validateDescriptionField,
+    validateWebsiteUrlField,
+    checkErrorsInRequestDataMiddleware,
+    (req: RequestWithBody<BlogInputModel>, res) => {
+        const newBlog = blogRepository.createBlog(req.body);
+        res.status(HTTP_STATUSES.CREATED_201).json(convertBlogToViewModel(newBlog));
+    })
 
-    // if (!isValid(APIErrorResult)) {
-    //     res.status(HTTP_STATUSES.BAD_REQUEST_400).json(APIErrorResult);
-    //     return;
-    // }
+blogsRouter.put('/:id',
+    validateNameField,
+    validateDescriptionField,
+    validateWebsiteUrlField,
+    checkErrorsInRequestDataMiddleware,
+    (req: RequestWithParamsAndBody<{ id: string }, BlogInputModel>, res) => {
+        const blog = blogRepository.getBlogById(req.params.id);
+        if (!blog) {
+            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+            return;
+        }
 
-    const newBlog = blogRepository.createBlog(req.body);
-    res.status(HTTP_STATUSES.CREATED_201).json(convertBlogToViewModel(newBlog));
-})
+        blogRepository.updateBlogById(req.params.id, req.body)
+        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
+    })
 
-blogsRouter.put('/:id', (req: RequestWithParamsAndBody<{ id: string }, BlogInputModel>, res) => {
-    const blog = blogRepository.getBlogById(req.params.id);
-    if (!blog) {
-        res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
-        return;
-    }
-
-    // const APIErrorResult = validateUpdateVideoModel(req.body);
-    // if (!isValid(APIErrorResult)) {
-    //     res.status(HTTP_STATUSES.BAD_REQUEST_400).json(APIErrorResult);
-    //     return;
-    // }
-
-    blogRepository.updateBlogById(req.params.id, req.body)
-    res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
-})
-
-blogsRouter.delete('/:id', (req: RequestWithParams<{id: string}>, res) => {
+blogsRouter.delete('/:id', (req: RequestWithParams<{ id: string }>, res) => {
     blogRepository.deleteBlogById(req.params.id)
         ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
         : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
