@@ -11,8 +11,8 @@ export const authGuardMiddleware = (req: Request, res: Response, next: NextFunct
         const [login, password] = atob(base64Val).split(':');
         if (userRepository.isUserExists(login, password)) {
             next();
+            return;
         }
     }
     res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401);
-    return
 }
