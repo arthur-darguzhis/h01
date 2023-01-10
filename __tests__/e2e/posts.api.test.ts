@@ -32,6 +32,7 @@ describe('/posts', () => {
 
         const createPostBadResponse = await request(app)
             .post('/posts')
+            .auth('admin', 'qwerty', {type: "basic"})
             .send(postInputModel)
             .expect(HTTP_STATUSES.BAD_REQUEST_400)
 
@@ -55,6 +56,7 @@ describe('/posts', () => {
 
         const createBlogResponse = await request(app)
             .post('/blogs')
+            .auth('admin', 'qwerty', {type: "basic"})
             .send(blogInputModel)
             .expect(HTTP_STATUSES.CREATED_201)
 
@@ -65,6 +67,20 @@ describe('/posts', () => {
             description: 'the first blog',
             websiteUrl: 'https://habr.com/ru/users/AlekDikarev/'
         })
+    })
+
+    it('can not create post without auth', async () => {
+        const PostInputModel: PostInputModel = {
+            title: 'Управление состоянием в React',
+            shortDescription: 'Все мы прекрасно знаем что построить полноценный стор на react context достаточно тяжело',
+            content: 'Буквально каждую конференцию мы слышим от спикеров, а вы знаете как работают контексты? а вы знаете что каждый ваш слушатель перерисовывает ваш умный компонент (useContext) Пора решить эту проблему раз и на всегда!',
+            blogId: firstBlog.id,
+        }
+
+        const createPostResponse = await request(app)
+            .post('/posts')
+            .send(PostInputModel)
+            .expect(HTTP_STATUSES.UNAUTHORIZED_401)
     })
 
     let firstPost: any = null;
@@ -78,6 +94,7 @@ describe('/posts', () => {
 
         const createPostResponse = await request(app)
             .post('/posts')
+            .auth('admin', 'qwerty', {type: "basic"})
             .send(PostInputModel)
             .expect(HTTP_STATUSES.CREATED_201)
 
@@ -103,6 +120,7 @@ describe('/posts', () => {
 
         const createPostResponse = await request(app)
             .post('/posts')
+            .auth('admin', 'qwerty', {type: "basic"})
             .send(postInputModel)
             .expect(HTTP_STATUSES.CREATED_201)
 
@@ -127,6 +145,7 @@ describe('/posts', () => {
 
         const notUpdatedPostResponse = await request(app)
             .put('/posts/' + secondPost.id)
+            .auth('admin', 'qwerty', {type: "basic"})
             .send(updatePostInputModel)
             .expect(HTTP_STATUSES.BAD_REQUEST_400)
 
@@ -145,8 +164,23 @@ describe('/posts', () => {
         };
         await request(app)
             .put('/posts/1000')
+            .auth('admin', 'qwerty', {type: "basic"})
             .send(updatePostInputModel)
             .expect(HTTP_STATUSES.NOT_FOUND_404)
+    })
+
+    it('can not update post without auth', async () => {
+        const postInputModel: PostInputModel = {
+            title: 'Мощь декораторов TypeScript',
+            shortDescription: 'В рамках этой статьи разбирается несколько примеров из реальных проектов',
+            content: 'С помощью декораторов мы можем избежать “дублирования” кода, инкапсулировав сквозную функциональность в отдельный модуль. Убрать лишний “шум” в коде, что позволит сфокусироваться автору на бизнес логике приложения.',
+            blogId: firstBlog.id
+        }
+
+        await request(app)
+            .put('/posts/' + firstPost.id)
+            .send(postInputModel)
+            .expect(HTTP_STATUSES.UNAUTHORIZED_401)
     })
 
     it('should update post with correct input data', async () => {
@@ -159,6 +193,7 @@ describe('/posts', () => {
 
         await request(app)
             .put('/posts/' + firstPost.id)
+            .auth('admin', 'qwerty', {type: "basic"})
             .send(postInputModel)
             .expect(HTTP_STATUSES.NO_CONTENT_204)
 
@@ -170,9 +205,16 @@ describe('/posts', () => {
             })
     })
 
+    it('can not delete post without auth',async () => {
+        await request(app)
+            .delete('/posts/' + firstPost.id)
+            .expect(HTTP_STATUSES.UNAUTHORIZED_401)
+    })
+
     it('should delete both posts', async () => {
         await request(app)
             .delete('/posts/' + firstPost.id)
+            .auth('admin', 'qwerty', {type: "basic"})
             .expect(HTTP_STATUSES.NO_CONTENT_204)
 
         await request(app)
@@ -181,6 +223,7 @@ describe('/posts', () => {
 
         await request(app)
             .delete('/posts/' + secondPost.id)
+            .auth('admin', 'qwerty', {type: "basic"})
             .expect(HTTP_STATUSES.NO_CONTENT_204)
 
         await request(app)
@@ -191,4 +234,6 @@ describe('/posts', () => {
             .get('/posts')
             .expect(HTTP_STATUSES.OK_200, [])
     })
+
+
 });

@@ -30,6 +30,7 @@ describe('/blogs', () => {
 
         const createBlogBadResponse = await request(app)
             .post('/blogs')
+            .auth('admin', 'qwerty', {type: "basic"})
             .send(blogInputModel)
             .expect(HTTP_STATUSES.BAD_REQUEST_400)
 
@@ -53,6 +54,7 @@ describe('/blogs', () => {
 
         const createBlogResponse = await request(app)
             .post('/blogs')
+            .auth('admin', 'qwerty', {type: "basic"})
             .send(blogInputModel)
             .expect(HTTP_STATUSES.CREATED_201)
 
@@ -65,6 +67,19 @@ describe('/blogs', () => {
         })
     })
 
+    it('can not create blog without auth', async () => {
+        const blogInputModel: BlogInputModel = {
+            name: 'second blog',
+            description: 'the second blog description',
+            websiteUrl: 'https://habr.com/ru/users/3Dvideo/'
+        }
+
+        const createBlogResponse = await request(app)
+            .post('/blogs')
+            .send(blogInputModel)
+            .expect(HTTP_STATUSES.UNAUTHORIZED_401)
+    })
+
     let secondBlog: any = null;
     it('create one more blog', async () => {
         const blogInputModel: BlogInputModel = {
@@ -75,6 +90,7 @@ describe('/blogs', () => {
 
         const createBlogResponse = await request(app)
             .post('/blogs')
+            .auth('admin', 'qwerty', {type: "basic"})
             .send(blogInputModel)
             .expect(HTTP_STATUSES.CREATED_201)
 
@@ -96,6 +112,7 @@ describe('/blogs', () => {
 
         const notUpdatedBlogResponse = await request(app)
             .put('/blogs/' + secondBlog.id)
+            .auth('admin', 'qwerty', {type: "basic"})
             .send(updateBlogInputModel)
             .expect(HTTP_STATUSES.BAD_REQUEST_400)
 
@@ -113,8 +130,22 @@ describe('/blogs', () => {
         };
         await request(app)
             .put('/blogs/1000')
+            .auth('admin', 'qwerty', {type: "basic"})
             .send(updateBlogInputModel)
             .expect(HTTP_STATUSES.NOT_FOUND_404)
+    })
+
+    it('should not update blog without auth', async () => {
+        const blogInputModel: BlogInputModel = {
+            name: 'second blog',
+            description: 'the second blog description',
+            websiteUrl: 'https://habr.com/ru/users/3Dvideo/'
+        }
+
+        await request(app)
+            .put('/blogs/' + firstBlog.id)
+            .send(blogInputModel)
+            .expect(HTTP_STATUSES.UNAUTHORIZED_401)
     })
 
     it('should update blog with correct input data', async () => {
@@ -126,6 +157,7 @@ describe('/blogs', () => {
 
         await request(app)
             .put('/blogs/' + firstBlog.id)
+            .auth('admin', 'qwerty', {type: "basic"})
             .send(blogInputModel)
             .expect(HTTP_STATUSES.NO_CONTENT_204)
 
@@ -139,9 +171,16 @@ describe('/blogs', () => {
 
     })
 
+    it('can not delete blog without auth',async () => {
+        await request(app)
+            .delete('/blogs/' + firstBlog.id)
+            .expect(HTTP_STATUSES.UNAUTHORIZED_401)
+    })
+
     it('should delete both blogs', async () => {
         await request(app)
             .delete('/blogs/' + firstBlog.id)
+            .auth('admin', 'qwerty', {type: "basic"})
             .expect(HTTP_STATUSES.NO_CONTENT_204)
 
         await request(app)
@@ -150,6 +189,7 @@ describe('/blogs', () => {
 
         await request(app)
             .delete('/blogs/' + secondBlog.id)
+            .auth('admin', 'qwerty', {type: "basic"})
             .expect(HTTP_STATUSES.NO_CONTENT_204)
 
         await request(app)
