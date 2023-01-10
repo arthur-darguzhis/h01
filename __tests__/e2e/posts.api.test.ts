@@ -1,0 +1,194 @@
+import request from "supertest";
+import {app} from "../../src";
+import {HTTP_STATUSES} from "../../src/types/requestTypes";
+import {BlogInputModel} from "../../src/model/blog/BlogInputModel";
+import {PostInputModel} from "../../src/model/post/PostInputModel";
+import {postRepository} from "../../src/repository/postRepository";
+
+describe('/posts', () => {
+    beforeAll(async () => {
+        postRepository.deleteAllPosts()
+    });
+
+    it('should return 200 and empty array', async () => {
+        await request(app)
+            .get('/posts')
+            .expect(HTTP_STATUSES.OK_200, [])
+    })
+
+    it('should return 404 for not existing posts', async () => {
+        await request(app)
+            .get('/posts/1')
+            .expect(HTTP_STATUSES.NOT_FOUND_404)
+    })
+
+    it('should not create post with incorrect input data', async () => {
+        const postInputModel: PostInputModel = {
+            title: '',
+            shortDescription: '',
+            content: '',
+            blogId: '',
+        }
+
+        const createPostBadResponse = await request(app)
+            .post('/posts')
+            .send(postInputModel)
+            .expect(HTTP_STATUSES.BAD_REQUEST_400)
+
+        expect(createPostBadResponse.body).toEqual({
+            errorsMessages: expect.any(Array)
+        })
+        expect(createPostBadResponse.body.errorsMessages.length).toBe(4)
+
+        await request(app)
+            .get('/posts')
+            .expect(HTTP_STATUSES.OK_200, [])
+    })
+
+    let firstBlog: any = null;
+    it('should create blog to assign posts ', async () => {
+        const blogInputModel: BlogInputModel = {
+            name: 'first blog',
+            description: 'the first blog description',
+            websiteUrl: 'https://habr.com/ru/users/AlekDikarev/'
+        }
+
+        const createBlogResponse = await request(app)
+            .post('/posts')
+            .send(blogInputModel)
+            .expect(HTTP_STATUSES.CREATED_201)
+
+        firstBlog = createBlogResponse.body;
+        expect(firstBlog).toEqual({
+            id: expect.any(String),
+            name: 'first blog',
+            description: 'the first blog description',
+            websiteUrl: 'https://habr.com/ru/users/AlekDikarev/'
+        })
+    })
+
+    let firstPost: any = null;
+    it('should create post with correct data', async () => {
+        const PostInputModel: PostInputModel = {
+            title: 'Управление состоянием в React приложения',
+            shortDescription: 'Все мы прекрасно знаем что построить полноценный стор на react context достаточно тяжело, а оптимизировать его ещё тяжелее.',
+            content: 'Буквально каждую конференцию мы слышим от спикеров, а вы знаете как работают контексты? а вы знаете что каждый ваш слушатель перерисовывает ваш умный компонент (useContext) Пора решить эту проблему раз и на всегда!',
+            blogId: firstBlog.id,
+        }
+
+        const createPostResponse = await request(app)
+            .post('/posts')
+            .send(PostInputModel)
+            .expect(HTTP_STATUSES.CREATED_201)
+
+        firstPost = createPostResponse.body;
+        expect(firstPost).toEqual({
+            id: expect.any(String),
+            title: 'Управление состоянием в React приложения',
+            shortDescription: 'Все мы прекрасно знаем что построить полноценный стор на react context достаточно тяжело, а оптимизировать его ещё тяжелее.',
+            content: 'Буквально каждую конференцию мы слышим от спикеров, а вы знаете как работают контексты? а вы знаете что каждый ваш слушатель перерисовывает ваш умный компонент (useContext) Пора решить эту проблему раз и на всегда!',
+            blogId: firstBlog.id,
+            blogName: firstBlog.name
+        })
+    })
+
+    let secondPost: any = null;
+    it('create one more post', async () => {
+        const postInputModel: PostInputModel = {
+            title: 'Экстремально уменьшаем размер NPM пакета',
+            shortDescription: 'Однажды я захотел создать небольшую NPM библиотеку по всем “best practices” - с покрытием тестами, написанием документации, ведением нормального версионирования и changelog\'а и т.п.',
+            content: 'И одной из интересных для меня меня задач при создании библиотеки была задача по максимальному уменьшению размера выходного NPM пакета - того, что в конечном итоге в теории будет использовать другой программист. И в этой статье я бы хотел описать, к каким методам я прибегал для того, чтобы достигнуть желанной цели.',
+            blogId: firstBlog.id,
+        }
+
+        const createPostResponse = await request(app)
+            .post('/posts')
+            .send(postInputModel)
+            .expect(HTTP_STATUSES.CREATED_201)
+
+        secondPost = createPostResponse.body
+        expect(secondPost).toEqual({
+            id: expect.any(String),
+            title: 'Экстремально уменьшаем размер NPM пакета',
+            shortDescription: 'Однажды я захотел создать небольшую NPM библиотеку по всем “best practices” - с покрытием тестами, написанием документации, ведением нормального версионирования и changelog\'а и т.п.',
+            content: 'И одной из интересных для меня меня задач при создании библиотеки была задача по максимальному уменьшению размера выходного NPM пакета - того, что в конечном итоге в теории будет использовать другой программист. И в этой статье я бы хотел описать, к каким методам я прибегал для того, чтобы достигнуть желанной цели.',
+            blogId: firstBlog.id,
+            blogName: firstBlog.name
+        })
+    })
+
+    it('should not update post with incorrect data', async () => {
+        const updatePostInputModel = {
+            title: '',
+            shortDescription: '',
+            content: '',
+            blogId: '',
+        };
+
+        const notUpdatedPostResponse = await request(app)
+            .put('/posts/' + secondPost.id)
+            .send(updatePostInputModel)
+            .expect(HTTP_STATUSES.BAD_REQUEST_400)
+
+        expect(notUpdatedPostResponse.body).toEqual({
+            errorsMessages: expect.any(Array)
+        })
+        expect(notUpdatedPostResponse.body.errorsMessages.length).toBe(4)
+    })
+
+    it('should not update post that is not exists', async () => {
+        const updatePostInputModel = {
+            name: 'second blog',
+            description: 'the second blog description',
+            websiteUrl: 'https://habr.com/ru/users/3Dvideo/'
+        };
+        await request(app)
+            .put('/posts/1000')
+            .send(updatePostInputModel)
+            .expect(HTTP_STATUSES.NOT_FOUND_404)
+    })
+
+    it('should update post with correct input data', async () => {
+        const postInputModel: PostInputModel = {
+            title: 'Мощь декораторов TypeScript на живых примерах. Декорирование методов класса',
+            shortDescription: 'В рамках этой статьи разбирается несколько примеров из реальных проектов, где применение декораторов сильно упростило код для понимания и исключило его дублирование.\n' +
+                '\n',
+            content: 'С помощью декораторов мы можем избежать “дублирования” кода, инкапсулировав сквозную функциональность в отдельный модуль. Убрать лишний “шум” в коде, что позволит сфокусироваться автору на бизнес логике приложения.',
+            blogId: firstBlog.id
+        }
+
+        await request(app)
+            .put('/posts/' + firstPost.id)
+            .send(postInputModel)
+            .expect(HTTP_STATUSES.NO_CONTENT_204)
+
+        await request(app)
+            .get('/posts/' + firstPost.id)
+            .expect(HTTP_STATUSES.OK_200, {
+                ...firstPost,
+                ...postInputModel
+            })
+    })
+
+    it('should delete both posts', async () => {
+        await request(app)
+            .delete('/posts/' + firstPost.id)
+            .expect(HTTP_STATUSES.NO_CONTENT_204)
+
+        await request(app)
+            .get('/posts/' + firstPost.id)
+            .expect(HTTP_STATUSES.NOT_FOUND_404)
+
+        await request(app)
+            .delete('/posts/' + secondPost.id)
+            .expect(HTTP_STATUSES.NO_CONTENT_204)
+
+        await request(app)
+            .get('/posts/' + secondPost.id)
+            .expect(HTTP_STATUSES.NOT_FOUND_404)
+
+        await request(app)
+            .get('/posts')
+            .expect(HTTP_STATUSES.OK_200, [])
+    })
+});
