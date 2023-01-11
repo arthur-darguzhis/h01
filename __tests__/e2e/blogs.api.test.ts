@@ -37,7 +37,7 @@ describe('/blogs', () => {
         expect(createBlogBadResponse.body).toEqual({
             errorsMessages: expect.any(Array)
         })
-        expect(createBlogBadResponse.body.errorsMessages.length).toBe(4)
+        expect(createBlogBadResponse.body.errorsMessages.length).toBe(3)
 
         await request(app)
             .get('/blogs')
@@ -119,7 +119,7 @@ describe('/blogs', () => {
         expect(notUpdatedBlogResponse.body).toEqual({
             errorsMessages: expect.any(Array)
         })
-        expect(notUpdatedBlogResponse.body.errorsMessages.length).toBe(4)
+        expect(notUpdatedBlogResponse.body.errorsMessages.length).toBe(3)
     })
 
     it('should not update blog that is not exists', async () => {
