@@ -4,7 +4,7 @@ import {db} from "../db";
 export const userRepository = {
     isUserExists(login: string, password: string): boolean {
         const user = this.findUserByLogin(login);
-        return user?.password === password;
+        return !!(user && (user.password === password));
     },
 
     findUserByLogin(login: string): UserType | undefined {
