@@ -8,6 +8,7 @@ import {body} from "express-validator";
 import {checkErrorsInRequestDataMiddleware} from "../middlewares/checkErrorsInRequestDataMiddleware";
 import {APIErrorResultType} from "../model/apiError/APIErrorResultType";
 import {authGuardMiddleware} from "../middlewares/authGuardMiddleware";
+import {blogRepository} from "../repository/blogRepository";
 
 export const postsRouter = Router({})
 
@@ -26,7 +27,13 @@ const validationContentField = body('content').trim().isLength({
     max: 1000
 }).withMessage('"content" length should be from 1 to 1000');
 
-const validationBlogIdField = body('blogId').trim().notEmpty();
+const validationBlogIdField = body('blogId').custom(async (blogId) => {
+    const blog = await blogRepository.getBlogById(blogId);
+    if (!blog) {
+        throw new Error(`Blog with ID: ${blogId} is not exists`);
+    }
+    return true;
+});
 
 postsRouter.get('/', (req: Request, res: Response<PostViewModel[]>) => {
     res
