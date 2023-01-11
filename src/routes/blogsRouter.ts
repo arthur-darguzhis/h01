@@ -20,12 +20,13 @@ const validateDescriptionField = body('description').trim().isLength({
     max: 500
 }).withMessage('"description" length should be from 1 to 500');
 
-const validateWebsiteUrlField = body('websiteUrl').trim().custom( websiteUrl => {
+const validateWebsiteUrlField = body('websiteUrl').trim().custom(websiteUrl => {
     const regex = /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/;
     const stringIsUrl = regex.test(websiteUrl);
-    if(!stringIsUrl || websiteUrl.length <= 13 || websiteUrl.length >= 100) {
-        return Promise.reject('"websiteUrl" should be valid URL and it\'s length should be from 13 to 100');
+    if (!stringIsUrl || websiteUrl.length <= 13 || websiteUrl.length >= 100) {
+        return Error('"websiteUrl" should be valid URL and it\'s length should be from 13 to 100');
     }
+    return true;
 })
 
 blogsRouter.get('/', (req: Request, res: Response<BlogViewModel[]>) => {

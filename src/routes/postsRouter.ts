@@ -28,10 +28,11 @@ const validationContentField = body('content').trim().isLength({
 }).withMessage('"content" length should be from 1 to 1000');
 
 const validationBlogIdField = body('blogId').custom(async (blogId) => {
-    const blog = blogRepository.getBlogById(blogId);
+    const blog = await blogRepository.getBlogById(blogId);
     if (!blog) {
-        return Promise.reject(`Blog with ID: ${blogId} is not exists`);
+        return Error(`Blog with ID: ${blogId} is not exists`);
     }
+    return true;
 });
 
 postsRouter.get('/', (req: Request, res: Response<PostViewModel[]>) => {
