@@ -4,26 +4,17 @@ import {atob} from "buffer";
 import {userRepository} from "../repository/userRepository";
 
 export const authGuardMiddleware = (req: Request, res: Response, next: NextFunction) => {
-    const basicAuthValue = req.header("Authorization")
-
-    if (!basicAuthValue) {
-        res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401);
-        return
-    }
-
     try {
-        const base64Val = basicAuthValue.replace('Basic ', '');
-        const [login, password] = atob(base64Val).split(':');
+        const basicAuthValue = req.header("Authorization")
+        const base64Val = basicAuthValue?.replace('Basic ', '');
+        const [login, password] = atob(base64Val + '').split(':');
         if (userRepository.isUserExists(login, password)) {
             next();
             return;
         }
-        res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401);
-        return
     } catch (e) {
-        res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401);
-        return
     }
 
-
+    res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401);
+    return
 }
