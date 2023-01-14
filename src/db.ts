@@ -1,6 +1,26 @@
 import {PostType} from "./types/PostType";
 import {BlogType} from "./types/BlogType";
 import {UserType} from "./types/UserType";
+import {MongoClient} from "mongodb";
+
+const mongoUri = process.env.mongoURI || 'mongodb://0.0.0.0:27017?maxPoolSize=20&w=majority'
+
+export const client: MongoClient = new MongoClient(mongoUri);
+
+//Расскажите почему эта функция не стрелочная и при чем здесь замыкание и переменная client? =)
+export async function runDb() {
+    try {
+        //connect the client to the server
+        await client.connect();
+        //Это тестовый пинг к базе данных hm, но здесь может быть что угодно
+        await client.db('hm').command({ping: 1})
+        console.log('Connected successfully to mongoServer');
+    //Почему в catch нет "e"? разве так можно?
+    } catch {
+        //Ensure that the client will close when you finish/error
+        await client.close();
+    }
+}
 
 export const db: { users: UserType[], blogs: BlogType[], posts: PostType[] } = {
     users: [
