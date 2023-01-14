@@ -1,7 +1,7 @@
 import {Request, Response, Router} from "express";
 import {BlogViewModel} from "../model/blog/BlogViewModel";
 import {HTTP_STATUSES, RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "../types/requestTypes";
-import {blogRepository} from "../repository/blogRepository";
+import {blogRepository} from "../repository/blogInMemoryRepository";
 import {convertBlogToViewModel} from "../types/BlogType";
 import {BlogInputModel} from "../model/blog/BlogInputModel";
 import {body} from "express-validator";

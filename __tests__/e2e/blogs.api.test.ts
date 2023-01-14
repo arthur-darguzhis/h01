@@ -1,7 +1,7 @@
 import request from "supertest";
 import {app} from "../../src";
 import {HTTP_STATUSES} from "../../src/types/requestTypes";
-import {blogRepository} from "../../src/repository/blogRepository";
+import {blogRepository} from "../../src/repository/blogInMemoryRepository";
 import {BlogInputModel} from "../../src/model/blog/BlogInputModel";
 
 describe('/blogs', () => {

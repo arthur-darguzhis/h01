@@ -1,7 +1,7 @@
 import {db} from "../db";
 import {PostInputModel} from "../model/post/PostInputModel";
 import {PostType} from "../types/PostType";
-import {blogRepository} from "./blogRepository";
+import {blogRepository} from "./blogInMemoryRepository";
 
 export const postRepository = {
     createPost(postInputModel: PostInputModel): PostType | never {

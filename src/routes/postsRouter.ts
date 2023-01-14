@@ -1,6 +1,6 @@
 import {Request, Response, Router} from "express";
 import {HTTP_STATUSES, RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "../types/requestTypes";
-import {postRepository} from "../repository/postRepository";
+import {postRepository} from "../repository/postInMemoryRepository";
 import {PostViewModel} from "../model/post/PostViewModel";
 import {convertPostToViewModel} from "../types/PostType";
 import {PostInputModel} from "../model/post/PostInputModel";
@@ -8,7 +8,7 @@ import {body} from "express-validator";
 import {checkErrorsInRequestDataMiddleware} from "../middlewares/checkErrorsInRequestDataMiddleware";
 import {APIErrorResultType} from "../model/apiError/APIErrorResultType";
 import {authGuardMiddleware} from "../middlewares/authGuardMiddleware";
-import {blogRepository} from "../repository/blogRepository";
+import {blogRepository} from "../repository/blogInMemoryRepository";
 
 export const postsRouter = Router({})
 

@@ -3,7 +3,7 @@ import {app} from "../../src";
 import {HTTP_STATUSES} from "../../src/types/requestTypes";
 import {BlogInputModel} from "../../src/model/blog/BlogInputModel";
 import {PostInputModel} from "../../src/model/post/PostInputModel";
-import {postRepository} from "../../src/repository/postRepository";
+import {postRepository} from "../../src/repository/postInMemoryRepository";
 
 describe('/posts', () => {
     beforeAll(async () => {
