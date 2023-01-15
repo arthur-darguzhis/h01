@@ -3,7 +3,8 @@ import {app} from "../../src";
 import {HTTP_STATUSES} from "../../src/types/requestTypes";
 import {BlogInputModel} from "../../src/model/blog/BlogInputModel";
 import {PostInputModel} from "../../src/model/post/PostInputModel";
-import {postRepository} from "../../src/repository/postInMemoryRepository";
+import {postRepository} from "../../src/repository/postMongoDbRepository";
+import {BlogType} from "../../src/types/BlogType";
 
 describe('/posts', () => {
     beforeAll(async () => {
@@ -156,11 +157,31 @@ describe('/posts', () => {
     })
 
     it('should not update post that is not exists', async () => {
+        const blogInputModel: BlogInputModel = {
+            name: 'first blog',
+            description: 'the first blog description',
+            websiteUrl: 'https://habr.com/ru/users/AlekDikarev/'
+        }
+
+        const createBlogResponse = await request(app)
+            .post('/blogs')
+            .auth('admin', 'qwerty', {type: "basic"})
+            .send(blogInputModel)
+            .expect(HTTP_STATUSES.CREATED_201)
+
+        const firstBlog: BlogType = createBlogResponse.body;
+        expect(firstBlog).toEqual({
+            id: expect.any(String),
+            name: 'first blog',
+            description: 'the first blog description',
+            websiteUrl: 'https://habr.com/ru/users/AlekDikarev/'
+        })
+
         const updatePostInputModel = {
             title: 'some Title',
             shortDescription: 'some Description',
             content: 'some Content',
-            blogId: '1'
+            blogId: firstBlog.id
         };
         await request(app)
             .put('/posts/1000')
