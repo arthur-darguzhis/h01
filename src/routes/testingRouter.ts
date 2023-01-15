@@ -1,7 +1,7 @@
 import {Router} from "express";
 import {HTTP_STATUSES} from "../types/requestTypes";
-import {blogRepository} from "../repository/blogInMemoryRepository";
-import {postRepository} from "../repository/postInMemoryRepository";
+import {blogRepository} from "../repository/blogMongoDbRepository";
+import {postRepository} from "../repository/postMongoDbRepository";
 
 export const testingRouter = Router({})
 
