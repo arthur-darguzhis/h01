@@ -7,6 +7,7 @@ export type PostType = {
     content: string,
     blogId: string,
     blogName: string,
+    createdAt: string
 }
 
 export const convertPostToViewModel = (post: PostType): PostViewModel => {
@@ -17,5 +18,6 @@ export const convertPostToViewModel = (post: PostType): PostViewModel => {
         content: post.content,
         blogId: post.blogId,
         blogName: post.blogName,
+        createdAt: post.createdAt
     }
 }

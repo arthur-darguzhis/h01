@@ -63,7 +63,8 @@ describe('/blogs', () => {
             id: expect.any(String),
             name: 'first blog',
             description: 'the first blog description',
-            websiteUrl: 'https://habr.com/ru/users/AlekDikarev/'
+            websiteUrl: 'https://habr.com/ru/users/AlekDikarev/',
+            createdAt: expect.any(String),
         })
     })
 
@@ -99,7 +100,8 @@ describe('/blogs', () => {
             id: expect.any(String),
             name: 'second blog',
             description: 'the second blog description',
-            websiteUrl: 'https://habr.com/ru/users/3Dvideo/'
+            websiteUrl: 'https://habr.com/ru/users/3Dvideo/',
+            createdAt: expect.any(String),
         })
     })
 

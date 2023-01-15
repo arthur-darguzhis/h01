@@ -5,6 +5,7 @@ export type BlogType = {
     name: string,
     description: string,
     websiteUrl: string
+    createdAt: string
 }
 
 export const convertBlogToViewModel = (blog: BlogType): BlogViewModel => {
@@ -12,6 +13,7 @@ export const convertBlogToViewModel = (blog: BlogType): BlogViewModel => {
         id: blog.id,
         name: blog.name,
         description: blog.description,
-        websiteUrl: blog.websiteUrl
+        websiteUrl: blog.websiteUrl,
+        createdAt: blog.createdAt,
     }
 }

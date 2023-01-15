@@ -9,7 +9,8 @@ export const blogRepository = {
             id: new Date().getTime().toString(),
             name: blogInputModel.name,
             description: blogInputModel.description,
-            websiteUrl: blogInputModel.websiteUrl
+            websiteUrl: blogInputModel.websiteUrl,
+            createdAt: new Date().toISOString()
         }
 
         await blogsCollection.insertOne(newBlog)

@@ -66,7 +66,8 @@ describe('/posts', () => {
             id: expect.any(String),
             name: 'first blog',
             description: 'the first blog',
-            websiteUrl: 'https://habr.com/ru/users/AlekDikarev/'
+            websiteUrl: 'https://habr.com/ru/users/AlekDikarev/',
+            createdAt: expect.any(String)
         })
     })
 
@@ -106,7 +107,8 @@ describe('/posts', () => {
             shortDescription: 'Все мы прекрасно знаем что построить полноценный стор на react context достаточно тяжело',
             content: 'Буквально каждую конференцию мы слышим от спикеров, а вы знаете как работают контексты? а вы знаете что каждый ваш слушатель перерисовывает ваш умный компонент (useContext) Пора решить эту проблему раз и на всегда!',
             blogId: firstBlog.id,
-            blogName: firstBlog.name
+            blogName: firstBlog.name,
+            createdAt: expect.any(String)
         })
     })
 
@@ -132,7 +134,8 @@ describe('/posts', () => {
             shortDescription: 'Однажды я захотел создать небольшую NPM библиотеку по всем “best practices”',
             content: 'И одной из интересных для меня меня задач при создании библиотеки была задача по максимальному уменьшению размера выходного NPM пакета - того, что в конечном итоге в теории будет использовать другой программист. И в этой статье я бы хотел описать, к каким методам я прибегал для того, чтобы достигнуть желанной цели.',
             blogId: firstBlog.id,
-            blogName: firstBlog.name
+            blogName: firstBlog.name,
+            createdAt: expect.any(String),
         })
     })
 
@@ -174,7 +177,8 @@ describe('/posts', () => {
             id: expect.any(String),
             name: 'first blog',
             description: 'the first blog description',
-            websiteUrl: 'https://habr.com/ru/users/AlekDikarev/'
+            websiteUrl: 'https://habr.com/ru/users/AlekDikarev/',
+            createdAt: expect.any(String),
         })
 
         const updatePostInputModel = {

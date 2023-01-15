@@ -41,13 +41,15 @@ export const db: { users: UserType[], blogs: BlogType[], posts: PostType[] } = {
             id: '1',
             name: 'JavaScript',
             description: 'blog about JS',
-            websiteUrl: 'https://habr.com/ru/hub/javascript/'
+            websiteUrl: 'https://habr.com/ru/hub/javascript/',
+            createdAt: ''
         },
         {
             id: '2',
             name: 'TypeScript',
             description: 'blog about TS',
-            websiteUrl: 'https://habr.com/ru/hub/typescript/'
+            websiteUrl: 'https://habr.com/ru/hub/typescript/',
+            createdAt: ''
         }
     ],
     posts: [
@@ -58,6 +60,7 @@ export const db: { users: UserType[], blogs: BlogType[], posts: PostType[] } = {
             content: 'Буквально каждую конференцию мы слышим от спикеров, а вы знаете как работают контексты? а вы знаете что каждый ваш слушатель перерисовывает ваш умный компонент (useContext) Пора решить эту проблему раз и на всегда!',
             blogId: '1',
             blogName: 'JavaScript',
+            createdAt: '',
         },
         {
             id: '709480',
@@ -66,6 +69,7 @@ export const db: { users: UserType[], blogs: BlogType[], posts: PostType[] } = {
             content: 'И одной из интересных для меня меня задач при создании библиотеки была задача по максимальному уменьшению размера выходного NPM пакета - того, что в конечном итоге в теории будет использовать другой программист. И в этой статье я бы хотел описать, к каким методам я прибегал для того, чтобы достигнуть желанной цели.',
             blogId: '1',
             blogName: 'JavaScript',
+            createdAt: ''
         },
         {
             id: '707744',
@@ -79,6 +83,7 @@ export const db: { users: UserType[], blogs: BlogType[], posts: PostType[] } = {
                 'рефакторить код и обновлять зависимости станет гораздо проще.',
             blogId: '2',
             blogName: 'TypeScript',
+            createdAt: ''
         },
         {
             id: '707496',
@@ -88,6 +93,7 @@ export const db: { users: UserType[], blogs: BlogType[], posts: PostType[] } = {
             content: 'С помощью декораторов мы можем избежать “дублирования” кода, инкапсулировав сквозную функциональность в отдельный модуль. Убрать лишний “шум” в коде, что позволит сфокусироваться автору на бизнес логике приложения.',
             blogId: '2',
             blogName: 'TypeScript',
+            createdAt: ''
         }
     ],
 }
