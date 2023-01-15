@@ -3,7 +3,7 @@ import {BlogInputModel} from "../model/blog/BlogInputModel";
 import {BlogType} from "../types/BlogType";
 
 export const blogRepository = {
-    createBlog(blogInputModel: BlogInputModel): BlogType {
+    async createBlog(blogInputModel: BlogInputModel): Promise<BlogType> {
         const newBlog: BlogType = {
             id: new Date().getTime().toString(),
             name: blogInputModel.name,
@@ -15,15 +15,15 @@ export const blogRepository = {
         return newBlog;
     },
 
-    getBlogs(): BlogType[] {
+    async getBlogs(): Promise<BlogType[]> {
         return db.blogs;
     },
 
-    getBlogById(id: string): BlogType | undefined {
+    async getBlogById(id: string): Promise<BlogType | undefined> {
         return db.blogs.find((b) => b.id === id)
     },
 
-    updateBlogById(id: string, blogInputModel: BlogInputModel): boolean {
+    async updateBlogById(id: string, blogInputModel: BlogInputModel): Promise<boolean> {
         const blogIndex = db.blogs.findIndex(b => b.id === id);
         if (blogIndex === -1) {
             return false;
@@ -38,7 +38,7 @@ export const blogRepository = {
         return true;
     },
 
-    deleteBlogById(id: string): boolean {
+    async deleteBlogById(id: string): Promise<boolean> {
         const blogIndex = db.blogs.findIndex((b) => b.id === id);
 
         if (blogIndex === -1) {
@@ -49,7 +49,7 @@ export const blogRepository = {
         return true;
     },
 
-    deleteAllBlogs() {
+    async deleteAllBlogs(): Promise<void> {
         db.blogs = []
     }
 }

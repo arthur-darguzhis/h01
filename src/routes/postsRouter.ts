@@ -35,13 +35,14 @@ const validationBlogIdField = body('blogId').custom(async (blogId) => {
     return true;
 });
 
-postsRouter.get('/', (req: Request, res: Response<PostViewModel[]>) => {
-    const posts = postRepository.getPosts().map(p => convertPostToViewModel(p));
-    res.status(HTTP_STATUSES.OK_200).json(posts)
+postsRouter.get('/', async (req: Request, res: Response<PostViewModel[]>) => {
+    const posts = await postRepository.getPosts();
+    const postsViewModel = posts.map(p => convertPostToViewModel(p));
+    res.status(HTTP_STATUSES.OK_200).json(postsViewModel)
 })
 
-postsRouter.get('/:id', (req: RequestWithParams<{ id: string }>, res) => {
-    const post = postRepository.getPostsById(req.params.id)
+postsRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res) => {
+    const post = await postRepository.getPostsById(req.params.id)
     if (!post) {
         return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
     }
@@ -55,11 +56,11 @@ postsRouter.post('/',
     validationContentField,
     validationBlogIdField,
     checkErrorsInRequestDataMiddleware,
-    (req: RequestWithBody<PostInputModel>, res) => {
+    async (req: RequestWithBody<PostInputModel>, res) => {
 
         let newPost;
         try {
-            newPost = postRepository.createPost(req.body);
+            newPost = await postRepository.createPost(req.body);
         } catch (e) {
             const err = e as Error
             const apiErrorResult: APIErrorResultType = {
@@ -81,15 +82,15 @@ postsRouter.put('/:id',
     validationContentField,
     validationBlogIdField,
     checkErrorsInRequestDataMiddleware,
-    (req: RequestWithParamsAndBody<{ id: string }, PostInputModel>, res) => {
+    async (req: RequestWithParamsAndBody<{ id: string }, PostInputModel>, res) => {
 
-        const post = postRepository.getPostsById(req.params.id);
+        const post = await postRepository.getPostsById(req.params.id);
         if (!post) {
             return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
         }
 
         try {
-            postRepository.updatePostById(req.params.id, req.body)
+            await postRepository.updatePostById(req.params.id, req.body)
         } catch (e) {
             const err = e as Error
             const apiErrorResult: APIErrorResultType = {
@@ -103,8 +104,8 @@ postsRouter.put('/:id',
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     })
 
-postsRouter.delete('/:id', authGuardMiddleware, (req: RequestWithParams<{ id: string }>, res) => {
-    postRepository.deletePostById(req.params.id)
+postsRouter.delete('/:id', authGuardMiddleware, async (req: RequestWithParams<{ id: string }>, res) => {
+    await postRepository.deletePostById(req.params.id)
         ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
         : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
 })

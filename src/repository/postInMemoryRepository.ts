@@ -4,8 +4,8 @@ import {PostType} from "../types/PostType";
 import {blogRepository} from "./blogInMemoryRepository";
 
 export const postRepository = {
-    createPost(postInputModel: PostInputModel): PostType | never {
-        const blog = blogRepository.getBlogById(postInputModel.blogId);
+    async createPost(postInputModel: PostInputModel): Promise<PostType | never> {
+        const blog = await blogRepository.getBlogById(postInputModel.blogId);
         if (!blog) {
             throw new Error(`Blog with ID: ${postInputModel.blogId} is not exists`);
         }
@@ -23,21 +23,21 @@ export const postRepository = {
         return newPost;
     },
 
-    getPosts(): PostType[] {
+    async getPosts(): Promise<PostType[]> {
         return db.posts;
     },
 
-    getPostsById(id: string): PostType | undefined {
+    async getPostsById(id: string): Promise<PostType | undefined> {
         return db.posts.find((p) => p.id === id)
     },
 
-    updatePostById(id: string, postInputModel: PostInputModel): boolean {
+    async updatePostById(id: string, postInputModel: PostInputModel): Promise<boolean | never> {
         const postIndex = db.posts.findIndex(b => b.id === id);
         if (postIndex === -1) {
             throw new Error(`Post with ID: ${id} is not exists`)
         }
 
-        const blog = blogRepository.getBlogById(postInputModel.blogId);
+        const blog = await blogRepository.getBlogById(postInputModel.blogId);
         if (!blog) {
             throw new Error(`Blog with ID: ${id} is not exists`)
         }
@@ -53,7 +53,7 @@ export const postRepository = {
         return true;
     },
 
-    deletePostById(id: string): boolean {
+    async deletePostById(id: string): Promise<boolean> {
         const postIndex = db.posts.findIndex((b) => b.id === id);
 
         if (postIndex === -1) {
