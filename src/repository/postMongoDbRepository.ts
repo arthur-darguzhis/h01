@@ -58,6 +58,6 @@ export const postRepository = {
     },
 
     async deleteAllPosts(): Promise<void> {
-        await postsCollection.drop()
+        await postsCollection.deleteMany({})
     }
 }

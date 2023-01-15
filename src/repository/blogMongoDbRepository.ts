@@ -45,6 +45,6 @@ export const blogRepository = {
     },
 
     async deleteAllBlogs(): Promise<void> {
-        await blogsCollection.drop()
+        await blogsCollection.deleteMany({})
     }
 }
