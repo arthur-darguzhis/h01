@@ -2,11 +2,16 @@ import {PostType} from "./types/PostType";
 import {BlogType} from "./types/BlogType";
 import {UserType} from "./types/UserType";
 import {MongoClient} from "mongodb";
+import * as dotenv from "dotenv";
+dotenv.config()
 
-const mongoUri = process.env.mongoURI || 'mongodb://0.0.0.0:27017?maxPoolSize=20&w=majority'
+const mongoUri = process.env.MONGO_URI
+if(!mongoUri){
+    throw new Error('MongoDB URI is not found')
+}
 
 export const client: MongoClient = new MongoClient(mongoUri);
-const dbConnection = client.db("hm");
+const dbConnection = client.db();
 //Почему здесь при обращении к методу коллекции мы указываем тип? эта запись новая для меня) .collection<BlogType>("blogs")
 //уберите типизацию коллекции посмотрите на ошибку, объясните ее происхождение.
 //marginnote3app://note/B299627A-D44B-44CA-B3CD-1E1714C7B949
