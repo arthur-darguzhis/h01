@@ -6,6 +6,12 @@ import {MongoClient} from "mongodb";
 const mongoUri = process.env.mongoURI || 'mongodb://0.0.0.0:27017?maxPoolSize=20&w=majority'
 
 export const client: MongoClient = new MongoClient(mongoUri);
+const dbConnection = client.db("hm");
+//Почему здесь при обращении к методу коллекции мы указываем тип? эта запись новая для меня) .collection<BlogType>("blogs")
+//уберите типизацию коллекции посмотрите на ошибку, объясните ее происхождение.
+//marginnote3app://note/B299627A-D44B-44CA-B3CD-1E1714C7B949
+export const blogsCollection = dbConnection.collection<BlogType>("blogs");
+export const postsCollection = dbConnection.collection<PostType>("posts");
 
 //Расскажите почему эта функция не стрелочная и при чем здесь замыкание и переменная client? =)
 export async function runDb() {
@@ -21,6 +27,7 @@ export async function runDb() {
         await client.close();
     }
 }
+
 
 export const db: { users: UserType[], blogs: BlogType[], posts: PostType[] } = {
     users: [
