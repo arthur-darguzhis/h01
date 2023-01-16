@@ -6,7 +6,7 @@ export const db: { users: UserType[], blogs: BlogType[], posts: PostType[] } = {
     users: [
         {
             login: 'admin',
-            password: 'qwerty',
+            password: 'cXdlcnR5',
         }
     ],
     blogs: [
