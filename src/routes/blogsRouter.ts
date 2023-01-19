@@ -30,18 +30,16 @@ const validateWebsiteUrlField = body('websiteUrl').trim().custom(websiteUrl => {
 })
 
 blogsRouter.get('/', (req: Request, res: Response<BlogViewModel[]>) => {
-    res
-        .status(HTTP_STATUSES.OK_200)
-        .json(
-            blogRepository.getBlogs().map(b => convertBlogToViewModel(b))
-        )
+    const blogs = blogRepository.getBlogs().map(b => convertBlogToViewModel(b));
+    res.status(HTTP_STATUSES.OK_200).json(blogs)
 })
 
 blogsRouter.get('/:id', (req: RequestWithParams<{ id: string }>, res) => {
     const blog = blogRepository.getBlogById(req.params.id)
-    blog
-        ? res.status(HTTP_STATUSES.OK_200).json(convertBlogToViewModel(blog))
-        : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+    if (blog) {
+        return res.status(HTTP_STATUSES.OK_200).json(convertBlogToViewModel(blog))
+    }
+    res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
 })
 
 blogsRouter.post('/',
@@ -64,16 +62,15 @@ blogsRouter.put('/:id',
     (req: RequestWithParamsAndBody<{ id: string }, BlogInputModel>, res) => {
         const blog = blogRepository.getBlogById(req.params.id);
         if (!blog) {
-            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
-            return;
+            return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
         }
-
         blogRepository.updateBlogById(req.params.id, req.body)
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     })
 
 blogsRouter.delete('/:id', authGuardMiddleware, (req: RequestWithParams<{ id: string }>, res) => {
-    blogRepository.deleteBlogById(req.params.id)
-        ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
-        : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+    if (!blogRepository.deleteBlogById(req.params.id)) {
+        return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+    }
+    res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 })

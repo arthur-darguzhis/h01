@@ -36,18 +36,16 @@ const validationBlogIdField = body('blogId').custom(async (blogId) => {
 });
 
 postsRouter.get('/', (req: Request, res: Response<PostViewModel[]>) => {
-    res
-        .status(HTTP_STATUSES.OK_200)
-        .json(
-            postRepository.getPosts().map(p => convertPostToViewModel(p))
-        )
+    const posts = postRepository.getPosts().map(p => convertPostToViewModel(p));
+    res.status(HTTP_STATUSES.OK_200).json(posts)
 })
 
 postsRouter.get('/:id', (req: RequestWithParams<{ id: string }>, res) => {
     const post = postRepository.getPostsById(req.params.id)
-    post
-        ? res.status(HTTP_STATUSES.OK_200).json(convertPostToViewModel(post))
-        : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+    if (!post) {
+        return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+    }
+    res.status(HTTP_STATUSES.OK_200).json(convertPostToViewModel(post))
 })
 
 postsRouter.post('/',
@@ -63,19 +61,14 @@ postsRouter.post('/',
         try {
             newPost = postRepository.createPost(req.body);
         } catch (e) {
-            if (e instanceof Error) {
-                const apiErrorResult: APIErrorResultType = {
-                    errorsMessages: [{
-                        field: req.body.blogId,
-                        message: e.message
-                    }]
-                }
-                res.status(HTTP_STATUSES.BAD_REQUEST_400).json(apiErrorResult)
-                return
+            const err = e as Error
+            const apiErrorResult: APIErrorResultType = {
+                errorsMessages: [{
+                    field: req.body.blogId,
+                    message: err.message
+                }]
             }
-
-            res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400)
-            return
+            return res.status(HTTP_STATUSES.BAD_REQUEST_400).json(apiErrorResult)
         }
 
         res.status(HTTP_STATUSES.CREATED_201).json(convertPostToViewModel(newPost));
@@ -92,26 +85,20 @@ postsRouter.put('/:id',
 
         const post = postRepository.getPostsById(req.params.id);
         if (!post) {
-            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
-            return;
+            return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
         }
 
         try {
             postRepository.updatePostById(req.params.id, req.body)
         } catch (e) {
-            if (e instanceof Error) {
-                const apiErrorResult: APIErrorResultType = {
-                    errorsMessages: [{
-                        field: req.body.blogId,
-                        message: e.message
-                    }]
-                }
-                res.status(HTTP_STATUSES.BAD_REQUEST_400).json(apiErrorResult)
-                return
+            const err = e as Error
+            const apiErrorResult: APIErrorResultType = {
+                errorsMessages: [{
+                    field: req.body.blogId,
+                    message: err.message
+                }]
             }
-
-            res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400)
-            return
+            return res.status(HTTP_STATUSES.BAD_REQUEST_400).json(apiErrorResult)
         }
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     })

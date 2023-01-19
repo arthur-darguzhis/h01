@@ -11,9 +11,7 @@ export const checkErrorsInRequestDataMiddleware = (req: Request, res: Response, 
                 field: e.param
             }
         ));
-
-        res.status(HTTP_STATUSES.BAD_REQUEST_400).json({errorsMessages: errorsArray});
-        return
+        return res.status(HTTP_STATUSES.BAD_REQUEST_400).json({errorsMessages: errorsArray});
     }
     next();
 }
