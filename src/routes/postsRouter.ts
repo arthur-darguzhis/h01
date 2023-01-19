@@ -1,6 +1,5 @@
 import {Request, Response, Router} from "express";
 import {HTTP_STATUSES, RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "../types/requestTypes";
-import {postRepository} from "../repository/postMongoDbRepository";
 import {PostViewModel} from "../model/post/PostViewModel";
 import {convertPostToViewModel} from "../types/PostType";
 import {PostInputModel} from "../model/post/PostInputModel";
@@ -9,6 +8,7 @@ import {checkErrorsInRequestDataMiddleware} from "../middlewares/checkErrorsInRe
 import {APIErrorResultType} from "../model/apiError/APIErrorResultType";
 import {authGuardMiddleware} from "../middlewares/authGuardMiddleware";
 import {blogRepository} from "../repository/blogMongoDbRepository";
+import {postsService} from "../domain/posts-service";
 
 export const postsRouter = Router({})
 
@@ -28,7 +28,7 @@ const validationContentField = body('content').trim().isLength({
 }).withMessage('"content" length should be from 1 to 1000');
 
 const validationBlogIdField = body('blogId').custom(async (blogId) => {
-    const blog = await blogRepository.getBlogById(blogId);
+    const blog = await blogRepository.findBlog(blogId);
     if (!blog) {
         throw new Error(`Blog with ID: ${blogId} is not exists`);
     }
@@ -36,13 +36,13 @@ const validationBlogIdField = body('blogId').custom(async (blogId) => {
 });
 
 postsRouter.get('/', async (req: Request, res: Response<PostViewModel[]>) => {
-    const posts = await postRepository.getPosts();
+    const posts = await postsService.findPosts();
     const postsViewModel = posts.map(p => convertPostToViewModel(p));
     res.status(HTTP_STATUSES.OK_200).json(postsViewModel)
 })
 
 postsRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res) => {
-    const post = await postRepository.getPostsById(req.params.id)
+    const post = await postsService.findPost(req.params.id)
     if (!post) {
         return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
     }
@@ -60,7 +60,7 @@ postsRouter.post('/',
 
         let newPost;
         try {
-            newPost = await postRepository.createPost(req.body);
+            newPost = await postsService.createPost(req.body);
         } catch (e) {
             const err = e as Error
             const apiErrorResult: APIErrorResultType = {
@@ -84,13 +84,13 @@ postsRouter.put('/:id',
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithParamsAndBody<{ id: string }, PostInputModel>, res) => {
 
-        const post = await postRepository.getPostsById(req.params.id);
+        const post = await postsService.findPost(req.params.id);
         if (!post) {
             return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
         }
 
         try {
-            await postRepository.updatePostById(req.params.id, req.body)
+            await postsService.updatePost(req.params.id, req.body)
         } catch (e) {
             const err = e as Error
             const apiErrorResult: APIErrorResultType = {
@@ -105,7 +105,7 @@ postsRouter.put('/:id',
     })
 
 postsRouter.delete('/:id', authGuardMiddleware, async (req: RequestWithParams<{ id: string }>, res) => {
-    await postRepository.deletePostById(req.params.id)
+    await postsService.deletePost(req.params.id)
         ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
         : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
 })
