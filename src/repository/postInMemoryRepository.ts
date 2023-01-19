@@ -5,7 +5,7 @@ import {blogRepository} from "./blogInMemoryRepository";
 
 export const postRepository = {
     async createPost(postInputModel: PostInputModel): Promise<PostType | never> {
-        const blog = await blogRepository.getBlogById(postInputModel.blogId);
+        const blog = await blogRepository.findBlog(postInputModel.blogId);
         if (!blog) {
             throw new Error(`Blog with ID: ${postInputModel.blogId} is not exists`);
         }
@@ -17,33 +17,34 @@ export const postRepository = {
             content: postInputModel.content,
             blogId: postInputModel.blogId,
             blogName: blog.name,
+            createdAt: new Date().toISOString()
         }
 
         db.posts.push(newPost);
         return newPost;
     },
 
-    async getPosts(): Promise<PostType[]> {
+    async findPosts(): Promise<PostType[]> {
         return db.posts;
     },
 
-    async getPostsById(id: string): Promise<PostType | undefined> {
+    async findPost(id: string): Promise<PostType | undefined> {
         return db.posts.find((p) => p.id === id)
     },
 
-    async updatePostById(id: string, postInputModel: PostInputModel): Promise<boolean | never> {
+    async updatePost(id: string, postInputModel: PostInputModel): Promise<boolean | never> {
         const postIndex = db.posts.findIndex(b => b.id === id);
         if (postIndex === -1) {
             throw new Error(`Post with ID: ${id} is not exists`)
         }
 
-        const blog = await blogRepository.getBlogById(postInputModel.blogId);
+        const blog = await blogRepository.findBlog(postInputModel.blogId);
         if (!blog) {
             throw new Error(`Blog with ID: ${id} is not exists`)
         }
-
+        const post = db.posts[postIndex]
         db.posts[postIndex] = {
-            id: id,
+            ...post,
             title: postInputModel.title,
             shortDescription: postInputModel.shortDescription,
             content: postInputModel.content,
@@ -53,7 +54,7 @@ export const postRepository = {
         return true;
     },
 
-    async deletePostById(id: string): Promise<boolean> {
+    async deletePost(id: string): Promise<boolean> {
         const postIndex = db.posts.findIndex((b) => b.id === id);
 
         if (postIndex === -1) {

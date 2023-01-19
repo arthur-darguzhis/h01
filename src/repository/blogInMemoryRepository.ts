@@ -8,29 +8,31 @@ export const blogRepository = {
             id: new Date().getTime().toString(),
             name: blogInputModel.name,
             description: blogInputModel.description,
-            websiteUrl: blogInputModel.websiteUrl
+            websiteUrl: blogInputModel.websiteUrl,
+            createdAt: new Date().toISOString()
         }
 
         db.blogs.push(newBlog)
         return newBlog;
     },
 
-    async getBlogs(): Promise<BlogType[]> {
+    async findBlogs(): Promise<BlogType[]> {
         return db.blogs;
     },
 
-    async getBlogById(id: string): Promise<BlogType | undefined> {
+    async findBlog(id: string): Promise<BlogType | undefined> {
         return db.blogs.find((b) => b.id === id)
     },
 
-    async updateBlogById(id: string, blogInputModel: BlogInputModel): Promise<boolean> {
+    async updateBlog(id: string, blogInputModel: BlogInputModel): Promise<boolean> {
         const blogIndex = db.blogs.findIndex(b => b.id === id);
         if (blogIndex === -1) {
             return false;
         }
 
+        const blog = db.blogs[blogIndex];
         db.blogs[blogIndex] = {
-            id: id,
+            ...blog,
             name: blogInputModel.name,
             description: blogInputModel.description,
             websiteUrl: blogInputModel.websiteUrl
@@ -38,7 +40,7 @@ export const blogRepository = {
         return true;
     },
 
-    async deleteBlogById(id: string): Promise<boolean> {
+    async deleteBlog(id: string): Promise<boolean> {
         const blogIndex = db.blogs.findIndex((b) => b.id === id);
 
         if (blogIndex === -1) {
