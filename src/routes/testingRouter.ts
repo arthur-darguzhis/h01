@@ -1,12 +1,12 @@
 import {Router} from "express";
 import {HTTP_STATUSES} from "../types/requestTypes";
-import {blogRepository} from "../repository/blogMongoDbRepository";
-import {postRepository} from "../repository/postMongoDbRepository";
+import {postsService} from "../domain/posts-service";
+import {blogsService} from "../domain/blogs-service";
 
 export const testingRouter = Router({})
 
 testingRouter.delete('/all-data', async (req, res) => {
-    await postRepository.deleteAllPosts()
-    await blogRepository.deleteAllBlogs();
+    await postsService.deleteAllPosts()
+    await blogsService.deleteAllBlogs();
     res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 })
