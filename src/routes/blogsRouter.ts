@@ -1,12 +1,12 @@
 import {Request, Response, Router} from "express";
 import {BlogViewModel} from "../model/blog/BlogViewModel";
 import {HTTP_STATUSES, RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "../types/requestTypes";
-import {blogRepository} from "../repository/blogMongoDbRepository";
 import {convertBlogToViewModel} from "../types/BlogType";
 import {BlogInputModel} from "../model/blog/BlogInputModel";
 import {body} from "express-validator";
 import {checkErrorsInRequestDataMiddleware} from "../middlewares/checkErrorsInRequestDataMiddleware";
 import {authGuardMiddleware} from "../middlewares/authGuardMiddleware";
+import {blogsService} from "../domain/blogs-service";
 
 export const blogsRouter = Router({})
 
@@ -30,7 +30,7 @@ const validateWebsiteUrlField = body('websiteUrl').trim().custom(websiteUrl => {
 })
 
 blogsRouter.get('/', async (req: Request, res: Response<BlogViewModel[]>) => {
-    const blogs = await blogRepository.getBlogs();
+    const blogs = await blogsService.findBlogs();
     const blogsViewModels = blogs.map(b => convertBlogToViewModel(b));
     res
         .status(HTTP_STATUSES.OK_200)
@@ -38,7 +38,7 @@ blogsRouter.get('/', async (req: Request, res: Response<BlogViewModel[]>) => {
 })
 
 blogsRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res) => {
-    const blog = await blogRepository.getBlogById(req.params.id)
+    const blog = await blogsService.findBlog(req.params.id)
     if (!blog) {
         return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
     }
@@ -52,7 +52,7 @@ blogsRouter.post('/',
     validateWebsiteUrlField,
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithBody<BlogInputModel>, res) => {
-        const newBlog = await blogRepository.createBlog(req.body);
+        const newBlog = await blogsService.createBlog(req.body);
         res.status(HTTP_STATUSES.CREATED_201).json(convertBlogToViewModel(newBlog));
     })
 
@@ -63,17 +63,17 @@ blogsRouter.put('/:id',
     validateWebsiteUrlField,
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithParamsAndBody<{ id: string }, BlogInputModel>, res) => {
-        const blog = await blogRepository.getBlogById(req.params.id);
+        const blog = await blogsService.findBlog(req.params.id);
         if (!blog) {
             return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
         }
 
-        await blogRepository.updateBlogById(req.params.id, req.body)
+        await blogsService.updateBlog(req.params.id, req.body)
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     })
 
 blogsRouter.delete('/:id', authGuardMiddleware, async (req: RequestWithParams<{ id: string }>, res) => {
-    const isBlogDeleted = await blogRepository.deleteBlogById(req.params.id)
+    const isBlogDeleted = await blogsService.deleteBlog(req.params.id)
     if (!isBlogDeleted) {
         return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
     }

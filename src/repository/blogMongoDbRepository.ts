@@ -17,29 +17,24 @@ export const blogRepository = {
         return newBlog;
     },
 
-    async getBlogs(): Promise<BlogType[]> {
+    async findBlogs(): Promise<BlogType[]> {
         //Здесь вопрос почему в этом методе нет await а в других есть?
         return await blogsCollection.find({}).toArray();
     },
 
-    async getBlogById(id: string): Promise<BlogType | null> {
+    async findBlog(id: string): Promise<BlogType | null> {
         return await blogsCollection.findOne({id: id});
     },
 
-    async updateBlogById(id: string, blogInputModel: BlogInputModel): Promise<boolean> {
+    async updateBlog(id: string, blog: BlogInputModel): Promise<boolean> {
         const result = await blogsCollection.updateOne({id: id}, {
-            $set: {
-                id: id,
-                name: blogInputModel.name,
-                description: blogInputModel.description,
-                websiteUrl: blogInputModel.websiteUrl
-            }
+            $set: blog
         });
 
         return result.matchedCount === 1;
     },
 
-    async deleteBlogById(id: string): Promise<boolean> {
+    async deleteBlog(id: string): Promise<boolean> {
         const result = await blogsCollection.deleteOne({id: id});
         return result.deletedCount === 1
     },
