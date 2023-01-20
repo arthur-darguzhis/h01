@@ -1,6 +1,6 @@
-import {postRepository} from '../repository/postMongoDbRepository'
-import {blogRepository} from '../repository/blogMongoDbRepository'
-import {PostInputModel} from "../model/post/PostInputModel";
+import {postRepository} from '../../repository/postMongoDbRepository'
+import {blogRepository} from '../../repository/blogMongoDbRepository'
+import {PostInputModel} from "../inputModels/PostInputModel";
 import {PostType} from "../types/PostType";
 
 export const postsService = {

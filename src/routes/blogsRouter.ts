@@ -1,12 +1,12 @@
 import {Request, Response, Router} from "express";
-import {BlogViewModel} from "../model/blog/BlogViewModel";
-import {HTTP_STATUSES, RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "../types/requestTypes";
-import {convertBlogToViewModel} from "../types/BlogType";
-import {BlogInputModel} from "../model/blog/BlogInputModel";
+import {BlogViewModel} from "../queryRepository/types/BlogViewModel";
+import {HTTP_STATUSES, RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "./types/requestTypes";
+import {convertBlogToViewModel} from "../queryRepository/blogQueryRepo";
+import {BlogInputModel} from "../domain/inputModels/BlogInputModel";
 import {body} from "express-validator";
 import {checkErrorsInRequestDataMiddleware} from "../middlewares/checkErrorsInRequestDataMiddleware";
 import {authGuardMiddleware} from "../middlewares/authGuardMiddleware";
-import {blogsService} from "../domain/blogs-service";
+import {blogsService} from "../domain/service/blogs-service";
 
 export const blogsRouter = Router({})
 

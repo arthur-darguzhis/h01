@@ -1,6 +1,6 @@
-import {BlogInputModel} from "../model/blog/BlogInputModel";
+import {BlogInputModel} from "../inputModels/BlogInputModel";
 import {BlogType} from "../types/BlogType";
-import {blogRepository} from "../repository/blogMongoDbRepository";
+import {blogRepository} from "../../repository/blogMongoDbRepository";
 
 export const blogsService = {
 

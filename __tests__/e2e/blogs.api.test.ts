@@ -1,8 +1,8 @@
 import request from "supertest";
 import {app} from "../../src";
-import {HTTP_STATUSES} from "../../src/types/requestTypes";
+import {HTTP_STATUSES} from "../../src/routes/types/requestTypes";
 import {blogRepository} from "../../src/repository/blogMongoDbRepository";
-import {BlogInputModel} from "../../src/model/blog/BlogInputModel";
+import {BlogInputModel} from "../../src/domain/inputModels/BlogInputModel";
 
 describe('/blogs', () => {
     beforeAll(async () => {

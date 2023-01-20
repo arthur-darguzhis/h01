@@ -1,6 +1,6 @@
 import {db} from "../db";
-import {BlogInputModel} from "../model/blog/BlogInputModel";
-import {BlogType} from "../types/BlogType";
+import {BlogInputModel} from "../domain/inputModels/BlogInputModel";
+import {BlogType} from "../domain/types/BlogType";
 
 export const blogRepository = {
     async createBlog(blogInputModel: BlogInputModel): Promise<BlogType> {

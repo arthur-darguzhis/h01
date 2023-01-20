@@ -1,14 +1,14 @@
 import {Request, Response, Router} from "express";
-import {HTTP_STATUSES, RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "../types/requestTypes";
-import {PostViewModel} from "../model/post/PostViewModel";
-import {convertPostToViewModel} from "../types/PostType";
-import {PostInputModel} from "../model/post/PostInputModel";
+import {HTTP_STATUSES, RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "./types/requestTypes";
+import {PostViewModel} from "../queryRepository/types/PostViewModel";
+import {convertPostToViewModel} from "../queryRepository/postQueryRepo";
+import {PostInputModel} from "../domain/inputModels/PostInputModel";
 import {body} from "express-validator";
 import {checkErrorsInRequestDataMiddleware} from "../middlewares/checkErrorsInRequestDataMiddleware";
-import {APIErrorResultType} from "../model/apiError/APIErrorResultType";
+import {APIErrorResultType} from "./types/apiError/APIErrorResultType";
 import {authGuardMiddleware} from "../middlewares/authGuardMiddleware";
 import {blogRepository} from "../repository/blogMongoDbRepository";
-import {postsService} from "../domain/posts-service";
+import {postsService} from "../domain/service/posts-service";
 
 export const postsRouter = Router({})
 

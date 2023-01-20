@@ -1,6 +1,6 @@
-import {PostType} from "./types/PostType";
-import {BlogType} from "./types/BlogType";
-import {UserType} from "./types/UserType";
+import {PostType} from "./domain/types/PostType";
+import {BlogType} from "./domain/types/BlogType";
+import {UserType} from "./domain/types/UserType";
 import {MongoClient} from "mongodb";
 import * as dotenv from "dotenv";
 dotenv.config()

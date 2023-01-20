@@ -1,6 +1,6 @@
 import {db} from "../db";
-import {PostInputModel} from "../model/post/PostInputModel";
-import {PostType} from "../types/PostType";
+import {PostInputModel} from "../domain/inputModels/PostInputModel";
+import {PostType} from "../domain/types/PostType";
 import {blogRepository} from "./blogInMemoryRepository";
 
 export const postRepository = {

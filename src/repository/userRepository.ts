@@ -1,4 +1,4 @@
-import {UserType} from "../types/UserType";
+import {UserType} from "../domain/types/UserType";
 import {db} from "../db";
 
 export const userRepository = {

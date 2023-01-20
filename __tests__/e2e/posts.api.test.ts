@@ -1,10 +1,10 @@
 import request from "supertest";
 import {app} from "../../src";
-import {HTTP_STATUSES} from "../../src/types/requestTypes";
-import {BlogInputModel} from "../../src/model/blog/BlogInputModel";
-import {PostInputModel} from "../../src/model/post/PostInputModel";
+import {HTTP_STATUSES} from "../../src/routes/types/requestTypes";
+import {BlogInputModel} from "../../src/domain/inputModels/BlogInputModel";
+import {PostInputModel} from "../../src/domain/inputModels/PostInputModel";
 import {postRepository} from "../../src/repository/postMongoDbRepository";
-import {BlogType} from "../../src/types/BlogType";
+import {BlogType} from "../../src/domain/types/BlogType";
 
 describe('/posts', () => {
     beforeAll(async () => {

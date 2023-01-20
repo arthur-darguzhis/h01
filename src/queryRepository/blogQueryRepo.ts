@@ -1,12 +1,14 @@
-import {BlogViewModel} from "../model/blog/BlogViewModel";
+import {BlogViewModel} from "./types/BlogViewModel";
+import {BlogType} from "../domain/types/BlogType";
 
-export type BlogType = {
-    id: string
-    name: string,
-    description: string,
-    websiteUrl: string
-    createdAt: string
-}
+// const blogQueryRepo = {
+//     getBlogs(): BlogViewModel {
+//         return [];
+//     }
+//
+//     _mapDbBlogToBlogViewModel
+// }
+
 
 export const convertBlogToViewModel = (blog: BlogType): BlogViewModel => {
     return {

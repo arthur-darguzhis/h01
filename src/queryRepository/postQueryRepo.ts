@@ -1,14 +1,5 @@
-import {PostViewModel} from "../model/post/PostViewModel";
-
-export type PostType = {
-    id: string,
-    title: string,
-    shortDescription: string,
-    content: string,
-    blogId: string,
-    blogName: string,
-    createdAt: string
-}
+import {PostViewModel} from "./types/PostViewModel";
+import {PostType} from "../domain/types/PostType";
 
 export const convertPostToViewModel = (post: PostType): PostViewModel => {
     return {
