@@ -15,14 +15,6 @@ export const blogsService = {
         return await blogRepository.createBlog(newBlog)
     },
 
-    async findBlogs(): Promise<BlogType[]> {
-        return blogRepository.findBlogs();
-    },
-
-    async findBlog(id: string): Promise<BlogType | null> {
-        return await blogRepository.findBlog(id);
-    },
-
     async updateBlog(id: string, blogInputModel: BlogInputModel): Promise<boolean> {
         const updatedBlog: BlogInputModel = {
             name: blogInputModel.name,

@@ -8,10 +8,6 @@ export const postRepository = {
         return newPost;
     },
 
-    async findPosts(): Promise<PostType[]> {
-        return postsCollection.find({}).toArray();
-    },
-
     async findPost(id: string): Promise<PostType | null> {
         return await postsCollection.findOne({id: id});
     },

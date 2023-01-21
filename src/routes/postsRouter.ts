@@ -1,14 +1,14 @@
 import {Request, Response, Router} from "express";
 import {HTTP_STATUSES, RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "./types/requestTypes";
 import {PostViewModel} from "../queryRepository/types/PostViewModel";
-import {convertPostToViewModel} from "../queryRepository/postQueryRepo";
+import {convertPostToViewModel, postQueryRepository} from "../queryRepository/postQueryRepository";
 import {PostInputModel} from "../domain/inputModels/PostInputModel";
 import {body} from "express-validator";
 import {checkErrorsInRequestDataMiddleware} from "../middlewares/checkErrorsInRequestDataMiddleware";
 import {APIErrorResultType} from "./types/apiError/APIErrorResultType";
 import {authGuardMiddleware} from "../middlewares/authGuardMiddleware";
-import {blogRepository} from "../repository/blogMongoDbRepository";
 import {postsService} from "../domain/service/posts-service";
+import {blogQueryRepository} from "../queryRepository/blogQueryRepository";
 
 export const postsRouter = Router({})
 
@@ -28,7 +28,7 @@ const validationContentField = body('content').trim().isLength({
 }).withMessage('"content" length should be from 1 to 1000');
 
 const validationBlogIdField = body('blogId').custom(async (blogId) => {
-    const blog = await blogRepository.findBlog(blogId);
+    const blog = await blogQueryRepository.findBlog(blogId);
     if (!blog) {
         throw new Error(`Blog with ID: ${blogId} is not exists`);
     }
@@ -36,13 +36,13 @@ const validationBlogIdField = body('blogId').custom(async (blogId) => {
 });
 
 postsRouter.get('/', async (req: Request, res: Response<PostViewModel[]>) => {
-    const posts = await postsService.findPosts();
+    const posts = await postQueryRepository.findPosts();
     const postsViewModel = posts.map(p => convertPostToViewModel(p));
     res.status(HTTP_STATUSES.OK_200).json(postsViewModel)
 })
 
 postsRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res) => {
-    const post = await postsService.findPost(req.params.id)
+    const post = await postQueryRepository.findPost(req.params.id)
     if (!post) {
         return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
     }
@@ -84,7 +84,7 @@ postsRouter.put('/:id',
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithParamsAndBody<{ id: string }, PostInputModel>, res) => {
 
-        const post = await postsService.findPost(req.params.id);
+        const post = await postQueryRepository.findPost(req.params.id);
         if (!post) {
             return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
         }

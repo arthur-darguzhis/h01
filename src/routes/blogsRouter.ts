@@ -1,7 +1,7 @@
 import {Request, Response, Router} from "express";
 import {BlogViewModel} from "../queryRepository/types/BlogViewModel";
 import {HTTP_STATUSES, RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "./types/requestTypes";
-import {convertBlogToViewModel} from "../queryRepository/blogQueryRepo";
+import {blogQueryRepository, convertBlogToViewModel} from "../queryRepository/blogQueryRepository";
 import {BlogInputModel} from "../domain/inputModels/BlogInputModel";
 import {body} from "express-validator";
 import {checkErrorsInRequestDataMiddleware} from "../middlewares/checkErrorsInRequestDataMiddleware";
@@ -30,7 +30,7 @@ const validateWebsiteUrlField = body('websiteUrl').trim().custom(websiteUrl => {
 })
 
 blogsRouter.get('/', async (req: Request, res: Response<BlogViewModel[]>) => {
-    const blogs = await blogsService.findBlogs();
+    const blogs = await blogQueryRepository.findBlogs();
     const blogsViewModels = blogs.map(b => convertBlogToViewModel(b));
     res
         .status(HTTP_STATUSES.OK_200)
@@ -38,7 +38,7 @@ blogsRouter.get('/', async (req: Request, res: Response<BlogViewModel[]>) => {
 })
 
 blogsRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res) => {
-    const blog = await blogsService.findBlog(req.params.id)
+    const blog = await blogQueryRepository.findBlog(req.params.id)
     if (!blog) {
         return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
     }
@@ -63,7 +63,7 @@ blogsRouter.put('/:id',
     validateWebsiteUrlField,
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithParamsAndBody<{ id: string }, BlogInputModel>, res) => {
-        const blog = await blogsService.findBlog(req.params.id);
+        const blog = await blogQueryRepository.findBlog(req.params.id);
         if (!blog) {
             return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
         }

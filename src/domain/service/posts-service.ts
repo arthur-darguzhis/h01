@@ -23,14 +23,6 @@ export const postsService = {
         return await postRepository.createPost(newPost)
     },
 
-    async findPosts(): Promise<PostType[]> {
-        return postRepository.findPosts();
-    },
-
-    async findPost(id: string): Promise<PostType | null> {
-        return await postRepository.findPost(id)
-    },
-
     async updatePost(id: string, postInputModel: PostInputModel): Promise<boolean | never> {
         const blog = await blogRepository.findBlog(postInputModel.blogId);
         if (!blog) {

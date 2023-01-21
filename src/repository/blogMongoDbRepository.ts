@@ -17,11 +17,6 @@ export const blogRepository = {
         return newBlog;
     },
 
-    async findBlogs(): Promise<BlogType[]> {
-        //Здесь вопрос почему в этом методе нет await а в других есть?
-        return await blogsCollection.find({}).toArray();
-    },
-
     async findBlog(id: string): Promise<BlogType | null> {
         return await blogsCollection.findOne({id: id});
     },
