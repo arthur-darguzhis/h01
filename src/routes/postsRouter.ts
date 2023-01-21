@@ -1,15 +1,17 @@
 import {Request, Response, Router} from "express";
-import {HTTP_STATUSES, RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "./types/requestTypes";
-import {PostViewModel} from "../queryRepository/types/PostViewModel";
+import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "./types/RequestTypes";
 import {postQueryRepository} from "../queryRepository/postQueryRepository";
 import {PostInputModel} from "../domain/inputModels/PostInputModel";
-import {body} from "express-validator";
+import {body, query} from "express-validator";
 import {checkErrorsInRequestDataMiddleware} from "../middlewares/checkErrorsInRequestDataMiddleware";
 import {APIErrorResultType} from "./types/apiError/APIErrorResultType";
 import {authGuardMiddleware} from "../middlewares/authGuardMiddleware";
 import {postsService} from "../domain/service/posts-service";
 import {blogQueryRepository} from "../queryRepository/blogQueryRepository";
 import {postRepository} from "../repository/postMongoDbRepository";
+import {HTTP_STATUSES} from "./types/HttpStatuses";
+import {sortDirections} from "./types/SortDirections";
+import {PostPaginatorType} from "../queryRepository/types/PostPaginatorType";
 
 export const postsRouter = Router({})
 
@@ -36,10 +38,40 @@ const validationBlogIdField = body('blogId').custom(async (blogId) => {
     return true;
 });
 
-postsRouter.get('/', async (req: Request, res: Response<PostViewModel[]>) => {
-    const posts = await postQueryRepository.findPosts();
-    res.status(HTTP_STATUSES.OK_200).json(posts)
+const validateSortByQueryParam = query('sortBy').optional({nullable: true}).trim().notEmpty().custom(sortBy => {
+    const allowedFields = ['id', 'string', 'title', 'shortDescription', 'content', 'blogId', 'blogName', 'createdAt']
+    if (!allowedFields.includes(sortBy)) {
+        throw new Error(`'sortBy' value can be one of: ${allowedFields.toString()}`);
+    }
+    return true;
 })
+
+const validateSortDirectionQueryParam = query('sortDirection').optional({nullable: true}).trim().notEmpty().custom(sortDirection => {
+    if (!sortDirections.includes(sortDirection)) {
+        throw new Error(`'sortDirection' value can be of ${sortDirections.toString()}`);
+    }
+    return true;
+})
+
+const validatePageNumberQueryParam = query('pageNumber').optional({nullable: true}).trim().notEmpty().isInt({min: 1})
+const validatePageSizeQueryParam = query('pageSize').optional({nullable: true}).trim().notEmpty().isInt({min: 1})
+
+
+postsRouter.get('/',
+    validateSortByQueryParam,
+    validateSortDirectionQueryParam,
+    validatePageNumberQueryParam,
+    validatePageSizeQueryParam,
+    checkErrorsInRequestDataMiddleware,
+    async (req: Request, res: Response<PostPaginatorType>) => {
+        const sortBy: string = req.query.sortBy ? req.query.sortBy.toString() : 'createdAt';
+        const sortDirection: string = req.query.sortDirection ? req.query.sortDirection.toString() : 'asc';
+        const pageNumber: number = req.query.pageNumber ? +req.query.pageNumber : 1;
+        const pageSize: number = req.query.pageSize ? +req.query.pageSize : 10;
+
+        const posts = await postQueryRepository.findPosts(sortBy, sortDirection, pageNumber, pageSize);
+        res.status(HTTP_STATUSES.OK_200).json(posts)
+    })
 
 postsRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res) => {
     const post = await postQueryRepository.findPost(req.params.id)
@@ -60,7 +92,7 @@ postsRouter.post('/',
         try {
             const newPostId = await postsService.createPost(req.body);
             const newPost = await postQueryRepository.findPost(newPostId);
-            if(!newPost){
+            if (!newPost) {
                 return res.status(HTTP_STATUSES.UNPROCESSABLE_ENTITY)
             }
             res.status(HTTP_STATUSES.CREATED_201).json(newPost);

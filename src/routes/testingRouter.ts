@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {HTTP_STATUSES} from "./types/requestTypes";
+import {HTTP_STATUSES} from "./types/HttpStatuses";
 import {postsService} from "../domain/service/posts-service";
 import {blogsService} from "../domain/service/blogs-service";
 

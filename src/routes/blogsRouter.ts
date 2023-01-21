@@ -1,12 +1,14 @@
 import {Request, Response, Router} from "express";
-import {BlogViewModel} from "../queryRepository/types/BlogViewModel";
-import {HTTP_STATUSES, RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "./types/requestTypes";
+import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "./types/RequestTypes";
 import {BlogInputModel} from "../domain/inputModels/BlogInputModel";
-import {body} from "express-validator";
+import {body, query} from "express-validator";
 import {checkErrorsInRequestDataMiddleware} from "../middlewares/checkErrorsInRequestDataMiddleware";
 import {authGuardMiddleware} from "../middlewares/authGuardMiddleware";
 import {blogsService} from "../domain/service/blogs-service";
 import {blogQueryRepository} from "../queryRepository/blogQueryRepository";
+import {BlogPaginatorType} from "../queryRepository/types/BlogPaginatorType";
+import {sortDirections} from "./types/SortDirections";
+import {HTTP_STATUSES} from "./types/HttpStatuses";
 
 export const blogsRouter = Router({})
 
@@ -29,12 +31,44 @@ const validateWebsiteUrlField = body('websiteUrl').trim().custom(websiteUrl => {
     return true;
 })
 
-blogsRouter.get('/', async (req: Request, res: Response<BlogViewModel[]>) => {
-    const blogs = await blogQueryRepository.findBlogs();
-    res
-        .status(HTTP_STATUSES.OK_200)
-        .json(blogs)
+const validateSearchNameTermQueryParam = query('searchNameTerm').optional({nullable: true}).trim().notEmpty()
+
+const validateSortByQueryParam = query('sortBy').optional({nullable: true}).trim().notEmpty().custom(sortBy => {
+    const allowedFields = ['id', 'name', 'description', 'websiteUrl', 'createdAt'];
+    if(!allowedFields.includes(sortBy)){
+        throw new Error(`'sortBy' value can be one of: ${allowedFields.toString()}`);
+    }
+    return true;
 })
+
+const validateSortDirectionQueryParam = query('sortDirection').optional({nullable: true}).trim().notEmpty().custom(sortDirection => {
+    if(!sortDirections.includes(sortDirection)){
+        throw new Error(`'sortDirection' value can be of ${sortDirections.toString()}`);
+    }
+    return true;
+})
+
+const validatePageNumberQueryParam = query('pageNumber').optional({nullable: true}).trim().notEmpty().isInt({min: 1})
+const validatePageSizeQueryParam = query('pageSize').optional({nullable: true}).trim().notEmpty().isInt({min: 1})
+
+blogsRouter.get('/',
+    validateSearchNameTermQueryParam,
+    validateSortByQueryParam,
+    validateSortDirectionQueryParam,
+    validatePageNumberQueryParam,
+    validatePageSizeQueryParam,
+    checkErrorsInRequestDataMiddleware,
+    async (req: Request, res: Response<BlogPaginatorType>) => {
+        const searchNameTerm: string | null = req.query.searchNameTerm ? req.query.searchNameTerm.toString() : null;
+        const sortBy: string = req.query.sortBy ? req.query.sortBy.toString() : 'createdAt';
+        const sortDirection: string = req.query.sortDirection ? req.query.sortDirection.toString() : 'asc';
+        const pageNumber: number = req.query.pageNumber ? +req.query.pageNumber : 1;
+        const pageSize: number = req.query.pageSize ? +req.query.pageSize : 10;
+
+        const blogs = await blogQueryRepository.findBlogs(searchNameTerm, sortBy, sortDirection, pageNumber, pageSize);
+
+        res.status(HTTP_STATUSES.OK_200).json(blogs)
+    })
 
 blogsRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res) => {
     const blog = await blogQueryRepository.findBlog(req.params.id)
@@ -53,7 +87,7 @@ blogsRouter.post('/',
     async (req: RequestWithBody<BlogInputModel>, res) => {
         const newBlogId = await blogsService.createBlog(req.body);
         const newBlog = await blogQueryRepository.findBlog(newBlogId);
-        if(!newBlog){
+        if (!newBlog) {
             return res.status(HTTP_STATUSES.UNPROCESSABLE_ENTITY)
         }
         res.status(HTTP_STATUSES.CREATED_201).json(newBlog);
