@@ -1,10 +1,10 @@
 import request from "supertest";
-import {app} from "../../src";
-import {HTTP_STATUSES} from "../../src/routes/types/requestTypes";
-import {BlogInputModel} from "../../src/domain/inputModels/BlogInputModel";
-import {PostInputModel} from "../../src/domain/inputModels/PostInputModel";
-import {postRepository} from "../../src/repository/postMongoDbRepository";
-import {BlogType} from "../../src/domain/types/BlogType";
+import {app} from "../../../../src";
+import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
+import {BlogInputModel} from "../../../../src/domain/inputModels/BlogInputModel";
+import {PostInputModel} from "../../../../src/domain/inputModels/PostInputModel";
+import {postRepository} from "../../../../src/repository/postMongoDbRepository";
+import {BlogType} from "../../../../src/domain/types/BlogType";
 
 describe('/posts', () => {
     beforeAll(async () => {
@@ -14,7 +14,7 @@ describe('/posts', () => {
     it('should return 200 and empty array', async () => {
         await request(app)
             .get('/posts')
-            .expect(HTTP_STATUSES.OK_200, [])
+            .expect(HTTP_STATUSES.OK_200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
     })
 
     it('should return 404 for not existing posts', async () => {
@@ -44,7 +44,7 @@ describe('/posts', () => {
 
         await request(app)
             .get('/posts')
-            .expect(HTTP_STATUSES.OK_200, [])
+            .expect(HTTP_STATUSES.OK_200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
     })
 
     let firstBlog: any = null;
@@ -257,7 +257,7 @@ describe('/posts', () => {
 
         await request(app)
             .get('/posts')
-            .expect(HTTP_STATUSES.OK_200, [])
+            .expect(HTTP_STATUSES.OK_200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
     })
 
 
