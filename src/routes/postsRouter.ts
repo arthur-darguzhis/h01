@@ -1,7 +1,7 @@
 import {Request, Response, Router} from "express";
 import {HTTP_STATUSES, RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "./types/requestTypes";
 import {PostViewModel} from "../queryRepository/types/PostViewModel";
-import {convertPostToViewModel, postQueryRepository} from "../queryRepository/postQueryRepository";
+import {postQueryRepository} from "../queryRepository/postQueryRepository";
 import {PostInputModel} from "../domain/inputModels/PostInputModel";
 import {body} from "express-validator";
 import {checkErrorsInRequestDataMiddleware} from "../middlewares/checkErrorsInRequestDataMiddleware";
@@ -9,6 +9,7 @@ import {APIErrorResultType} from "./types/apiError/APIErrorResultType";
 import {authGuardMiddleware} from "../middlewares/authGuardMiddleware";
 import {postsService} from "../domain/service/posts-service";
 import {blogQueryRepository} from "../queryRepository/blogQueryRepository";
+import {postRepository} from "../repository/postMongoDbRepository";
 
 export const postsRouter = Router({})
 
@@ -37,8 +38,7 @@ const validationBlogIdField = body('blogId').custom(async (blogId) => {
 
 postsRouter.get('/', async (req: Request, res: Response<PostViewModel[]>) => {
     const posts = await postQueryRepository.findPosts();
-    const postsViewModel = posts.map(p => convertPostToViewModel(p));
-    res.status(HTTP_STATUSES.OK_200).json(postsViewModel)
+    res.status(HTTP_STATUSES.OK_200).json(posts)
 })
 
 postsRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res) => {
@@ -46,7 +46,7 @@ postsRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res) => {
     if (!post) {
         return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
     }
-    res.status(HTTP_STATUSES.OK_200).json(convertPostToViewModel(post))
+    res.status(HTTP_STATUSES.OK_200).json(post)
 })
 
 postsRouter.post('/',
@@ -57,10 +57,13 @@ postsRouter.post('/',
     validationBlogIdField,
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithBody<PostInputModel>, res) => {
-
-        let newPost;
         try {
-            newPost = await postsService.createPost(req.body);
+            const newPostId = await postsService.createPost(req.body);
+            const newPost = await postQueryRepository.findPost(newPostId);
+            if(!newPost){
+                return res.status(HTTP_STATUSES.UNPROCESSABLE_ENTITY)
+            }
+            res.status(HTTP_STATUSES.CREATED_201).json(newPost);
         } catch (e) {
             const err = e as Error
             const apiErrorResult: APIErrorResultType = {
@@ -71,8 +74,6 @@ postsRouter.post('/',
             }
             return res.status(HTTP_STATUSES.BAD_REQUEST_400).json(apiErrorResult)
         }
-
-        res.status(HTTP_STATUSES.CREATED_201).json(convertPostToViewModel(newPost));
     })
 
 postsRouter.put('/:id',
@@ -84,7 +85,7 @@ postsRouter.put('/:id',
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithParamsAndBody<{ id: string }, PostInputModel>, res) => {
 
-        const post = await postQueryRepository.findPost(req.params.id);
+        const post = await postRepository.findPost(req.params.id);
         if (!post) {
             return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
         }

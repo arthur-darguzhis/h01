@@ -4,7 +4,7 @@ import {blogRepository} from "../../repository/blogMongoDbRepository";
 
 export const blogsService = {
 
-    async createBlog(blogInputModel: BlogInputModel): Promise<BlogType> {
+    async createBlog(blogInputModel: BlogInputModel): Promise<string> {
         const newBlog: BlogType = {
             id: new Date().getTime().toString(),
             name: blogInputModel.name,
@@ -12,7 +12,8 @@ export const blogsService = {
             websiteUrl: blogInputModel.websiteUrl,
             createdAt: new Date().toISOString()
         }
-        return await blogRepository.createBlog(newBlog)
+        const blog = await blogRepository.createBlog(newBlog)
+        return blog.id
     },
 
     async updateBlog(id: string, blogInputModel: BlogInputModel): Promise<boolean> {

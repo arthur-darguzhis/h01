@@ -6,7 +6,7 @@ import {BlogInputModel} from "../../src/domain/inputModels/BlogInputModel";
 
 describe('/blogs', () => {
     beforeAll(async () => {
-        blogRepository.deleteAllBlogs();
+        await blogRepository.deleteAllBlogs();
     });
 
     it('should return 200 and empty array', async () => {

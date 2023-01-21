@@ -8,7 +8,7 @@ import {BlogType} from "../../src/domain/types/BlogType";
 
 describe('/posts', () => {
     beforeAll(async () => {
-        postRepository.deleteAllPosts()
+        await postRepository.deleteAllPosts()
     });
 
     it('should return 200 and empty array', async () => {

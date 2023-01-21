@@ -2,7 +2,8 @@ import {PostViewModel} from "./types/PostViewModel";
 import {PostType} from "../domain/types/PostType";
 import {postsCollection} from "../db";
 
-export const convertPostToViewModel = (post: PostType): PostViewModel => {
+// export const convertPostToViewModel = (post: PostType): PostViewModel => {
+const _mapPostToViewModel = (post: PostType): PostViewModel => {
     return {
         id: post.id,
         title: post.title,
@@ -16,11 +17,13 @@ export const convertPostToViewModel = (post: PostType): PostViewModel => {
 
 export const postQueryRepository = {
 
-    async findPosts(): Promise<PostType[]> {
-        return postsCollection.find({}).toArray();
+    async findPosts(): Promise<PostViewModel[]> {
+        const posts = await postsCollection.find({}).toArray();
+        return posts.map(_mapPostToViewModel);
     },
 
-    async findPost(id: string): Promise<PostType | null> {
-        return await postsCollection.findOne({id: id});
+    async findPost(id: string): Promise<PostViewModel | null> {
+        const post = await postsCollection.findOne({id: id});
+        return post ? _mapPostToViewModel(post) : null
     },
 }

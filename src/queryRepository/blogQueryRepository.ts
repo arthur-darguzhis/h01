@@ -2,8 +2,8 @@ import {BlogViewModel} from "./types/BlogViewModel";
 import {BlogType} from "../domain/types/BlogType";
 import {blogsCollection} from "../db";
 
-// _mapBlogToBlogViewModel
-export const convertBlogToViewModel = (blog: BlogType): BlogViewModel => {
+const _mapBlogToViewModel = (blog: BlogType): BlogViewModel => {
+    //Делаем ручной маппинг почему?)
     return {
         id: blog.id,
         name: blog.name,
@@ -15,11 +15,13 @@ export const convertBlogToViewModel = (blog: BlogType): BlogViewModel => {
 
 export const blogQueryRepository = {
 
-    async findBlogs(): Promise<BlogType[]> {
-        return blogsCollection.find({}).toArray()
+    async findBlogs(): Promise<BlogViewModel[]> {
+        const blogs = await blogsCollection.find({}).toArray()
+        return blogs.map(_mapBlogToViewModel);
     },
 
-    async findBlog(id: string): Promise<BlogType | null> {
-        return await blogsCollection.findOne({id: id});
+    async findBlog(id: string): Promise<BlogViewModel | null> {
+        const blog = await blogsCollection.findOne({id: id});
+        return blog ? _mapBlogToViewModel(blog) : null;
     },
 }

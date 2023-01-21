@@ -1,12 +1,12 @@
 import {Request, Response, Router} from "express";
 import {BlogViewModel} from "../queryRepository/types/BlogViewModel";
 import {HTTP_STATUSES, RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "./types/requestTypes";
-import {blogQueryRepository, convertBlogToViewModel} from "../queryRepository/blogQueryRepository";
 import {BlogInputModel} from "../domain/inputModels/BlogInputModel";
 import {body} from "express-validator";
 import {checkErrorsInRequestDataMiddleware} from "../middlewares/checkErrorsInRequestDataMiddleware";
 import {authGuardMiddleware} from "../middlewares/authGuardMiddleware";
 import {blogsService} from "../domain/service/blogs-service";
+import {blogQueryRepository} from "../queryRepository/blogQueryRepository";
 
 export const blogsRouter = Router({})
 
@@ -31,10 +31,9 @@ const validateWebsiteUrlField = body('websiteUrl').trim().custom(websiteUrl => {
 
 blogsRouter.get('/', async (req: Request, res: Response<BlogViewModel[]>) => {
     const blogs = await blogQueryRepository.findBlogs();
-    const blogsViewModels = blogs.map(b => convertBlogToViewModel(b));
     res
         .status(HTTP_STATUSES.OK_200)
-        .json(blogsViewModels)
+        .json(blogs)
 })
 
 blogsRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res) => {
@@ -42,7 +41,7 @@ blogsRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res) => {
     if (!blog) {
         return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
     }
-    res.status(HTTP_STATUSES.OK_200).json(convertBlogToViewModel(blog))
+    res.status(HTTP_STATUSES.OK_200).json(blog)
 })
 
 blogsRouter.post('/',
@@ -52,8 +51,12 @@ blogsRouter.post('/',
     validateWebsiteUrlField,
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithBody<BlogInputModel>, res) => {
-        const newBlog = await blogsService.createBlog(req.body);
-        res.status(HTTP_STATUSES.CREATED_201).json(convertBlogToViewModel(newBlog));
+        const newBlogId = await blogsService.createBlog(req.body);
+        const newBlog = await blogQueryRepository.findBlog(newBlogId);
+        if(!newBlog){
+            return res.status(HTTP_STATUSES.UNPROCESSABLE_ENTITY)
+        }
+        res.status(HTTP_STATUSES.CREATED_201).json(newBlog);
     })
 
 blogsRouter.put('/:id',
