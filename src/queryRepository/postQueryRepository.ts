@@ -1,6 +1,7 @@
 import {PostViewModel} from "./types/PostViewModel";
 import {PostType} from "../domain/types/PostType";
-import {postsCollection} from "../db";
+import {blogsCollection, postsCollection} from "../db";
+import {PostPaginatorType} from "./types/PostPaginatorType";
 
 // export const convertPostToViewModel = (post: PostType): PostViewModel => {
 const _mapPostToViewModel = (post: PostType): PostViewModel => {
@@ -17,9 +18,25 @@ const _mapPostToViewModel = (post: PostType): PostViewModel => {
 
 export const postQueryRepository = {
 
-    async findPosts(): Promise<PostViewModel[]> {
-        const posts = await postsCollection.find({}).toArray();
-        return posts.map(_mapPostToViewModel);
+    async findPosts(
+        sortBy: string,
+        sortDirection: string,
+        pageNumber: number,
+        pageSize: number
+    ): Promise<PostPaginatorType> {
+        const direction = sortDirection === 'asc' ? 1 : -1;
+
+        const count = await postsCollection.countDocuments({});
+        const howManySkip = (pageNumber - 1) * pageSize;
+        const blogs = await postsCollection.find({}).sort(sortBy, direction).skip(howManySkip).limit(pageSize).toArray()
+
+        return {
+            "pagesCount": Math.ceil(count/pageSize),
+            "page": pageNumber,
+            "pageSize": pageSize,
+            "totalCount": count,
+            "items": blogs.map(_mapPostToViewModel)
+        }
     },
 
     async findPost(id: string): Promise<PostViewModel | null> {

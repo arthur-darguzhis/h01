@@ -1,6 +1,8 @@
 import {BlogViewModel} from "./types/BlogViewModel";
 import {BlogType} from "../domain/types/BlogType";
 import {blogsCollection} from "../db";
+import {BlogPaginatorType} from "./types/BlogPaginatorType";
+import {BlogFilterType} from "./types/BlogFilterType";
 
 const _mapBlogToViewModel = (blog: BlogType): BlogViewModel => {
     //Делаем ручной маппинг почему?)
@@ -15,9 +17,32 @@ const _mapBlogToViewModel = (blog: BlogType): BlogViewModel => {
 
 export const blogQueryRepository = {
 
-    async findBlogs(): Promise<BlogViewModel[]> {
-        const blogs = await blogsCollection.find({}).toArray()
-        return blogs.map(_mapBlogToViewModel);
+    async findBlogs(
+        searchNameTerm: string | null,
+        sortBy: string,
+        sortDirection: string,
+        pageNumber: number,
+        pageSize: number
+    ): Promise<BlogPaginatorType> {
+
+        const filter: BlogFilterType = {};
+        if (searchNameTerm) {
+            filter.name = {'$regex': searchNameTerm, '$options': 'i'};
+        }
+
+        const direction = sortDirection === 'asc' ? 1 : -1;
+
+        const count = await blogsCollection.countDocuments(filter);
+        const howManySkip = (pageNumber - 1) * pageSize;
+        const blogs = await blogsCollection.find(filter).sort(sortBy, direction).skip(howManySkip).limit(pageSize).toArray()
+
+        return {
+            "pagesCount": Math.ceil(count/pageSize),
+            "page": pageNumber,
+            "pageSize": pageSize,
+            "totalCount": count,
+            "items": blogs.map(_mapBlogToViewModel)
+        }
     },
 
     async findBlog(id: string): Promise<BlogViewModel | null> {
