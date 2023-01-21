@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from "express";
-import {HTTP_STATUSES} from "../routes/types/requestTypes";
+import {HTTP_STATUSES} from "../routes/types/HttpStatuses";
 import {atob} from "buffer";
 import {userRepository} from "../repository/userRepository";
 

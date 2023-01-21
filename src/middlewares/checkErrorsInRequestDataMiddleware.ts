@@ -1,6 +1,6 @@
 import {Request, Response, NextFunction} from "express";
 import {validationResult} from "express-validator";
-import {HTTP_STATUSES} from "../routes/types/requestTypes";
+import {HTTP_STATUSES} from "../routes/types/HttpStatuses";
 
 export const checkErrorsInRequestDataMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);

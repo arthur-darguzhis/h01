@@ -4,15 +4,7 @@ import {BlogType} from "../domain/types/BlogType";
 
 export const blogRepository = {
 
-    async createBlog(blogInputModel: BlogInputModel): Promise<BlogType> {
-        const newBlog: BlogType = {
-            id: new Date().getTime().toString(),
-            name: blogInputModel.name,
-            description: blogInputModel.description,
-            websiteUrl: blogInputModel.websiteUrl,
-            createdAt: new Date().toISOString()
-        }
-
+    async createBlog(newBlog: BlogType): Promise<BlogType> {
         await blogsCollection.insertOne(newBlog)
         return newBlog;
     },
