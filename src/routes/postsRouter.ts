@@ -2,66 +2,23 @@ import {Request, Response, Router} from "express";
 import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "./types/RequestTypes";
 import {postQueryRepository} from "../queryRepository/postQueryRepository";
 import {PostInputModel} from "../domain/inputModels/PostInputModel";
-import {body, query} from "express-validator";
 import {checkErrorsInRequestDataMiddleware} from "../middlewares/checkErrorsInRequestDataMiddleware";
 import {APIErrorResultType} from "./types/apiError/APIErrorResultType";
 import {authGuardMiddleware} from "../middlewares/authGuardMiddleware";
 import {postsService} from "../domain/service/posts-service";
-import {blogQueryRepository} from "../queryRepository/blogQueryRepository";
 import {postRepository} from "../repository/postMongoDbRepository";
 import {HTTP_STATUSES} from "./types/HttpStatuses";
-import {sortDirections} from "./types/SortDirections";
 import {PostPaginatorType} from "../queryRepository/types/PostPaginatorType";
+import {validatePost} from "../middlewares/validators/validatePost";
+import {validatePaginator} from "../middlewares/validators/validatePaginator";
 
 export const postsRouter = Router({})
 
-const validateTitleField = body('title').trim().isLength({
-    min: 1,
-    max: 30
-}).withMessage('"title" length should be from 1 to 30');
-
-const validationShortDescriptionField = body('shortDescription').trim().isLength({
-    min: 1,
-    max: 100
-}).withMessage('"shortDescription" length should be from 1 to 100');
-
-const validationContentField = body('content').trim().isLength({
-    min: 1,
-    max: 1000
-}).withMessage('"content" length should be from 1 to 1000');
-
-const validationBlogIdField = body('blogId').custom(async (blogId) => {
-    const blog = await blogQueryRepository.findBlog(blogId);
-    if (!blog) {
-        throw new Error(`Blog with ID: ${blogId} is not exists`);
-    }
-    return true;
-});
-
-const validateSortByQueryParam = query('sortBy').optional({nullable: true}).trim().notEmpty().custom(sortBy => {
-    const allowedFields = ['id', 'string', 'title', 'shortDescription', 'content', 'blogId', 'blogName', 'createdAt']
-    if (!allowedFields.includes(sortBy)) {
-        throw new Error(`'sortBy' value can be one of: ${allowedFields.toString()}`);
-    }
-    return true;
-})
-
-const validateSortDirectionQueryParam = query('sortDirection').optional({nullable: true}).trim().notEmpty().custom(sortDirection => {
-    if (!sortDirections.includes(sortDirection)) {
-        throw new Error(`'sortDirection' value can be of ${sortDirections.toString()}`);
-    }
-    return true;
-})
-
-const validatePageNumberQueryParam = query('pageNumber').optional({nullable: true}).trim().notEmpty().isInt({min: 1})
-const validatePageSizeQueryParam = query('pageSize').optional({nullable: true}).trim().notEmpty().isInt({min: 1})
-
-
 postsRouter.get('/',
-    validateSortByQueryParam,
-    validateSortDirectionQueryParam,
-    validatePageNumberQueryParam,
-    validatePageSizeQueryParam,
+    validatePost.query.sortBy,
+    validatePost.query.sortDirection,
+    validatePaginator.pageNumber,
+    validatePaginator.pageSize,
     checkErrorsInRequestDataMiddleware,
     async (req: Request, res: Response<PostPaginatorType>) => {
         const sortBy: string = req.query.sortBy ? req.query.sortBy.toString() : 'createdAt';
@@ -83,10 +40,10 @@ postsRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res) => {
 
 postsRouter.post('/',
     authGuardMiddleware,
-    validateTitleField,
-    validationShortDescriptionField,
-    validationContentField,
-    validationBlogIdField,
+    validatePost.body.title,
+    validatePost.body.shortDescription,
+    validatePost.body.content,
+    validatePost.body.blogId,
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithBody<PostInputModel>, res) => {
         try {
@@ -110,10 +67,10 @@ postsRouter.post('/',
 
 postsRouter.put('/:id',
     authGuardMiddleware,
-    validateTitleField,
-    validationShortDescriptionField,
-    validationContentField,
-    validationBlogIdField,
+    validatePost.body.title,
+    validatePost.body.shortDescription,
+    validatePost.body.content,
+    validatePost.body.blogId,
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithParamsAndBody<{ id: string }, PostInputModel>, res) => {
 
