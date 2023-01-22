@@ -1,6 +1,6 @@
 import {postRepository} from '../../repository/postMongoDbRepository'
 import {blogRepository} from '../../repository/blogMongoDbRepository'
-import {PostInputModel} from "../inputModels/PostInputModel";
+import {PostInputModel} from "../../routes/inputModels/PostInputModel";
 
 export const postsService = {
     async createPost(postInputModel: PostInputModel): Promise<string | never> {

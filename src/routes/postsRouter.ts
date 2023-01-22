@@ -1,7 +1,7 @@
 import {Request, Response, Router} from "express";
 import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "./types/RequestTypes";
 import {postQueryRepository} from "../queryRepository/postQueryRepository";
-import {PostInputModel} from "../domain/inputModels/PostInputModel";
+import {PostInputModel} from "./inputModels/PostInputModel";
 import {checkErrorsInRequestDataMiddleware} from "../middlewares/checkErrorsInRequestDataMiddleware";
 import {APIErrorResultType} from "./types/apiError/APIErrorResultType";
 import {authGuardMiddleware} from "../middlewares/authGuardMiddleware";

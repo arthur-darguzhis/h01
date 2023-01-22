@@ -1,5 +1,5 @@
 import {blogsCollection, client} from "../db";
-import {BlogInputModel} from "../domain/inputModels/BlogInputModel";
+import {BlogInputModel} from "../routes/inputModels/BlogInputModel";
 import {BlogType} from "../domain/types/BlogType";
 
 export const blogRepository = {

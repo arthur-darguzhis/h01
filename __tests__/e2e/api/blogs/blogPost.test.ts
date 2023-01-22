@@ -4,7 +4,7 @@ import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
 import {blogRepository} from "../../../../src/repository/blogMongoDbRepository";
 import {blogsService} from "../../../../src/domain/service/blogs-service";
 import {postRepository} from "../../../../src/repository/postMongoDbRepository";
-import {PostInputModel} from "../../../../src/domain/inputModels/PostInputModel";
+import {PostInputModel} from "../../../../src/routes/inputModels/PostInputModel";
 import {blogQueryRepository} from "../../../../src/queryRepository/blogQueryRepository";
 import {BlogViewModel} from "../../../../src/queryRepository/types/BlogViewModel";
 

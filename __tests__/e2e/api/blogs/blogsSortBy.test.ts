@@ -8,29 +8,29 @@ describe('/blogs', () => {
     beforeAll(async () => {
         await blogRepository.deleteAllBlogs();
         await blogsService.createBlog({
-            "name" : "5 blog",
-            "description" : "some description",
-            "websiteUrl" : "https://habr.com/ru/users/AlekDikarev/",
+            "name": "5 blog",
+            "description": "some description",
+            "websiteUrl": "https://habr.com/ru/users/AlekDikarev/",
         });
         await blogsService.createBlog({
-            "name" : "2 blog",
-            "description" : "some description",
-            "websiteUrl" : "https://habr.com/ru/users/AlekDikarev/",
+            "name": "2 blog",
+            "description": "some description",
+            "websiteUrl": "https://habr.com/ru/users/AlekDikarev/",
         });
         await blogsService.createBlog({
-            "name" : "3 blog",
-            "description" : "some description",
-            "websiteUrl" : "https://habr.com/ru/users/AlekDikarev/",
+            "name": "3 blog",
+            "description": "some description",
+            "websiteUrl": "https://habr.com/ru/users/AlekDikarev/",
         });
         await blogsService.createBlog({
-            "name" : "4 blog",
-            "description" : "some description",
-            "websiteUrl" : "https://habr.com/ru/users/AlekDikarev/",
+            "name": "4 blog",
+            "description": "some description",
+            "websiteUrl": "https://habr.com/ru/users/AlekDikarev/",
         });
         await blogsService.createBlog({
-            "name" : "1 blog",
-            "description" : "some description",
-            "websiteUrl" : "https://habr.com/ru/users/AlekDikarev/",
+            "name": "1 blog",
+            "description": "some description",
+            "websiteUrl": "https://habr.com/ru/users/AlekDikarev/",
         });
     })
 

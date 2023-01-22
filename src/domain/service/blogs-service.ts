@@ -1,4 +1,4 @@
-import {BlogInputModel} from "../inputModels/BlogInputModel";
+import {BlogInputModel} from "../../routes/inputModels/BlogInputModel";
 import {BlogType} from "../types/BlogType";
 import {blogRepository} from "../../repository/blogMongoDbRepository";
 

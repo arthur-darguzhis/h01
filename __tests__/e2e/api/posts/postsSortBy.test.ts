@@ -11,9 +11,9 @@ describe('/blogs', () => {
         await blogRepository.deleteAllBlogs();
         await postRepository.deleteAllPosts();
         const blogId = await blogsService.createBlog({
-            name : "1 blog",
-            description : "some description",
-            websiteUrl : "https://habr.com/ru/users/AlekDikarev/",
+            name: "1 blog",
+            description: "some description",
+            websiteUrl: "https://habr.com/ru/users/AlekDikarev/",
         });
 
         await postsService.createPost({

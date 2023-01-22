@@ -1,6 +1,6 @@
 import {Request, Response, Router} from "express";
 import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "./types/RequestTypes";
-import {BlogInputModel} from "../domain/inputModels/BlogInputModel";
+import {BlogInputModel} from "./inputModels/BlogInputModel";
 import {checkErrorsInRequestDataMiddleware} from "../middlewares/checkErrorsInRequestDataMiddleware";
 import {authGuardMiddleware} from "../middlewares/authGuardMiddleware";
 import {blogsService} from "../domain/service/blogs-service";
@@ -13,7 +13,7 @@ import {validateBlog} from "../middlewares/validators/validateBlog";
 import {validatePost} from "../middlewares/validators/validatePost";
 import {postsService} from "../domain/service/posts-service";
 import {APIErrorResultType} from "./types/apiError/APIErrorResultType";
-import {PostInputModel} from "../domain/inputModels/PostInputModel";
+import {PostInputModel} from "./inputModels/PostInputModel";
 
 export const blogsRouter = Router({})
 
@@ -107,7 +107,7 @@ blogsRouter.post('/:id/posts',
             }
             return res.status(HTTP_STATUSES.BAD_REQUEST_400).json(apiErrorResult)
         }
-})
+    })
 
 blogsRouter.put('/:id',
     authGuardMiddleware,

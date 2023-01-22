@@ -2,7 +2,7 @@ import request from "supertest";
 import {app} from "../../../../src";
 import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
 import {blogRepository} from "../../../../src/repository/blogMongoDbRepository";
-import {BlogInputModel} from "../../../../src/domain/inputModels/BlogInputModel";
+import {BlogInputModel} from "../../../../src/routes/inputModels/BlogInputModel";
 
 describe('/blogs', () => {
     beforeAll(async () => {
@@ -12,7 +12,7 @@ describe('/blogs', () => {
     it('should return 200 and empty array', async () => {
         await request(app)
             .get('/blogs')
-            .expect(HTTP_STATUSES.OK_200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
+            .expect(HTTP_STATUSES.OK_200, {pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: []})
     })
 
     it('should return 404 for not existing blog', async () => {
@@ -41,7 +41,7 @@ describe('/blogs', () => {
 
         await request(app)
             .get('/blogs')
-            .expect(HTTP_STATUSES.OK_200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
+            .expect(HTTP_STATUSES.OK_200, {pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: []})
     })
 
     let firstBlog: any = null;
@@ -171,7 +171,7 @@ describe('/blogs', () => {
             })
     })
 
-    it('can not delete blog without auth',async () => {
+    it('can not delete blog without auth', async () => {
         await request(app)
             .delete('/blogs/' + firstBlog.id)
             .expect(HTTP_STATUSES.UNAUTHORIZED_401)
@@ -198,6 +198,6 @@ describe('/blogs', () => {
 
         await request(app)
             .get('/blogs')
-            .expect(HTTP_STATUSES.OK_200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
+            .expect(HTTP_STATUSES.OK_200, {pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: []})
     })
 });

@@ -3,10 +3,11 @@ import {BlogType} from "./domain/types/BlogType";
 import {UserType} from "./domain/types/UserType";
 import {MongoClient} from "mongodb";
 import * as dotenv from "dotenv";
+
 dotenv.config()
 
 const mongoUri = process.env.MONGO_URI
-if(!mongoUri){
+if (!mongoUri) {
     throw new Error('MongoDB URI is not found')
 }
 
@@ -26,7 +27,7 @@ export async function runDb() {
         //Это тестовый пинг к базе данных hm, но здесь может быть что угодно
         await client.db('hm').command({ping: 1})
         console.log('Connected successfully to mongoServer');
-    //Почему в catch нет "e"? разве так можно?
+        //Почему в catch нет "e"? разве так можно?
     } catch {
         //Ensure that the client will close when you finish/error
         await client.close();

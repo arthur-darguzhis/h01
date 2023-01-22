@@ -8,29 +8,29 @@ describe('/blogs', () => {
     beforeAll(async () => {
         await blogRepository.deleteAllBlogs();
         await blogsService.createBlog({
-            "name" : "first blog",
-            "description" : "some description",
-            "websiteUrl" : "https://habr.com/ru/users/AlekDikarev/",
+            "name": "first blog",
+            "description": "some description",
+            "websiteUrl": "https://habr.com/ru/users/AlekDikarev/",
         });
         await blogsService.createBlog({
-            "name" : "the First blog",
-            "description" : "some description",
-            "websiteUrl" : "https://habr.com/ru/users/AlekDikarev/",
+            "name": "the First blog",
+            "description": "some description",
+            "websiteUrl": "https://habr.com/ru/users/AlekDikarev/",
         });
         await blogsService.createBlog({
-            "name" : "exactly that the FiRsT blog",
-            "description" : "some description",
-            "websiteUrl" : "https://habr.com/ru/users/AlekDikarev/",
+            "name": "exactly that the FiRsT blog",
+            "description": "some description",
+            "websiteUrl": "https://habr.com/ru/users/AlekDikarev/",
         });
         await blogsService.createBlog({
-            "name" : "Arturs blog",
-            "description" : "some description",
-            "websiteUrl" : "https://habr.com/ru/users/AlekDikarev/",
+            "name": "Arturs blog",
+            "description": "some description",
+            "websiteUrl": "https://habr.com/ru/users/AlekDikarev/",
         });
         await blogsService.createBlog({
-            "name" : "Olgas blog",
-            "description" : "some description",
-            "websiteUrl" : "https://habr.com/ru/users/AlekDikarev/",
+            "name": "Olgas blog",
+            "description": "some description",
+            "websiteUrl": "https://habr.com/ru/users/AlekDikarev/",
         });
     })
 

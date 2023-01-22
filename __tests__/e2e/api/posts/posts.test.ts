@@ -1,8 +1,8 @@
 import request from "supertest";
 import {app} from "../../../../src";
 import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
-import {BlogInputModel} from "../../../../src/domain/inputModels/BlogInputModel";
-import {PostInputModel} from "../../../../src/domain/inputModels/PostInputModel";
+import {BlogInputModel} from "../../../../src/routes/inputModels/BlogInputModel";
+import {PostInputModel} from "../../../../src/routes/inputModels/PostInputModel";
 import {postRepository} from "../../../../src/repository/postMongoDbRepository";
 import {BlogType} from "../../../../src/domain/types/BlogType";
 
@@ -14,7 +14,7 @@ describe('/posts', () => {
     it('should return 200 and empty array', async () => {
         await request(app)
             .get('/posts')
-            .expect(HTTP_STATUSES.OK_200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
+            .expect(HTTP_STATUSES.OK_200, {pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: []})
     })
 
     it('should return 404 for not existing posts', async () => {
@@ -44,7 +44,7 @@ describe('/posts', () => {
 
         await request(app)
             .get('/posts')
-            .expect(HTTP_STATUSES.OK_200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
+            .expect(HTTP_STATUSES.OK_200, {pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: []})
     })
 
     let firstBlog: any = null;
@@ -79,7 +79,7 @@ describe('/posts', () => {
             blogId: firstBlog.id,
         }
 
-        const createPostResponse = await request(app)
+        await request(app)
             .post('/posts')
             .send(PostInputModel)
             .expect(HTTP_STATUSES.UNAUTHORIZED_401)
@@ -230,7 +230,7 @@ describe('/posts', () => {
             })
     })
 
-    it('can not delete post without auth',async () => {
+    it('can not delete post without auth', async () => {
         await request(app)
             .delete('/posts/' + firstPost.id)
             .expect(HTTP_STATUSES.UNAUTHORIZED_401)
@@ -257,7 +257,7 @@ describe('/posts', () => {
 
         await request(app)
             .get('/posts')
-            .expect(HTTP_STATUSES.OK_200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
+            .expect(HTTP_STATUSES.OK_200, {pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: []})
     })
 
 
