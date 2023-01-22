@@ -87,7 +87,7 @@ blogsRouter.post('/:id/posts',
     validatePost.body.title,
     validatePost.body.shortDescription,
     validatePost.body.content,
-    validatePost.body.blogId,
+    // validatePost.body.blogId,
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithParamsAndBody<{ id: string }, PostInputModel>, res) => {
         try {
