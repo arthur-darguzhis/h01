@@ -31,7 +31,7 @@ export const postQueryRepository = {
         const blogs = await postsCollection.find({}).sort(sortBy, direction).skip(howManySkip).limit(pageSize).toArray()
 
         return {
-            "pagesCount": Math.ceil(count/pageSize),
+            "pagesCount": Math.ceil(count / pageSize),
             "page": pageNumber,
             "pageSize": pageSize,
             "totalCount": count,
@@ -43,4 +43,27 @@ export const postQueryRepository = {
         const post = await postsCollection.findOne({id: id});
         return post ? _mapPostToViewModel(post) : null
     },
+
+    async findPostsByBlogId(
+        id: string,
+        sortBy: string,
+        sortDirection: string,
+        pageNumber: number,
+        pageSize: number): Promise<PostPaginatorType> {
+
+        const direction = sortDirection === 'asc' ? 1 : -1;
+
+        const count = await postsCollection.countDocuments({});
+        const howManySkip = (pageNumber - 1) * pageSize;
+        const blogs = await postsCollection.find({blogId: id}).sort(sortBy, direction).skip(howManySkip).limit(pageSize).toArray()
+
+        return {
+            "pagesCount": Math.ceil(count / pageSize),
+            "page": pageNumber,
+            "pageSize": pageSize,
+            "totalCount": count,
+            "items": blogs.map(_mapPostToViewModel)
+        }
+
+    }
 }
