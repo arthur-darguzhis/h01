@@ -11,6 +11,7 @@ import {HTTP_STATUSES} from "./types/HttpStatuses";
 import {PostPaginatorType} from "../queryRepository/types/PostPaginatorType";
 import {validatePost} from "../middlewares/validators/validatePost";
 import {validatePaginator} from "../middlewares/validators/validatePaginator";
+import {PostViewModel} from "../queryRepository/types/PostViewModel";
 
 export const postsRouter = Router({})
 
@@ -22,7 +23,7 @@ postsRouter.get('/',
     checkErrorsInRequestDataMiddleware,
     async (req: Request, res: Response<PostPaginatorType>) => {
         const sortBy: string = req.query.sortBy ? req.query.sortBy.toString() : 'createdAt';
-        const sortDirection: string = req.query.sortDirection ? req.query.sortDirection.toString() : 'asc';
+        const sortDirection: string = req.query.sortDirection ? req.query.sortDirection.toString() : 'desc';
         const pageNumber: number = req.query.pageNumber ? +req.query.pageNumber : 1;
         const pageSize: number = req.query.pageSize ? +req.query.pageSize : 10;
 
@@ -48,10 +49,7 @@ postsRouter.post('/',
     async (req: RequestWithBody<PostInputModel>, res) => {
         try {
             const newPostId = await postsService.createPost(req.body);
-            const newPost = await postQueryRepository.findPost(newPostId);
-            if (!newPost) {
-                return res.status(HTTP_STATUSES.UNPROCESSABLE_ENTITY)
-            }
+            const newPost = await postQueryRepository.findPost(newPostId) as PostViewModel;
             res.status(HTTP_STATUSES.CREATED_201).json(newPost);
         } catch (e) {
             const err = e as Error

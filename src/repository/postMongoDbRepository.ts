@@ -22,7 +22,12 @@ export const postRepository = {
         return result.deletedCount === 1;
     },
 
+    async deleteBlogPosts(blogId: string): Promise<void> {
+        await postsCollection.deleteMany({blogId: blogId});
+    },
+
     async deleteAllPosts(): Promise<void> {
         await postsCollection.deleteMany({})
-    }
+    },
+
 }

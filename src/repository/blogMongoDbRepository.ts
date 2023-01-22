@@ -1,4 +1,4 @@
-import {blogsCollection, client} from "../db";
+import {blogsCollection} from "../db";
 import {BlogInputModel} from "../routes/inputModels/BlogInputModel";
 import {BlogType} from "../domain/types/BlogType";
 

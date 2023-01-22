@@ -13,7 +13,10 @@ import {validateBlog} from "../middlewares/validators/validateBlog";
 import {validatePost} from "../middlewares/validators/validatePost";
 import {postsService} from "../domain/service/posts-service";
 import {APIErrorResultType} from "./types/apiError/APIErrorResultType";
-import {PostInputModel} from "./inputModels/PostInputModel";
+import {BlogPostInputModel} from "./inputModels/BlogPostInputModel";
+import {PostViewModel} from "../queryRepository/types/PostViewModel";
+import {BlogViewModel} from "../queryRepository/types/BlogViewModel";
+import {postRepository} from "../repository/postMongoDbRepository";
 
 export const blogsRouter = Router({})
 
@@ -27,7 +30,7 @@ blogsRouter.get('/',
     async (req: Request, res: Response<BlogPaginatorType>) => {
         const searchNameTerm: string | null = req.query.searchNameTerm ? req.query.searchNameTerm.toString() : null;
         const sortBy: string = req.query.sortBy ? req.query.sortBy.toString() : 'createdAt';
-        const sortDirection: string = req.query.sortDirection ? req.query.sortDirection.toString() : 'asc';
+        const sortDirection: string = req.query.sortDirection ? req.query.sortDirection.toString() : 'desc';
         const pageNumber: number = req.query.pageNumber ? +req.query.pageNumber : 1;
         const pageSize: number = req.query.pageSize ? +req.query.pageSize : 10;
 
@@ -58,11 +61,12 @@ blogsRouter.get('/:id/posts',
         }
 
         const sortBy: string = req.query.sortBy ? req.query.sortBy.toString() : 'createdAt';
-        const sortDirection: string = req.query.sortDirection ? req.query.sortDirection.toString() : 'asc';
+        const sortDirection: string = req.query.sortDirection ? req.query.sortDirection.toString() : 'desc';
         const pageNumber: number = req.query.pageNumber ? +req.query.pageNumber : 1;
         const pageSize: number = req.query.pageSize ? +req.query.pageSize : 10;
 
         const posts = await postQueryRepository.findPostsByBlogId(req.params.id, sortBy, sortDirection, pageNumber, pageSize);
+
         res.status(HTTP_STATUSES.OK_200).json(posts)
     })
 
@@ -74,10 +78,7 @@ blogsRouter.post('/',
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithBody<BlogInputModel>, res) => {
         const newBlogId = await blogsService.createBlog(req.body);
-        const newBlog = await blogQueryRepository.findBlog(newBlogId);
-        if (!newBlog) {
-            return res.status(HTTP_STATUSES.UNPROCESSABLE_ENTITY)
-        }
+        const newBlog = await blogQueryRepository.findBlog(newBlogId) as BlogViewModel;
         res.status(HTTP_STATUSES.CREATED_201).json(newBlog);
     })
 
@@ -87,25 +88,21 @@ blogsRouter.post('/:id/posts',
     validatePost.body.title,
     validatePost.body.shortDescription,
     validatePost.body.content,
-    // validatePost.body.blogId,
     checkErrorsInRequestDataMiddleware,
-    async (req: RequestWithParamsAndBody<{ id: string }, PostInputModel>, res) => {
+    async (req: RequestWithParamsAndBody<{ id: string }, BlogPostInputModel>, res) => {
         try {
-            const newPostId = await postsService.createPost(req.body);
-            const newPost = await postQueryRepository.findPost(newPostId);
-            if (!newPost) {
-                return res.status(HTTP_STATUSES.UNPROCESSABLE_ENTITY)
-            }
+            const newPostId = await postsService.createPostInBlog(req.params.id, req.body);
+            const newPost = await postQueryRepository.findPost(newPostId) as PostViewModel;
             res.status(HTTP_STATUSES.CREATED_201).json(newPost);
         } catch (e) {
             const err = e as Error
             const apiErrorResult: APIErrorResultType = {
                 errorsMessages: [{
-                    field: req.body.blogId,
+                    field: req.params.id,
                     message: err.message
                 }]
             }
-            return res.status(HTTP_STATUSES.BAD_REQUEST_400).json(apiErrorResult)
+            return res.status(HTTP_STATUSES.NOT_FOUND_404).json(apiErrorResult)
         }
     })
 
@@ -130,5 +127,7 @@ blogsRouter.delete('/:id', authGuardMiddleware, async (req: RequestWithParams<{ 
     if (!isBlogDeleted) {
         return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
     }
+
+    await postRepository.deleteBlogPosts(req.params.id);
     res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 })

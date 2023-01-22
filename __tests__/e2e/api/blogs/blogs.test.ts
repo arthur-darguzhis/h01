@@ -75,7 +75,7 @@ describe('/blogs', () => {
             websiteUrl: 'https://habr.com/ru/users/3Dvideo/'
         }
 
-        const createBlogResponse = await request(app)
+        await request(app)
             .post('/blogs')
             .send(blogInputModel)
             .expect(HTTP_STATUSES.UNAUTHORIZED_401)

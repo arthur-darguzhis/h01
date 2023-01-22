@@ -70,10 +70,13 @@ describe('/blogs', () => {
             .get('/posts/?searchNameTerm=blog&pageNumber=3&pageSize=2')
             .expect(HTTP_STATUSES.OK_200)
 
-        expect(blogsPaginatorResponse.body.pagesCount).toBe(3)
-        expect(blogsPaginatorResponse.body.page).toBe(3)
-        expect(blogsPaginatorResponse.body.pageSize).toBe(2)
-        expect(blogsPaginatorResponse.body.totalCount).toBe(5)
         expect(blogsPaginatorResponse.body.items.length).toBe(1)
+        expect(blogsPaginatorResponse.body).toEqual({
+            pagesCount: 3,
+            page: 3,
+            pageSize: 2,
+            totalCount: 5,
+            items: expect.any(Array),
+        });
     });
 })

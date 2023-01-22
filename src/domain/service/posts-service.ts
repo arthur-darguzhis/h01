@@ -1,6 +1,7 @@
 import {postRepository} from '../../repository/postMongoDbRepository'
 import {blogRepository} from '../../repository/blogMongoDbRepository'
 import {PostInputModel} from "../../routes/inputModels/PostInputModel";
+import {BlogPostInputModel} from "../../routes/inputModels/BlogPostInputModel";
 
 export const postsService = {
     async createPost(postInputModel: PostInputModel): Promise<string | never> {
@@ -15,6 +16,26 @@ export const postsService = {
             shortDescription: postInputModel.shortDescription,
             content: postInputModel.content,
             blogId: postInputModel.blogId,
+            blogName: blog.name,
+            createdAt: new Date().toISOString()
+        }
+
+        const post = await postRepository.createPost(newPost)
+        return post.id
+    },
+
+    async createPostInBlog(blogId: string, body: BlogPostInputModel): Promise<string | never> {
+        const blog = await blogRepository.findBlog(blogId);
+        if (!blog) {
+            throw new Error(`Blog with ID: ${blogId} is not exists`);
+        }
+
+        const newPost = {
+            id: new Date().getTime().toString(),
+            title: body.title,
+            shortDescription: body.shortDescription,
+            content: body.content,
+            blogId: blogId,
             blogName: blog.name,
             createdAt: new Date().toISOString()
         }
@@ -45,5 +66,5 @@ export const postsService = {
 
     async deleteAllPosts(): Promise<void> {
         await postRepository.deleteAllPosts()
-    }
+    },
 }

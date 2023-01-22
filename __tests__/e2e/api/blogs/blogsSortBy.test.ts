@@ -42,7 +42,7 @@ describe('/blogs', () => {
         expect(blogsPaginatorResponse.body.errorsMessages.length).toBe(2)
     });
 
-    it('should return 5 documents sorted by "name" with "asc" direction', async () => {
+    it('should return 5 documents sorted by "name" with "desc" direction', async () => {
         const blogsResponse = await request(app)
             .get('/blogs/?searchNameTerm=blog&sortBy=name&sortDirection=asc')
             .expect(HTTP_STATUSES.OK_200)

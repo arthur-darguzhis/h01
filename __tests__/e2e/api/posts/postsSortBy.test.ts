@@ -74,4 +74,14 @@ describe('/blogs', () => {
         expect(blogsResponse.body.items[0].title).toBe('1 post')
         expect(blogsResponse.body.items[4].title).toBe('5 post')
     });
+
+    it('should have default sorting by "createdAd" with "desc" direction', async() => {
+        const blogsResponse = await request(app)
+            .get('/posts')
+            .expect(HTTP_STATUSES.OK_200)
+
+        expect(blogsResponse.body.items.length).toBe(5)
+        expect(blogsResponse.body.items[0].title).toBe('1 post')
+        expect(blogsResponse.body.items[4].title).toBe('5 post')
+    })
 })
