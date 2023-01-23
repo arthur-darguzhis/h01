@@ -38,7 +38,7 @@ export const blogQueryRepository = {
         const blogs = await blogsCollection.find(filter).sort(sortBy, direction).skip(howManySkip).limit(pageSize).toArray()
 
         return {
-            "pagesCount": Math.ceil(count/pageSize),
+            "pagesCount": Math.ceil(count / pageSize),
             "page": pageNumber,
             "pageSize": pageSize,
             "totalCount": count,
