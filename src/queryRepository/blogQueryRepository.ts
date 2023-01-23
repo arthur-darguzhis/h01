@@ -1,8 +1,8 @@
-import {BlogViewModel} from "./types/BlogViewModel";
+import {BlogViewModel} from "./types/Blog/BlogViewModel";
 import {BlogType} from "../domain/types/BlogType";
 import {blogsCollection} from "../db";
-import {BlogPaginatorType} from "./types/BlogPaginatorType";
-import {BlogFilterType} from "./types/BlogFilterType";
+import {BlogPaginatorType} from "./types/Blog/BlogPaginatorType";
+import {BlogFilterType} from "./types/Blog/BlogFilterType";
 
 const _mapBlogToViewModel = (blog: BlogType): BlogViewModel => {
     //Делаем ручной маппинг почему?)

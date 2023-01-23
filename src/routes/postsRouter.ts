@@ -8,10 +8,10 @@ import {authGuardMiddleware} from "../middlewares/authGuardMiddleware";
 import {postsService} from "../domain/service/posts-service";
 import {postRepository} from "../repository/postMongoDbRepository";
 import {HTTP_STATUSES} from "./types/HttpStatuses";
-import {PostPaginatorType} from "../queryRepository/types/PostPaginatorType";
+import {PostPaginatorType} from "../queryRepository/types/Post/PostPaginatorType";
 import {validatePost} from "../middlewares/validators/validatePost";
 import {validatePaginator} from "../middlewares/validators/validatePaginator";
-import {PostViewModel} from "../queryRepository/types/PostViewModel";
+import {PostViewModel} from "../queryRepository/types/Post/PostViewModel";
 
 export const postsRouter = Router({})
 

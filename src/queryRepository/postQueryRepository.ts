@@ -1,7 +1,8 @@
-import {PostViewModel} from "./types/PostViewModel";
+import {PostViewModel} from "./types/Post/PostViewModel";
 import {PostType} from "../domain/types/PostType";
 import {postsCollection} from "../db";
-import {PostPaginatorType} from "./types/PostPaginatorType";
+import {PostPaginatorType} from "./types/Post/PostPaginatorType";
+import {BlogPostFilterType} from "./types/BlogPost/BlogPostFilterType";
 
 const _mapPostToViewModel = (post: PostType): PostViewModel => {
     return {
@@ -51,9 +52,10 @@ export const postQueryRepository = {
 
         const direction = sortDirection === 'asc' ? 1 : -1;
 
-        let count = await postsCollection.countDocuments({blogId: id});
+        let filter: BlogPostFilterType = {blogId: id}
+        let count = await postsCollection.countDocuments(filter);
         const howManySkip = (pageNumber - 1) * pageSize;
-        const blogs = await postsCollection.find({blogId: id}).sort(sortBy, direction).skip(howManySkip).limit(pageSize).toArray()
+        const blogs = await postsCollection.find(filter).sort(sortBy, direction).skip(howManySkip).limit(pageSize).toArray()
 
         return {
             "pagesCount": Math.ceil(count / pageSize),
