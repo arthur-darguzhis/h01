@@ -18,6 +18,7 @@ const dbConnection = client.db();
 //marginnote3app://note/B299627A-D44B-44CA-B3CD-1E1714C7B949
 export const blogsCollection = dbConnection.collection<BlogType>("blogs");
 export const postsCollection = dbConnection.collection<PostType>("posts");
+export const usersCollection = dbConnection.collection<UserType>("users");
 
 //Расскажите почему эта функция не стрелочная и при чем здесь замыкание и переменная client? =)
 export async function runDb() {
@@ -38,8 +39,11 @@ export async function runDb() {
 export const db: { users: UserType[]} = {
     users: [
         {
+            _id: '1009',
             login: 'admin',
             password: 'cXdlcnR5',
+            email: 'test@test.ts',
+            createdAt: ''
         }
     ]
 }
