@@ -28,7 +28,7 @@ export const validatePost = {
         })
     },
     query: {
-        sortBy: query('sortBy').optional({nullable: true}).trim().notEmpty().custom(sortBy => {
+        sortBy: query('sortBy').default('createdAt').custom(sortBy => {
             const allowedFields = ['id', 'string', 'title', 'shortDescription', 'content', 'blogId', 'blogName', 'createdAt']
             if (!allowedFields.includes(sortBy)) {
                 throw new Error(`'sortBy' value can be one of: ${allowedFields.toString()}`);
@@ -36,7 +36,7 @@ export const validatePost = {
             return true;
         }),
 
-        sortDirection: query('sortDirection').optional({nullable: true}).trim().notEmpty().custom(sortDirection => {
+        sortDirection: query('sortDirection').default('desc').custom(sortDirection => {
             if (!sortDirections.includes(sortDirection)) {
                 throw new Error(`'sortDirection' value can be of ${sortDirections.toString()}`);
             }

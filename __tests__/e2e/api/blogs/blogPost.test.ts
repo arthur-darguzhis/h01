@@ -6,7 +6,7 @@ import {blogsService} from "../../../../src/domain/service/blogs-service";
 import {postRepository} from "../../../../src/repository/postMongoDbRepository";
 import {PostInputModel} from "../../../../src/routes/inputModels/PostInputModel";
 import {blogQueryRepository} from "../../../../src/queryRepository/blogQueryRepository";
-import {BlogViewModel} from "../../../../src/queryRepository/types/BlogViewModel";
+import {BlogViewModel} from "../../../../src/queryRepository/types/Blog/BlogViewModel";
 
 describe('/blogs/:id/post', () => {
     let blogId: string;

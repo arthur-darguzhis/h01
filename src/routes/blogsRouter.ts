@@ -1,11 +1,16 @@
 import {Request, Response, Router} from "express";
-import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "./types/RequestTypes";
+import {
+    RequestWithBody,
+    RequestWithParams,
+    RequestWithParamsAndBody,
+    RequestWithParamsAndQuery, RequestWithQuery
+} from "./types/RequestTypes";
 import {BlogInputModel} from "./inputModels/BlogInputModel";
 import {checkErrorsInRequestDataMiddleware} from "../middlewares/checkErrorsInRequestDataMiddleware";
 import {authGuardMiddleware} from "../middlewares/authGuardMiddleware";
 import {blogsService} from "../domain/service/blogs-service";
 import {blogQueryRepository} from "../queryRepository/blogQueryRepository";
-import {BlogPaginatorType} from "../queryRepository/types/BlogPaginatorType";
+import {BlogPaginatorType} from "../queryRepository/types/Blog/BlogPaginatorType";
 import {HTTP_STATUSES} from "./types/HttpStatuses";
 import {postQueryRepository} from "../queryRepository/postQueryRepository";
 import {validatePaginator} from "../middlewares/validators/validatePaginator";
@@ -14,8 +19,8 @@ import {validatePost} from "../middlewares/validators/validatePost";
 import {postsService} from "../domain/service/posts-service";
 import {APIErrorResultType} from "./types/apiError/APIErrorResultType";
 import {BlogPostInputModel} from "./inputModels/BlogPostInputModel";
-import {PostViewModel} from "../queryRepository/types/PostViewModel";
-import {BlogViewModel} from "../queryRepository/types/BlogViewModel";
+import {PostViewModel} from "../queryRepository/types/Post/PostViewModel";
+import {BlogViewModel} from "../queryRepository/types/Blog/BlogViewModel";
 import {postRepository} from "../repository/postMongoDbRepository";
 
 export const blogsRouter = Router({})
@@ -27,14 +32,11 @@ blogsRouter.get('/',
     validatePaginator.pageSize,
     validatePaginator.pageNumber,
     checkErrorsInRequestDataMiddleware,
-    async (req: Request, res: Response<BlogPaginatorType>) => {
-        const searchNameTerm: string | null = req.query.searchNameTerm ? req.query.searchNameTerm.toString() : null;
-        const sortBy: string = req.query.sortBy ? req.query.sortBy.toString() : 'createdAt';
-        const sortDirection: string = req.query.sortDirection ? req.query.sortDirection.toString() : 'desc';
-        const pageNumber: number = req.query.pageNumber ? +req.query.pageNumber : 1;
-        const pageSize: number = req.query.pageSize ? +req.query.pageSize : 10;
+    async (req: RequestWithQuery<{ searchNameTerm: string, sortBy: string, sortDirection: string, pageSize: string, pageNumber: string }>,
+           res: Response<BlogPaginatorType>) => {
 
-        const blogs = await blogQueryRepository.findBlogs(searchNameTerm, sortBy, sortDirection, pageNumber, pageSize);
+        const {searchNameTerm, sortBy, sortDirection, pageSize, pageNumber} = req.query
+        const blogs = await blogQueryRepository.findBlogs(searchNameTerm, sortBy, sortDirection, +pageNumber, +pageSize);
 
         res.status(HTTP_STATUSES.OK_200).json(blogs)
     })
@@ -48,24 +50,20 @@ blogsRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res) => {
 })
 
 blogsRouter.get('/:id/posts',
-    validateBlog.query.sortBy,
-    validateBlog.query.sortDirection,
+    validatePost.query.sortBy,
+    validatePost.query.sortDirection,
     validatePaginator.pageSize,
     validatePaginator.pageNumber,
     checkErrorsInRequestDataMiddleware,
-    async (req: RequestWithParams<{ id: string }>, res) => {
+    async (req: RequestWithParamsAndQuery<{ id: string }, { sortBy: string, sortDirection: string, pageSize: string, pageNumber: string }>, res) => {
 
         const blog = await blogQueryRepository.findBlog(req.params.id)
         if (!blog) {
             return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
         }
 
-        const sortBy: string = req.query.sortBy ? req.query.sortBy.toString() : 'createdAt';
-        const sortDirection: string = req.query.sortDirection ? req.query.sortDirection.toString() : 'desc';
-        const pageNumber: number = req.query.pageNumber ? +req.query.pageNumber : 1;
-        const pageSize: number = req.query.pageSize ? +req.query.pageSize : 10;
-
-        const posts = await postQueryRepository.findPostsByBlogId(req.params.id, sortBy, sortDirection, pageNumber, pageSize);
+        const {sortBy, sortDirection, pageNumber, pageSize} = req.query
+        const posts = await postQueryRepository.findPostsByBlogId(req.params.id, sortBy, sortDirection, +pageNumber, +pageSize);
 
         res.status(HTTP_STATUSES.OK_200).json(posts)
     })

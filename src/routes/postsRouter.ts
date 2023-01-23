@@ -1,5 +1,5 @@
-import {Request, Response, Router} from "express";
-import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "./types/RequestTypes";
+import {Response, Router} from "express";
+import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody, RequestWithQuery} from "./types/RequestTypes";
 import {postQueryRepository} from "../queryRepository/postQueryRepository";
 import {PostInputModel} from "./inputModels/PostInputModel";
 import {checkErrorsInRequestDataMiddleware} from "../middlewares/checkErrorsInRequestDataMiddleware";
@@ -21,13 +21,11 @@ postsRouter.get('/',
     validatePaginator.pageNumber,
     validatePaginator.pageSize,
     checkErrorsInRequestDataMiddleware,
-    async (req: Request, res: Response<PostPaginatorType>) => {
-        const sortBy: string = req.query.sortBy ? req.query.sortBy.toString() : 'createdAt';
-        const sortDirection: string = req.query.sortDirection ? req.query.sortDirection.toString() : 'desc';
-        const pageNumber: number = req.query.pageNumber ? +req.query.pageNumber : 1;
-        const pageSize: number = req.query.pageSize ? +req.query.pageSize : 10;
+    async (req: RequestWithQuery<{ sortBy: string, sortDirection: string, pageSize: string, pageNumber: string }>,
+           res: Response<PostPaginatorType>) => {
 
-        const posts = await postQueryRepository.findPosts(sortBy, sortDirection, pageNumber, pageSize);
+        const {sortBy, sortDirection, pageNumber, pageSize} = req.query
+        const posts = await postQueryRepository.findPosts(sortBy, sortDirection, +pageNumber, +pageSize);
         res.status(HTTP_STATUSES.OK_200).json(posts)
     })
 
