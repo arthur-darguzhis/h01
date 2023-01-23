@@ -3,10 +3,11 @@ import {PostType} from "../domain/types/PostType";
 import {postsCollection} from "../db";
 import {PostPaginatorType} from "./types/Post/PostPaginatorType";
 import {BlogPostFilterType} from "./types/BlogPost/BlogPostFilterType";
+import {ObjectId} from "mongodb";
 
 const _mapPostToViewModel = (post: PostType): PostViewModel => {
     return {
-        id: post.id,
+        id: post._id,
         title: post.title,
         shortDescription: post.shortDescription,
         content: post.content,
@@ -17,7 +18,6 @@ const _mapPostToViewModel = (post: PostType): PostViewModel => {
 }
 
 export const postQueryRepository = {
-
     async findPosts(
         sortBy: string,
         sortDirection: string,
@@ -39,7 +39,7 @@ export const postQueryRepository = {
     },
 
     async findPost(id: string): Promise<PostViewModel | null> {
-        const post = await postsCollection.findOne({id: id});
+        const post = await postsCollection.findOne({_id: new ObjectId(id).toString()});
         return post ? _mapPostToViewModel(post) : null
     },
 

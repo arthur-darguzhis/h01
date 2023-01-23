@@ -1,19 +1,20 @@
 import {BlogInputModel} from "../../routes/inputModels/BlogInputModel";
 import {BlogType} from "../types/BlogType";
 import {blogRepository} from "../../repository/blogMongoDbRepository";
+import {ObjectId} from "mongodb";
 
 export const blogsService = {
 
     async createBlog(blogInputModel: BlogInputModel): Promise<string> {
         const newBlog: BlogType = {
-            id: new Date().getTime().toString(),
+            _id: new ObjectId().toString(),
             name: blogInputModel.name,
             description: blogInputModel.description,
             websiteUrl: blogInputModel.websiteUrl,
             createdAt: new Date().toISOString()
         }
         const blog = await blogRepository.createBlog(newBlog)
-        return blog.id
+        return blog._id.toString()
     },
 
     async updateBlog(id: string, blogInputModel: BlogInputModel): Promise<boolean> {

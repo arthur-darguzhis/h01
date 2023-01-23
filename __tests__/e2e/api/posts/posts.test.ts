@@ -4,7 +4,7 @@ import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
 import {BlogInputModel} from "../../../../src/routes/inputModels/BlogInputModel";
 import {PostInputModel} from "../../../../src/routes/inputModels/PostInputModel";
 import {postRepository} from "../../../../src/repository/postMongoDbRepository";
-import {BlogType} from "../../../../src/domain/types/BlogType";
+import {BlogViewModel} from "../../../../src/queryRepository/types/Blog/BlogViewModel";
 
 describe('/posts', () => {
     beforeAll(async () => {
@@ -19,7 +19,7 @@ describe('/posts', () => {
 
     it('should return 404 for not existing posts', async () => {
         await request(app)
-            .get('/posts/1')
+            .get('/posts/63cee71e288013069a37f2b8')
             .expect(HTTP_STATUSES.NOT_FOUND_404)
     })
 
@@ -172,7 +172,7 @@ describe('/posts', () => {
             .send(blogInputModel)
             .expect(HTTP_STATUSES.CREATED_201)
 
-        const firstBlog: BlogType = createBlogResponse.body;
+        const firstBlog: BlogViewModel = createBlogResponse.body;
         expect(firstBlog).toEqual({
             id: expect.any(String),
             name: 'first blog',
@@ -188,7 +188,7 @@ describe('/posts', () => {
             blogId: firstBlog.id
         };
         await request(app)
-            .put('/posts/1000')
+            .put('/posts/63cee71e288013069a37f2b8')
             .auth('admin', 'qwerty', {type: "basic"})
             .send(updatePostInputModel)
             .expect(HTTP_STATUSES.NOT_FOUND_404)

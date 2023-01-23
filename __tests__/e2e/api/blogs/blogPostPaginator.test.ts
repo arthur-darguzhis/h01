@@ -7,6 +7,7 @@ import {postRepository} from "../../../../src/repository/postMongoDbRepository";
 import {PostInputModel} from "../../../../src/routes/inputModels/PostInputModel";
 import {blogQueryRepository} from "../../../../src/queryRepository/blogQueryRepository";
 import {BlogViewModel} from "../../../../src/queryRepository/types/Blog/BlogViewModel";
+import {postsService} from "../../../../src/domain/service/posts-service";
 
 describe('/blogs/:id/post', () => {
     let blogId: string;
@@ -29,11 +30,7 @@ describe('/blogs/:id/post', () => {
                 blogId: blogId,
             }
 
-            const createPostResponse = await request(app)
-                .post('/blogs/' + blogId + '/posts')
-                .auth('admin', 'qwerty', {type: "basic"})
-                .send(PostInputModel)
-                .expect(HTTP_STATUSES.CREATED_201)
+            await postsService.createPostInBlog(blogId, PostInputModel);
         }
     }, 30000)
 

@@ -70,7 +70,7 @@ describe('/blogs/:id/post', () => {
 
     it('it can not read posts of blog without posts', async () => {
         await request(app)
-            .get('/blogs/1000/posts')
+            .get('/blogs/63cee71e288013069a37f2b8/posts')
             .expect(HTTP_STATUSES.NOT_FOUND_404)
     })
 });

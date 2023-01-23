@@ -2,6 +2,7 @@ import {postRepository} from '../../repository/postMongoDbRepository'
 import {blogRepository} from '../../repository/blogMongoDbRepository'
 import {PostInputModel} from "../../routes/inputModels/PostInputModel";
 import {BlogPostInputModel} from "../../routes/inputModels/BlogPostInputModel";
+import {ObjectId} from "mongodb";
 
 export const postsService = {
     async createPost(postInputModel: PostInputModel): Promise<string | never> {
@@ -11,7 +12,7 @@ export const postsService = {
         }
 
         const newPost = {
-            id: new Date().getTime().toString(),
+            _id: new ObjectId().toString(),
             title: postInputModel.title,
             shortDescription: postInputModel.shortDescription,
             content: postInputModel.content,
@@ -21,7 +22,7 @@ export const postsService = {
         }
 
         const post = await postRepository.createPost(newPost)
-        return post.id
+        return post._id
     },
 
     async createPostInBlog(blogId: string, body: BlogPostInputModel): Promise<string | never> {
@@ -31,7 +32,7 @@ export const postsService = {
         }
 
         const newPost = {
-            id: new Date().getTime().toString(),
+            _id: new ObjectId().toString(),
             title: body.title,
             shortDescription: body.shortDescription,
             content: body.content,
@@ -41,7 +42,7 @@ export const postsService = {
         }
 
         const post = await postRepository.createPost(newPost)
-        return post.id
+        return post._id
     },
 
     async updatePost(id: string, postInputModel: PostInputModel): Promise<boolean | never> {

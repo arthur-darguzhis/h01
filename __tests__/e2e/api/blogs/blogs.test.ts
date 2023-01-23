@@ -17,7 +17,7 @@ describe('/blogs', () => {
 
     it('should return 404 for not existing blog', async () => {
         await request(app)
-            .get('/blogs/1')
+            .get('/blogs/63cee71e288013069a37f2b8')
             .expect(HTTP_STATUSES.NOT_FOUND_404)
     })
 
@@ -131,7 +131,7 @@ describe('/blogs', () => {
             websiteUrl: 'https://habr.com/ru/users/3Dvideo/'
         };
         await request(app)
-            .put('/blogs/1000')
+            .put('/blogs/63cee71e288013069a37f2b8')
             .auth('admin', 'qwerty', {type: "basic"})
             .send(updateBlogInputModel)
             .expect(HTTP_STATUSES.NOT_FOUND_404)
