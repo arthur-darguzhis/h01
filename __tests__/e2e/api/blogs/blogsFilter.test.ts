@@ -34,12 +34,12 @@ describe('/blogs', () => {
         });
     })
 
-    it('should return 5 documents when query param "searchNameTerm" is empty', async () => {
+    it('should return 0 documents when query param "searchNameTerm" does not match with any blog name', async () => {
         const blogsResponse = await request(app)
-            .get('/blogs/?searchNameTerm=')
-            .expect(HTTP_STATUSES.BAD_REQUEST_400)
+            .get('/blogs/?searchNameTerm=qwer')
+            .expect(HTTP_STATUSES.OK_200)
 
-        expect(blogsResponse.body.errorsMessages.length).toBe(1)
+        expect(blogsResponse.body.items.length).toBe(0)
     })
 
     it('Should return 3 case insensitive document where "name" = "first"', async () => {
