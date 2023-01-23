@@ -51,7 +51,7 @@ export const postQueryRepository = {
 
         const direction = sortDirection === 'asc' ? 1 : -1;
 
-        let count = await postsCollection.countDocuments({});
+        let count = await postsCollection.countDocuments({blogId: id});
         const howManySkip = (pageNumber - 1) * pageSize;
         const blogs = await postsCollection.find({blogId: id}).sort(sortBy, direction).skip(howManySkip).limit(pageSize).toArray()
 
