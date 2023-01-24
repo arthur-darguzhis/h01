@@ -13,7 +13,16 @@ export const userRepository = {
         return result.deletedCount === 1
     },
 
-    async deleteAllUsers(): Promise<void>{
+    async deleteAllUsers(): Promise<void> {
         await usersCollection.deleteMany({})
+    },
+
+    async findByLoginOrEmail(loginOrEmail: string): Promise<UserType | null> {
+        return await usersCollection.findOne({
+            $or: [
+                {login: loginOrEmail},
+                {email: loginOrEmail}
+            ]
+        })
     }
 }
