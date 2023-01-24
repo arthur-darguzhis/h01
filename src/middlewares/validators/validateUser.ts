@@ -3,9 +3,9 @@ import {sortDirections} from "../../routes/types/SortDirections";
 
 export const validateUser = {
     body: {
-        login: body('login').matches(/^[a-zA-Z0-9_-]*$/).isLength({min: 3, max: 10}),
-        password: body('password').isLength({min: 6, max: 20}),
-        email: body('email').matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
+        login: body('login').trim().matches(/^[a-zA-Z0-9_-]*$/).isLength({min: 3, max: 10}),
+        password: body('password').trim().isLength({min: 6, max: 20}),
+        email: body('email').trim().matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/),
     },
     query: {
         searchLoginTerm: query('searchLoginTerm').default(null).trim(),
