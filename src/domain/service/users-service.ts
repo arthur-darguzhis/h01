@@ -16,7 +16,7 @@ export const usersService = {
             createdAt: new Date().toISOString()
         }
 
-        const user = await userRepository.createUser(newUser);
+        const user = await userRepository.addUser(newUser);
         return user._id.toString();
     },
 

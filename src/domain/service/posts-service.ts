@@ -21,7 +21,7 @@ export const postsService = {
             createdAt: new Date().toISOString()
         }
 
-        const post = await postRepository.createPost(newPost)
+        const post = await postRepository.addPost(newPost)
         return post._id
     },
 
@@ -41,7 +41,7 @@ export const postsService = {
             createdAt: new Date().toISOString()
         }
 
-        const post = await postRepository.createPost(newPost)
+        const post = await postRepository.addPost(newPost)
         return post._id
     },
 

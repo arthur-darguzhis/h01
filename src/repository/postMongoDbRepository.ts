@@ -4,7 +4,7 @@ import {PostType} from "../domain/types/PostType";
 import {ObjectId} from "mongodb";
 
 export const postRepository = {
-    async createPost(newPost: PostType): Promise<PostType> {
+    async addPost(newPost: PostType): Promise<PostType> {
         await postsCollection.insertOne(newPost)
         return newPost;
     },

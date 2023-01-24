@@ -13,7 +13,7 @@ export const blogsService = {
             websiteUrl: blogInputModel.websiteUrl,
             createdAt: new Date().toISOString()
         }
-        const blog = await blogRepository.createBlog(newBlog)
+        const blog = await blogRepository.addBlog(newBlog)
         return blog._id.toString()
     },
 
