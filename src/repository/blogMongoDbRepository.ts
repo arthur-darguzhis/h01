@@ -11,11 +11,11 @@ export const blogRepository = {
     },
 
     async findBlog(id: string): Promise<BlogType | null> {
-        return await blogsCollection.findOne({_id: new ObjectId(id).toString()});
+        return await blogsCollection.findOne({_id: id});
     },
 
     async updateBlog(id: string, blog: BlogInputModel): Promise<boolean> {
-        const result = await blogsCollection.updateOne({_id: new ObjectId(id).toString()}, {
+        const result = await blogsCollection.updateOne({_id: id}, {
             $set: blog
         });
 
@@ -23,7 +23,7 @@ export const blogRepository = {
     },
 
     async deleteBlog(id: string): Promise<boolean> {
-        const result = await blogsCollection.deleteOne({_id: new ObjectId(id).toString()});
+        const result = await blogsCollection.deleteOne({_id: id});
         return result.deletedCount === 1
     },
 

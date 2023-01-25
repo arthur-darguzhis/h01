@@ -1,3 +1,3 @@
-class EntityNotFound extends Error {
-    
+export class EntityNotFound extends Error {
+
 }

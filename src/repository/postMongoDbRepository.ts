@@ -10,16 +10,16 @@ export const postRepository = {
     },
 
     async findPost(id: string): Promise<PostType | null> {
-        return await postsCollection.findOne({_id: new ObjectId(id).toString()});
+        return await postsCollection.findOne({_id: id});
     },
 
     async updatePost(id: string, post: PostInputModel): Promise<boolean> {
-        const result = await postsCollection.updateOne({_id: new ObjectId(id).toString()}, {$set: post})
+        const result = await postsCollection.updateOne({_id: id}, {$set: post})
         return result.matchedCount === 1;
     },
 
     async deletePost(id: string): Promise<boolean> {
-        const result = await postsCollection.deleteOne({_id: new ObjectId(id).toString()});
+        const result = await postsCollection.deleteOne({_id: id});
         return result.deletedCount === 1;
     },
 

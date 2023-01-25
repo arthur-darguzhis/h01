@@ -57,7 +57,7 @@ describe('/blogs', () => {
         });
     })
 
-    it('send incorrect parameters for "pageNumber" and "pageSize". should fail with 2 errorss', async () => {
+    it('send incorrect parameters for "pageNumber" and "pageSize". should fail with 2 errors', async () => {
         const blogsPaginatorResponse = await request(app)
             .get('/posts/?searchNameTerm=blog&pageNumber=-1&pageSize=-1')
             .expect(HTTP_STATUSES.BAD_REQUEST_400)

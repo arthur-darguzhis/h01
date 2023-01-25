@@ -9,7 +9,7 @@ export const userRepository = {
     },
 
     async findUser(id: string): Promise<UserType | null> {
-        return await usersCollection.findOne({_id: new ObjectId(id).toString()});
+        return await usersCollection.findOne({_id: id});
     },
 
     async findByLoginOrEmail(loginOrEmail: string): Promise<UserType | null> {
@@ -22,7 +22,7 @@ export const userRepository = {
     },
 
     async deleteUser(id: string): Promise<boolean> {
-        const result = await usersCollection.deleteOne({_id: new ObjectId(id).toString()})
+        const result = await usersCollection.deleteOne({_id: id})
         return result.deletedCount === 1
     },
 

@@ -1,6 +1,5 @@
 import {UserViewModel} from "./types/User/UserViewModel";
 import {usersCollection} from "../db";
-import {ObjectId} from "mongodb";
 import {UserType} from "../domain/types/UserType";
 import {UserPaginatorType} from "./types/User/UserPaginatorType";
 import {UserFilterType} from "./types/User/UserFilterType";
@@ -25,12 +24,12 @@ const _mapUserToMeViewModel = (user: UserType): MeViewModel => {
 
 export const userQueryRepository = {
     async findUser(id: string): Promise<UserViewModel | null> {
-        const user = await usersCollection.findOne({_id: new ObjectId(id).toString()})
+        const user = await usersCollection.findOne({_id: id})
         return user ? _mapUserToViewModel(user) : null
     },
 
     async findMe(id: string): Promise<MeViewModel | null> {
-        const user = await usersCollection.findOne({_id: new ObjectId(id).toString()})
+        const user = await usersCollection.findOne({_id: id})
         return user ? _mapUserToMeViewModel(user): null;
     },
 

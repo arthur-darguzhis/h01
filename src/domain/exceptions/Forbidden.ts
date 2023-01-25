@@ -1,3 +1,3 @@
-class Forbidden extends Error {
+export class Forbidden extends Error {
 
 }

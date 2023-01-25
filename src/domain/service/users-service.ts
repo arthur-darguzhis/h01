@@ -36,7 +36,7 @@ export const usersService = {
         const user = await userRepository.findByLoginOrEmail(loginOrEmail)
         if (!user) return false;
 
-        const areCredentialValid = bcrypt.compare(password, user.password);
+        const areCredentialValid = await bcrypt.compare(password, user.password);
         if (!areCredentialValid) return false;
 
         return user;

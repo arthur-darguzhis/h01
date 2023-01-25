@@ -1,6 +1,5 @@
 import {CommentType} from "../domain/types/CommentType";
 import {commentsCollection} from "../db";
-import {ObjectId} from "mongodb";
 import {CommentViewModel} from "./types/Comment/CommentViewModel";
 import {PostCommentFilterType} from "./types/PostComment/PostCommentFilterType";
 import {CommentPaginatorType} from "./types/Comment/CommentPaginatorType";
@@ -19,12 +18,12 @@ const _mapCommentToViewModel = (comment: CommentType): CommentViewModel => {
 
 export const commentQueryRepository = {
     async findComment(commentId: string): Promise<CommentViewModel | null> {
-        const comment = await commentsCollection.findOne({_id: new ObjectId(commentId).toString()})
+        const comment = await commentsCollection.findOne({_id: commentId})
         return comment ? _mapCommentToViewModel(comment) : null
     },
 
     async findCommentsByPostId(
-        id: string,
+        postId: string,
         sortBy: string,
         sortDirection: string,
         pageNumber: number,
@@ -32,7 +31,7 @@ export const commentQueryRepository = {
 
         const direction = sortDirection === 'asc' ? 1 : -1;
 
-        let filter: PostCommentFilterType = {postId: id}
+        let filter: PostCommentFilterType = {postId: postId}
         let count = await commentsCollection.countDocuments(filter);
         const howManySkip = (pageNumber - 1) * pageSize;
         const comments = await commentsCollection.find(filter).sort(sortBy, direction).skip(howManySkip).limit(pageSize).toArray()

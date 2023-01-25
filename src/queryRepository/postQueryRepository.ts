@@ -3,7 +3,6 @@ import {PostType} from "../domain/types/PostType";
 import {postsCollection} from "../db";
 import {PostPaginatorType} from "./types/Post/PostPaginatorType";
 import {BlogPostFilterType} from "./types/BlogPost/BlogPostFilterType";
-import {ObjectId} from "mongodb";
 
 const _mapPostToViewModel = (post: PostType): PostViewModel => {
     return {
@@ -38,8 +37,8 @@ export const postQueryRepository = {
         }
     },
 
-    async findPost(id: string): Promise<PostViewModel | null> {
-        const post = await postsCollection.findOne({_id: new ObjectId(id).toString()});
+    async findPost(postId: string): Promise<PostViewModel | null> {
+        const post = await postsCollection.findOne({_id: postId});
         return post ? _mapPostToViewModel(post) : null
     },
 

@@ -21,7 +21,7 @@ import {PostViewModel} from "../queryRepository/types/Post/PostViewModel";
 import {CommentInputModel} from "./inputModels/CommentInputModel";
 import {validateComment} from "../middlewares/validators/validateComment";
 import {jwtAuthGuardMiddleware} from "../middlewares/jwtAuthGuardMiddleware";
-import {commentService} from "../domain/service/comment-service";
+import {commentsService} from "../domain/service/comments-service";
 import {commentQueryRepository} from "../queryRepository/commentQueryRepository";
 import {CommentViewModel} from "../queryRepository/types/Comment/CommentViewModel";
 
@@ -108,20 +108,20 @@ postsRouter.delete('/:id', authGuardMiddleware, async (req: RequestWithParams<{ 
         : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
 })
 
-postsRouter.post('/:id/comments',
+postsRouter.post('/:postId/comments',
     jwtAuthGuardMiddleware,
     validateComment.body.content,
     checkErrorsInRequestDataMiddleware,
-    async (req: RequestWithParamsAndBody<{ id: string }, CommentInputModel>, res) => {
+    async (req: RequestWithParamsAndBody<{ postId: string }, CommentInputModel>, res) => {
         try {
-            const newCommentId = await commentService.addComment(req.params.id, req.body, req.user!);
+            const newCommentId = await commentsService.addComment(req.params.postId, req.body, req.user!);
             const newComment = await commentQueryRepository.findComment(newCommentId) as CommentViewModel
-            res.status(HTTP_STATUSES.CREATED_201).json(newComment);
+            return res.status(HTTP_STATUSES.CREATED_201).json(newComment);
         } catch (e) {
             const err = e as Error
             const apiErrorResult: APIErrorResultType = {
                 errorsMessages: [{
-                    field: req.params.id,
+                    field: req.params.postId,
                     message: err.message
                 }]
             }
@@ -129,20 +129,20 @@ postsRouter.post('/:id/comments',
         }
     })
 
-postsRouter.get('/:id/comments',
+postsRouter.get('/:postId/comments',
     validateComment.query.sortBy,
     validateComment.query.sortDirection,
     validatePaginator.pageSize,
     validatePaginator.pageNumber,
     checkErrorsInRequestDataMiddleware,
-    async (req: RequestWithParamsAndQuery<{ id: string }, { sortBy: string, sortDirection: string, pageSize: string, pageNumber: string }>, res) => {
-        const post = await postQueryRepository.findPost(req.params.id);
+    async (req: RequestWithParamsAndQuery<{ postId: string }, { sortBy: string, sortDirection: string, pageSize: string, pageNumber: string }>, res) => {
+        const post = await postQueryRepository.findPost(req.params.postId);
         if(!post){
             return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
         }
 
         const {sortBy, sortDirection, pageNumber, pageSize} = req.query
-        const comments = await commentQueryRepository.findCommentsByPostId(req.params.id, sortBy, sortDirection, +pageNumber, +pageSize)
+        const comments = await commentQueryRepository.findCommentsByPostId(req.params.postId, sortBy, sortDirection, +pageNumber, +pageSize)
 
         res.status(HTTP_STATUSES.OK_200).json(comments);
     })

@@ -3,7 +3,6 @@ import {BlogType} from "../domain/types/BlogType";
 import {blogsCollection} from "../db";
 import {BlogPaginatorType} from "./types/Blog/BlogPaginatorType";
 import {BlogFilterType} from "./types/Blog/BlogFilterType";
-import {ObjectId} from "mongodb";
 
 const _mapBlogToViewModel = (blog: BlogType): BlogViewModel => {
     //Делаем ручной маппинг почему?)
@@ -47,7 +46,7 @@ export const blogQueryRepository = {
     },
 
     async findBlog(id: string): Promise<BlogViewModel | null> {
-        const blog = await blogsCollection.findOne({_id: new ObjectId(id).toString()});
+        const blog = await blogsCollection.findOne({_id: id});
         return blog ? _mapBlogToViewModel(blog) : null;
     },
 }

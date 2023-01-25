@@ -84,7 +84,7 @@ describe('/posts/:id/comments', () => {
     })
 
     it('get 404 when post is not exists', async () => {
-        const postCommentResponse =  await request(app)
+        await request(app)
             .post('/posts/' + '63d11d1562ede10be4f024ad' + '/comments')
             .auth(token, {type: "bearer"})
             .send({content: 'this is a sample of a correct comment that can be saved'})

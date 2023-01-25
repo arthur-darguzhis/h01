@@ -85,6 +85,6 @@ describe('/posts/:id/comments', () => {
 
         expect(postsCommentsPaginatorResponse.body.items.length).toBe(10)
         expect(postsCommentsPaginatorResponse.body.items[0].content).toMatch('comment №:1')
-        expect(postsCommentsPaginatorResponse.body.items[4].content).toMatch('comment №:5')
+        expect(postsCommentsPaginatorResponse.body.items[4].content).toMatch('comment №:2')
     })
 })

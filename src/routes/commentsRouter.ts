@@ -3,9 +3,12 @@ import {RequestWithParams, RequestWithParamsAndBody} from "./types/RequestTypes"
 import {commentQueryRepository} from "../queryRepository/commentQueryRepository";
 import {HTTP_STATUSES} from "./types/HttpStatuses";
 import {CommentInputModel} from "./inputModels/CommentInputModel";
-import {commentService} from "../domain/service/comment-service";
+import {commentsService} from "../domain/service/comments-service";
 import {jwtAuthGuardMiddleware} from "../middlewares/jwtAuthGuardMiddleware";
 import {validateComment} from "../middlewares/validators/validateComment";
+import {EntityNotFound} from "../domain/exceptions/EntityNotFound";
+import {Forbidden} from "../domain/exceptions/Forbidden";
+import {checkErrorsInRequestDataMiddleware} from "../middlewares/checkErrorsInRequestDataMiddleware";
 
 export const commentsRouter = Router({})
 
@@ -18,23 +21,23 @@ commentsRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res) =
 })
 
 commentsRouter.put('/:id',
-    validateComment.body.content,
     jwtAuthGuardMiddleware,
+    validateComment.body.content,
+    checkErrorsInRequestDataMiddleware,
     async (req: RequestWithParamsAndBody<{ id: string }, CommentInputModel>, res) => {
         const commentInputModel: CommentInputModel = {content: req.body.content};
 
         try {
-            await commentService.updateUsersComment(req.params.id, req.user!._id, commentInputModel)
+            await commentsService.updateUsersComment(req.params.id, req.user!._id, commentInputModel)
         } catch (e) {
             if (e instanceof EntityNotFound) {
                 return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
             }
 
             if (e instanceof Forbidden) {
-                return res.status(HTTP_STATUSES.FORBIDDEN_403)
+                return res.sendStatus(HTTP_STATUSES.FORBIDDEN_403)
             }
         }
-
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     })
 
@@ -42,16 +45,14 @@ commentsRouter.delete('/:id',
     jwtAuthGuardMiddleware,
     async (req: RequestWithParams<{ id: string }>, res) => {
         try {
-            await commentService.deleteUserComment(req.params.id, req.user!._id)
+            await commentsService.deleteUserComment(req.params.id, req.user!._id)
         } catch (e) {
             if (e instanceof EntityNotFound) {
                 return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
             }
-
             if (e instanceof Forbidden) {
-                return res.status(HTTP_STATUSES.FORBIDDEN_403)
+                return res.sendStatus(HTTP_STATUSES.FORBIDDEN_403)
             }
         }
-
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     })

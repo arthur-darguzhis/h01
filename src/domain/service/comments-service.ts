@@ -4,8 +4,10 @@ import {CommentInputModel} from "../../routes/inputModels/CommentInputModel";
 import {UserType} from "../types/UserType";
 import {commentRepository} from "../../repository/commentMongoDbRepository";
 import {postRepository} from "../../repository/postMongoDbRepository";
+import {EntityNotFound} from "../exceptions/EntityNotFound";
+import {Forbidden} from "../exceptions/Forbidden";
 
-export const commentService = {
+export const commentsService = {
     async addComment(postId: string, commentInputModel: CommentInputModel, currentUser: UserType): Promise<string> {
         const post = await postRepository.findPost(postId);
         if (!post) {
@@ -22,6 +24,7 @@ export const commentService = {
             postId: postId,
             createdAt: new Date().toISOString()
         }
+
         await commentRepository.addComment(newComment);
         return newComment._id;
     },
@@ -48,5 +51,9 @@ export const commentService = {
             throw new Forbidden("You can delete only your comments")
         }
         return await commentRepository.deleteUserComment(commentId, userId)
-    }
+    },
+
+    async deleteAllComments(): Promise<void> {
+        await commentRepository.deleteAllComments()
+    },
 }
