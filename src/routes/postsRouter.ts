@@ -1,5 +1,11 @@
 import {Response, Router} from "express";
-import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody, RequestWithQuery} from "./types/RequestTypes";
+import {
+    RequestWithBody,
+    RequestWithParams,
+    RequestWithParamsAndBody,
+    RequestWithParamsAndQuery,
+    RequestWithQuery
+} from "./types/RequestTypes";
 import {postQueryRepository} from "../queryRepository/postQueryRepository";
 import {PostInputModel} from "./inputModels/PostInputModel";
 import {checkErrorsInRequestDataMiddleware} from "../middlewares/checkErrorsInRequestDataMiddleware";
@@ -122,3 +128,21 @@ postsRouter.post('/:id/comments',
             return res.status(HTTP_STATUSES.NOT_FOUND_404).json(apiErrorResult)
         }
     })
+
+postsRouter.get('/:id/comments',
+    validateComment.query.sortBy,
+    validateComment.query.sortDirection,
+    validatePaginator.pageSize,
+    validatePaginator.pageNumber,
+    async (req: RequestWithParamsAndQuery<{ id: string }, { sortBy: string, sortDirection: string, pageSize: string, pageNumber: string }>, res) => {
+        const post = await postQueryRepository.findPost(req.params.id);
+        if(!post){
+            return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+        }
+
+        const {sortBy, sortDirection, pageNumber, pageSize} = req.query
+        const comments = await commentQueryRepository.findCommentsByPostId(req.params.id, sortBy, sortDirection, +pageNumber, +pageSize)
+
+        res.status(HTTP_STATUSES.OK_200).json(comments);
+    })
+

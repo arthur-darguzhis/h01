@@ -2,6 +2,8 @@ import {CommentType} from "../domain/types/CommentType";
 import {commentsCollection} from "../db";
 import {ObjectId} from "mongodb";
 import {CommentViewModel} from "./types/Comment/CommentViewModel";
+import {PostCommentFilterType} from "./types/PostComment/PostCommentFilterType";
+import {CommentPaginatorType} from "./types/Comment/CommentPaginatorType";
 
 const _mapCommentToViewModel = (comment: CommentType): CommentViewModel => {
     return {
@@ -19,5 +21,28 @@ export const commentQueryRepository = {
     async findComment(commentId: string): Promise<CommentViewModel | null> {
         const comment = await commentsCollection.findOne({_id: new ObjectId(commentId).toString()})
         return comment ? _mapCommentToViewModel(comment) : null
+    },
+
+    async findCommentsByPostId(
+        id: string,
+        sortBy: string,
+        sortDirection: string,
+        pageNumber: number,
+        pageSize: number): Promise<CommentPaginatorType> {
+
+        const direction = sortDirection === 'asc' ? 1 : -1;
+
+        let filter: PostCommentFilterType = {postId: id}
+        let count = await commentsCollection.countDocuments(filter);
+        const howManySkip = (pageNumber - 1) * pageSize;
+        const comments = await commentsCollection.find(filter).sort(sortBy, direction).skip(howManySkip).limit(pageSize).toArray()
+
+        return {
+            "pagesCount": Math.ceil(count / pageSize),
+            "page": pageNumber,
+            "pageSize": pageSize,
+            "totalCount": count,
+            "items": comments.map(_mapCommentToViewModel)
+        }
     }
 }

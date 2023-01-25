@@ -19,6 +19,7 @@ export const commentService = {
                 userId: currentUser._id,
                 userLogin: currentUser.login
             },
+            postId: postId,
             createdAt: new Date().toISOString()
         }
         await commentRepository.addComment(newComment);
