@@ -134,6 +134,7 @@ postsRouter.get('/:id/comments',
     validateComment.query.sortDirection,
     validatePaginator.pageSize,
     validatePaginator.pageNumber,
+    checkErrorsInRequestDataMiddleware,
     async (req: RequestWithParamsAndQuery<{ id: string }, { sortBy: string, sortDirection: string, pageSize: string, pageNumber: string }>, res) => {
         const post = await postQueryRepository.findPost(req.params.id);
         if(!post){

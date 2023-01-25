@@ -23,20 +23,26 @@ describe('/blogs/:id/post', () => {
         blog = await blogQueryRepository.findBlog(blogId) as BlogViewModel;
 
         for (let i = 0; i < 12; i++) {
-            const PostInputModel: PostInputModel = {
-                title: i+'post title',
+            const postInputModel: PostInputModel = {
+                title: i + 'post title',
                 shortDescription: 'description',
                 content: 'new post content',
                 blogId: blogId,
             }
 
-            await postsService.createPostInBlog(blogId, PostInputModel);
+            await postsService.createPostInBlog(blogId, postInputModel);
         }
     }, 30000)
 
+    it('return 404 if there is not blog with ID:63d11d0962ede10be4f024ac', async () => {
+        await request(app)
+            .get('/blogs/63d11d0962ede10be4f024ac/posts')
+            .expect(HTTP_STATUSES.NOT_FOUND_404)
+    });
+
     it('send request to take documents paginator with sorted data by "createdAt desc"', async () => {
         const blogsPaginatorResponse = await request(app)
-            .get('/blogs/'+blogId+'/posts')
+            .get('/blogs/' + blogId + '/posts')
             .expect(HTTP_STATUSES.OK_200)
 
         expect(blogsPaginatorResponse.body.items.length).toBe(10)
