@@ -120,12 +120,14 @@ blogsRouter.put('/:id',
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     })
 
-blogsRouter.delete('/:id', authGuardMiddleware, async (req: RequestWithParams<{ id: string }>, res) => {
-    const isBlogDeleted = await blogsService.deleteBlog(req.params.id)
-    if (!isBlogDeleted) {
-        return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
-    }
+blogsRouter.delete('/:id',
+    authGuardMiddleware,
+    async (req: RequestWithParams<{ id: string }>, res) => {
+        const isBlogDeleted = await blogsService.deleteBlog(req.params.id)
+        if (!isBlogDeleted) {
+            return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+        }
 
-    await postRepository.deleteBlogPosts(req.params.id);
-    res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
-})
+        await postRepository.deleteBlogPosts(req.params.id);
+        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
+    })

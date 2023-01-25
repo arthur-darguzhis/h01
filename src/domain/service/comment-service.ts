@@ -24,5 +24,29 @@ export const commentService = {
         }
         await commentRepository.addComment(newComment);
         return newComment._id;
+    },
+
+    async updateUsersComment(commentId: string, userId: string, commentInputModel: CommentInputModel): Promise<boolean | never> {
+        const comment = await commentRepository.findComment(commentId)
+        if (!comment) {
+            throw new EntityNotFound(`Comment id: ${commentId} is not exists`)
+        }
+
+        if (comment.commentatorInfo.userId !== userId) {
+            throw new Forbidden("You can update only your comments")
+        }
+        return await commentRepository.updateComment(commentId, userId,commentInputModel)
+    },
+
+    async deleteUserComment(commentId: string, userId: string): Promise<boolean | never> {
+        const comment = await commentRepository.findComment(commentId)
+        if (!comment) {
+            throw new EntityNotFound(`Comment id: ${commentId} is not exists`)
+        }
+
+        if (comment.commentatorInfo.userId !== userId) {
+            throw new Forbidden("You can delete only your comments")
+        }
+        return await commentRepository.deleteUserComment(commentId, userId)
     }
 }

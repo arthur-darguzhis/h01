@@ -1,0 +1,3 @@
+class EntityNotFound extends Error {
+    
+}

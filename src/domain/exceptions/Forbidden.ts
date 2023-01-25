@@ -1,0 +1,3 @@
+class Forbidden extends Error {
+
+}
