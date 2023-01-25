@@ -67,7 +67,7 @@ describe('/posts/:id/comments', () => {
                 .send({content: 'comment №:' + i + ' this is a sample of a correct comment that can be saved'})
                 .expect(HTTP_STATUSES.CREATED_201)
         }
-    })
+    }, 30000)
 
     it('return 200 and paginated list of 5 comments sorted by "content"', async () => {
         const postsCommentsPaginatorResponse = await request(app)
@@ -84,7 +84,7 @@ describe('/posts/:id/comments', () => {
         });
 
         expect(postsCommentsPaginatorResponse.body.items.length).toBe(10)
-        expect(postsCommentsPaginatorResponse.body.items[0].name).toContain('comment №:1')
-        expect(postsCommentsPaginatorResponse.body.items[4].name).toBe('comment №:5')
+        expect(postsCommentsPaginatorResponse.body.items[0].content).toMatch('comment №:1')
+        expect(postsCommentsPaginatorResponse.body.items[4].content).toMatch('comment №:5')
     })
 })

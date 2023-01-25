@@ -4,7 +4,7 @@ import {postsRouter} from "./routes/postsRouter";
 import {blogsRouter} from "./routes/blogsRouter";
 import {runDb} from "./db";
 import {usersRouter} from "./routes/usersRouter";
-import {authRouter} from "./routes/types/authRouter";
+import {authRouter} from "./routes/authRouter";
 
 export const app = express()
 const port = process.env.PORT || 3000

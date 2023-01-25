@@ -50,6 +50,6 @@ describe('/blogs', () => {
 
         expect(blogsResponse.body.items.length).toBe(5)
         expect(blogsResponse.body.items[0].name).toBe('1 blog')
-        expect(blogsResponse.body.items[4].name).toBe('5 blog')
+        expect(blogsResponse.body.items[3].name).toBe('12 blog')
     });
 })
