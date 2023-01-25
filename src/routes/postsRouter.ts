@@ -12,6 +12,12 @@ import {PostPaginatorType} from "../queryRepository/types/Post/PostPaginatorType
 import {validatePost} from "../middlewares/validators/validatePost";
 import {validatePaginator} from "../middlewares/validators/validatePaginator";
 import {PostViewModel} from "../queryRepository/types/Post/PostViewModel";
+import {CommentInputModel} from "./inputModels/CommentInputModel";
+import {validateComment} from "../middlewares/validators/validateComment";
+import {jwtAuthGuardMiddleware} from "../middlewares/jwtAuthGuardMiddleware";
+import {commentService} from "../domain/service/comment-service";
+import {commentQueryRepository} from "../queryRepository/commentQueryRepository";
+import {CommentViewModel} from "../queryRepository/types/Comment/CommentViewModel";
 
 export const postsRouter = Router({})
 
@@ -95,3 +101,24 @@ postsRouter.delete('/:id', authGuardMiddleware, async (req: RequestWithParams<{ 
         ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
         : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
 })
+
+postsRouter.post('/:id/comments',
+    jwtAuthGuardMiddleware,
+    validateComment.body.content,
+    checkErrorsInRequestDataMiddleware,
+    async (req: RequestWithParamsAndBody<{ id: string }, CommentInputModel>, res) => {
+        try {
+            const newCommentId = await commentService.addComment(req.params.id, req.body, req.user!);
+            const newComment = await commentQueryRepository.findComment(newCommentId) as CommentViewModel
+            res.status(HTTP_STATUSES.CREATED_201).json(newComment);
+        } catch (e) {
+            const err = e as Error
+            const apiErrorResult: APIErrorResultType = {
+                errorsMessages: [{
+                    field: req.params.id,
+                    message: err.message
+                }]
+            }
+            return res.status(HTTP_STATUSES.NOT_FOUND_404).json(apiErrorResult)
+        }
+    })

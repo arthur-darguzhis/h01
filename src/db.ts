@@ -3,6 +3,7 @@ import {BlogType} from "./domain/types/BlogType";
 import {UserType} from "./domain/types/UserType";
 import {MongoClient} from "mongodb";
 import * as dotenv from "dotenv";
+import {CommentType} from "./domain/types/CommentType";
 
 dotenv.config()
 
@@ -19,6 +20,7 @@ const dbConnection = client.db();
 export const blogsCollection = dbConnection.collection<BlogType>("blogs");
 export const postsCollection = dbConnection.collection<PostType>("posts");
 export const usersCollection = dbConnection.collection<UserType>("users");
+export const commentsCollection = dbConnection.collection<CommentType>("comments")
 
 //Расскажите почему эта функция не стрелочная и при чем здесь замыкание и переменная client? =)
 export async function runDb() {
