@@ -8,6 +8,10 @@ export const userRepository = {
         return newUser
     },
 
+    async findUser(id: string): Promise<UserType | null> {
+        return await usersCollection.findOne({_id: new ObjectId(id).toString()});
+    },
+
     async findByLoginOrEmail(loginOrEmail: string): Promise<UserType | null> {
         return await usersCollection.findOne({
             $or: [

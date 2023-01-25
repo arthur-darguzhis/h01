@@ -47,9 +47,13 @@ describe('/auth', () => {
             "password": "123456"
         }
 
-        await request(app)
+        const token = await request(app)
             .post('/auth/login')
             .send(logInputModel)
-            .expect(HTTP_STATUSES.NO_CONTENT_204)
+            .expect(HTTP_STATUSES.OK_200)
+
+        expect(token.body).toEqual({
+            accessToken: expect.any(String)
+        })
     })
 })

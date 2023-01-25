@@ -4,6 +4,7 @@ import {ObjectId} from "mongodb";
 import {UserType} from "../domain/types/UserType";
 import {UserPaginatorType} from "./types/User/UserPaginatorType";
 import {UserFilterType} from "./types/User/UserFilterType";
+import {MeViewModel} from "./types/User/MeViewModel";
 
 const _mapUserToViewModel = (user: UserType): UserViewModel => {
     return {
@@ -14,10 +15,23 @@ const _mapUserToViewModel = (user: UserType): UserViewModel => {
     }
 }
 
+const _mapUserToMeViewModel = (user: UserType): MeViewModel => {
+    return {
+        email: user.email,
+        login: user.login,
+        userId: user._id
+    }
+}
+
 export const userQueryRepository = {
     async findUser(id: string): Promise<UserViewModel | null> {
         const user = await usersCollection.findOne({_id: new ObjectId(id).toString()})
         return user ? _mapUserToViewModel(user) : null
+    },
+
+    async findMe(id: string): Promise<MeViewModel | null> {
+        const user = await usersCollection.findOne({_id: new ObjectId(id).toString()})
+        return user ? _mapUserToMeViewModel(user): null;
     },
 
     async findUsers(

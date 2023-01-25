@@ -20,6 +20,10 @@ export const usersService = {
         return user._id.toString();
     },
 
+    async findUserById(id: string): Promise<UserType | null> {
+      return await userRepository.findUser(id);
+    },
+
     async deleteUser(id: string): Promise<boolean> {
         return await userRepository.deleteUser(id)
     },
@@ -28,11 +32,14 @@ export const usersService = {
         await userRepository.deleteAllUsers()
     },
 
-    async checkCredentials(loginOrEmail: string, password: string): Promise<boolean> {
+    async checkCredentials(loginOrEmail: string, password: string): Promise<UserType | false> {
         const user = await userRepository.findByLoginOrEmail(loginOrEmail)
-
         if (!user) return false;
-        return bcrypt.compare(password, user.password)
+
+        const areCredentialValid = bcrypt.compare(password, user.password);
+        if (!areCredentialValid) return false;
+
+        return user;
     },
 
     async _generatePasswordHash(password: string): Promise<string> {
