@@ -1,6 +1,5 @@
 import {UserType} from "../domain/types/UserType";
 import {usersCollection} from "../db";
-import {ObjectId} from "mongodb";
 
 export const userRepository = {
     async addUser(newUser: UserType): Promise<UserType> {

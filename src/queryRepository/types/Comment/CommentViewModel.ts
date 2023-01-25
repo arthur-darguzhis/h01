@@ -3,6 +3,7 @@ import {CommentatorInfo} from "../../../domain/types/CommentType";
 export type CommentViewModel = {
     id: string
     content: string
-    commentatorInfo: CommentatorInfo
+    userId: string
+    userLogin: string
     createdAt: string
 }

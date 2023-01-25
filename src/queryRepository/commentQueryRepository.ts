@@ -4,14 +4,24 @@ import {CommentViewModel} from "./types/Comment/CommentViewModel";
 import {PostCommentFilterType} from "./types/PostComment/PostCommentFilterType";
 import {CommentPaginatorType} from "./types/Comment/CommentPaginatorType";
 
-const _mapCommentToViewModel = (comment: CommentType): CommentViewModel => {
+// const _mapCommentToViewModel = (comment: CommentType): CommentViewModel => {
+//     return {
+//         id: comment._id,
+//         content: comment.content,
+//         commentatorInfo: {
+//             userId: comment.commentatorInfo.userId,
+//             userLogin: comment.commentatorInfo.userLogin
+//         },
+//         createdAt: comment.createdAt
+//     }
+// }
+
+const _mapCommentToViewModelOldFormat = (comment: CommentType) => {
     return {
         id: comment._id,
         content: comment.content,
-        commentatorInfo: {
-            userId: comment.commentatorInfo.userId,
-            userLogin: comment.commentatorInfo.userLogin
-        },
+        userId: comment.commentatorInfo.userId,
+        userLogin: comment.commentatorInfo.userLogin,
         createdAt: comment.createdAt
     }
 }
@@ -19,7 +29,7 @@ const _mapCommentToViewModel = (comment: CommentType): CommentViewModel => {
 export const commentQueryRepository = {
     async findComment(commentId: string): Promise<CommentViewModel | null> {
         const comment = await commentsCollection.findOne({_id: commentId})
-        return comment ? _mapCommentToViewModel(comment) : null
+        return comment ? _mapCommentToViewModelOldFormat(comment) : null
     },
 
     async findCommentsByPostId(
@@ -41,7 +51,8 @@ export const commentQueryRepository = {
             "page": pageNumber,
             "pageSize": pageSize,
             "totalCount": count,
-            "items": comments.map(_mapCommentToViewModel)
+            // "items": comments.map(_mapCommentToViewModel)
+            "items": comments.map(_mapCommentToViewModelOldFormat)
         }
     }
 }

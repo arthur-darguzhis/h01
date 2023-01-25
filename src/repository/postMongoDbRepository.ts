@@ -1,7 +1,6 @@
 import {postsCollection} from "../db";
 import {PostInputModel} from "../routes/inputModels/PostInputModel";
 import {PostType} from "../domain/types/PostType";
-import {ObjectId} from "mongodb";
 
 export const postRepository = {
     async addPost(newPost: PostType): Promise<PostType> {

@@ -1,7 +1,6 @@
 import {blogsCollection} from "../db";
 import {BlogInputModel} from "../routes/inputModels/BlogInputModel";
 import {BlogType} from "../domain/types/BlogType";
-import {ObjectId} from "mongodb";
 
 export const blogRepository = {
 

@@ -1,6 +1,5 @@
 import {CommentType} from "../domain/types/CommentType";
 import {commentsCollection} from "../db";
-import {ObjectId} from "mongodb";
 import {CommentInputModel} from "../routes/inputModels/CommentInputModel";
 
 export const commentRepository = {
