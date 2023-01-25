@@ -5,8 +5,9 @@ import request from "supertest";
 import {app} from "../../../../src";
 import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
 
-let token: string;
+
 describe('/auth/me', () => {
+    let token: string;
     beforeAll(async () => {
         await userRepository.deleteAllUsers();
         await usersService.createUser({
@@ -27,7 +28,7 @@ describe('/auth/me', () => {
         token = responseWithToken.body.accessToken;
     })
 
-    it('can not get info if token is not valid', async () => {
+    it('get 401 without JWT token', async () => {
         await request(app)
             .get('/auth/me')
             .auth('', {type: "bearer"})
@@ -35,7 +36,7 @@ describe('/auth/me', () => {
             .expect(HTTP_STATUSES.UNAUTHORIZED_401)
     })
 
-    it('return info about user if token is valid', async () => {
+    it('get 200 and userViewModel', async () => {
         const meResponse = await request(app)
             .get('/auth/me')
             .auth(token, {type: "bearer"})

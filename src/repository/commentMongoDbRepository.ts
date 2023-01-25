@@ -5,5 +5,9 @@ export const commentRepository = {
     async addComment(newComment: CommentType): Promise<CommentType> {
         await commentsCollection.insertOne(newComment);
         return newComment
+    },
+
+    async deleteAllComments(): Promise<void> {
+        await commentsCollection.deleteMany({})
     }
 }
