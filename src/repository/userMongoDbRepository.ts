@@ -28,4 +28,14 @@ export const userRepository = {
     async deleteAllUsers(): Promise<void> {
         await usersCollection.deleteMany({})
     },
+
+    async isUserExists(email: string, login: string): Promise<boolean> {
+        const user = await usersCollection.findOne({
+            $or: [
+                {email: email},
+                {login: login}
+            ]
+        })
+        return !!user;
+    }
 }

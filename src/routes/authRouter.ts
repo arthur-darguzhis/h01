@@ -9,8 +9,34 @@ import {jwtService} from "../application/jwt-service";
 import {jwtAuthGuardMiddleware} from "../middlewares/jwtAuthGuardMiddleware";
 import {userQueryRepository} from "../queryRepository/userQueryRepository";
 import {LoginSuccessViewModel} from "./types/apiError/LoginSuccessViewModel";
+import {UserInputModel} from "./inputModels/UserInputModel";
+import {EntityAlreadyExists} from "../domain/exceptions/EntityAlreadyExists";
+import {validateUser} from "../middlewares/validators/validateUser";
+import {APIErrorResultType} from "./types/apiError/APIErrorResultType";
 
 export const authRouter = Router({});
+
+authRouter.post('/registration',
+    validateUser.body.email,
+    validateUser.body.login,
+    validateUser.body.password,
+    checkErrorsInRequestDataMiddleware,
+    async (req: RequestWithBody<UserInputModel>, res) => {
+        try {
+            await usersService.registerUser(req.body);
+        } catch (err) {
+            if (err instanceof EntityAlreadyExists) {
+                const apiErrorResult: APIErrorResultType = {
+                    errorsMessages: [{
+                        field: 'email',
+                        message: err.message
+                    }]
+                }
+                res.status(HTTP_STATUSES.BAD_REQUEST_400).json(apiErrorResult)
+            }
+        }
+        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
+    })
 
 authRouter.post('/login',
     validateLogin.body.loginOrEmail,
