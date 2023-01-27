@@ -4,10 +4,11 @@ import {UserType} from "./domain/types/UserType";
 import {MongoClient} from "mongodb";
 import * as dotenv from "dotenv";
 import {CommentType} from "./domain/types/CommentType";
+import {settings} from "./settings";
 
 dotenv.config()
 
-const mongoUri = process.env.MONGO_URI
+const mongoUri = settings.MONGO_URI;
 if (!mongoUri) {
     throw new Error('MongoDB URI is not found')
 }
@@ -38,7 +39,7 @@ export async function runDb() {
 }
 
 
-export const db: { users: UserType[]} = {
+export const db: { users: UserType[] } = {
     users: [
         {
             _id: '1009',
