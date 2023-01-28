@@ -13,6 +13,8 @@ import {UserInputModel} from "./inputModels/UserInputModel";
 import {EntityAlreadyExists} from "../domain/exceptions/EntityAlreadyExists";
 import {validateUser} from "../middlewares/validators/validateUser";
 import {APIErrorResultType} from "./types/apiError/APIErrorResultType";
+import {MailIsNotSent} from "../domain/exceptions/MailIsNotSent";
+import {RegistrationConfirmationCodeModel} from "./types/RegistrationConfirmationCodeModel";
 
 export const authRouter = Router({});
 
@@ -25,17 +27,55 @@ authRouter.post('/registration',
         try {
             await usersService.registerUser(req.body);
         } catch (err) {
-            if (err instanceof EntityAlreadyExists) {
+            if (err instanceof EntityAlreadyExists || err instanceof MailIsNotSent) {
                 const apiErrorResult: APIErrorResultType = {
                     errorsMessages: [{
                         field: 'email',
                         message: err.message
                     }]
                 }
-                res.status(HTTP_STATUSES.BAD_REQUEST_400).json(apiErrorResult)
+                return res.status(HTTP_STATUSES.BAD_REQUEST_400).json(apiErrorResult)
             }
         }
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
+    })
+
+authRouter.post('/registration-confirmation', async (req: RequestWithBody<RegistrationConfirmationCodeModel>, res) => {
+    try {
+        await usersService.confirmEmail(req.body.code);
+    } catch (err) {
+        //TODO Как пофиксить? по тмоу как (он не может отловить исключение класса UnprocessableEntity все думает что это Error)
+        if (err instanceof Error) {
+            const apiErrorResult: APIErrorResultType = {
+                errorsMessages: [{
+                    field: 'code',
+                    message: err.message
+                }]
+            }
+            return res.status(HTTP_STATUSES.BAD_REQUEST_400).json(apiErrorResult)
+        }
+    }
+    return res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
+})
+
+authRouter.post('/registration-email-resending',
+    validateUser.body.email,
+    checkErrorsInRequestDataMiddleware,
+    async (req: RequestWithBody<{ email: string }>, res) => {
+        try {
+            await usersService.resendConfirmEmail(req.body.email)
+        } catch (err) {
+            if (err instanceof Error) {
+                const apiErrorResult: APIErrorResultType = {
+                    errorsMessages: [{
+                        field: 'email',
+                        message: err.message
+                    }]
+                }
+                return res.status(HTTP_STATUSES.BAD_REQUEST_400).json(apiErrorResult)
+            }
+        }
+        return res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     })
 
 authRouter.post('/login',
@@ -45,7 +85,7 @@ authRouter.post('/login',
     async (req: RequestWithBody<LoginInputModel>, res) => {
         const user = await usersService.checkCredentials(req.body.loginOrEmail, req.body.password)
 
-        if (!user) {
+        if (!user || !user.emailConfirmation.isConfirmed || !user.isActive) {
             return res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401);
         }
 

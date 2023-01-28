@@ -2,11 +2,8 @@ import {PostType} from "./domain/types/PostType";
 import {BlogType} from "./domain/types/BlogType";
 import {UserType} from "./domain/types/UserType";
 import {MongoClient} from "mongodb";
-import * as dotenv from "dotenv";
 import {CommentType} from "./domain/types/CommentType";
 import {settings} from "./settings";
-
-dotenv.config()
 
 const mongoUri = settings.MONGO_URI;
 if (!mongoUri) {
@@ -47,7 +44,13 @@ export const db: { users: UserType[] } = {
             login: 'admin',
             password: 'cXdlcnR5',
             email: 'test@test.ts',
-            createdAt: ''
+            isActive: true,
+            createdAt: '',
+            emailConfirmation: {
+                confirmationCode: undefined,
+                expirationDate: undefined,
+                isConfirmed: undefined
+            }
         }
     ]
 }

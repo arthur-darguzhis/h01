@@ -67,5 +67,12 @@ export const userQueryRepository = {
             "totalCount": count,
             "items": users.map(_mapUserToViewModel)
         }
+    },
+    async findByLogin(login: string): Promise<UserType | null> {
+        return await usersCollection.findOne({login: login})
+    },
+
+    async findByEmail(email: string): Promise<UserType | null> {
+        return await usersCollection.findOne({email: email})
     }
 }

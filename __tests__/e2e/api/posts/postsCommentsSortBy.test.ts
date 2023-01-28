@@ -47,7 +47,7 @@ describe('/posts/:id/comments', () => {
             "login": "user1",
             "password": "123456",
             "email": "user1@gmail.com"
-        })
+        }, true)
 
         const logInputModel: LoginInputModel = {
             "loginOrEmail": "user1",

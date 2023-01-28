@@ -1,11 +1,21 @@
 import {body, query} from "express-validator";
 import {sortDirections} from "../../routes/types/SortDirections";
+import {userQueryRepository} from "../../queryRepository/userQueryRepository";
 
 export const validateUser = {
     body: {
-        login: body('login').trim().matches(/^[a-zA-Z0-9_-]*$/).isLength({min: 3, max: 10}),
         password: body('password').trim().isLength({min: 6, max: 20}),
-        email: body('email').trim().matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/),
+
+        login: body('login').trim().matches(/^[a-zA-Z0-9_-]*$/).isLength({min: 3, max: 10}).custom(async login => {
+            const user = await userQueryRepository.findByLogin(login);
+            if(user) throw Error(`User with login: ${login} is already exists`);
+        }),
+
+        email: body('email').trim().matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/).custom(async email => {
+            const user = await userQueryRepository.findByEmail(email);
+            if(user) throw new Error(`User with email: ${email} is already exists`);
+            return true;
+        }),
     },
     query: {
         searchLoginTerm: query('searchLoginTerm').default(null).trim(),

@@ -11,8 +11,8 @@ describe('/auth', () => {
         await usersService.createUser({
             "login": "user1",
             "password": "123456",
-            "email": "user1@gmail.com"
-        })
+            "email": "user1@gmail.com",
+        }, true)
     })
 
     it('validate input data for login and return 400 with 2 errors', async () => {

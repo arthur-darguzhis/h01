@@ -13,7 +13,7 @@ describe('/users', () => {
                 "login": "user" + i,
                 "password": "123456" + i,
                 "email": "user" + i + "-test@gmail.com"
-            })
+            }, true)
         }
     });
 

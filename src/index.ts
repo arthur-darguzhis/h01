@@ -6,9 +6,12 @@ import {runDb} from "./db";
 import {usersRouter} from "./routes/usersRouter";
 import {authRouter} from "./routes/authRouter";
 import {commentsRouter} from "./routes/commentsRouter";
+import {settings} from "./settings";
+import {RequestWithQuery} from "./routes/types/RequestTypes";
+import {RegistrationConfirmationCodeModel} from "./routes/types/RegistrationConfirmationCodeModel";
 
 export const app = express()
-const port = process.env.PORT || 3000
+const port = settings.PORT
 
 const jsonBodyMiddleware = express.json()
 
@@ -26,5 +29,18 @@ const startApp = async () => {
         console.log(`Example app listening on port ${port}`)
     })
 }
+
+app.get('/confirm-email', async (req: RequestWithQuery<RegistrationConfirmationCodeModel>, res) => {
+    const url = settings.APP_HOST + 'auth/registration-confirmation'
+    const result = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: JSON.stringify({code: req.query.code})
+    })
+
+    res.sendStatus(result.status)
+})
 
 startApp();

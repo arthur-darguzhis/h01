@@ -1,10 +1,17 @@
-import {UserType} from "../domain/types/UserType";
+import {UserEmailConfirmation, UserType} from "../domain/types/UserType";
 import {usersCollection} from "../db";
+import {EntityNotFound} from "../domain/exceptions/EntityNotFound";
 
 export const userRepository = {
     async addUser(newUser: UserType): Promise<UserType> {
         await usersCollection.insertOne(newUser);
         return newUser
+    },
+
+    async getUser(id: string): Promise<UserType | never> {
+        const user = await usersCollection.findOne({_id: id});
+        if (!user) throw new EntityNotFound(`User with id: ${id} is not exists`)
+        return user
     },
 
     async findUser(id: string): Promise<UserType | null> {
@@ -37,5 +44,32 @@ export const userRepository = {
             ]
         })
         return !!user;
+    },
+
+    async getUserByConfirmationCode(code: string): Promise<UserType | never> {
+        const user = await usersCollection.findOne({"emailConfirmation.confirmationCode": code});
+        if (!user) throw new EntityNotFound(`User with confirmationCode: ${code} is not exists`)
+        return user;
+    },
+
+    async saveConfirmedUser(userId: string, emailConfirmation: UserEmailConfirmation): Promise<boolean> {
+        const result = await usersCollection.updateOne({_id: userId}, {
+            $set: {
+                isActive: true,
+                emailConfirmation: emailConfirmation,
+            }
+        })
+        return result.matchedCount === 1;
+    },
+
+    async getUserByEmail(email: string): Promise<UserType | never> {
+        const user = await usersCollection.findOne({email: email})
+        if (!user) throw new EntityNotFound(`User with email: ${email} is not exists`)
+        return user
+    },
+
+    async updateUser(userId: string, updateFilter: { emailConfirmation: UserEmailConfirmation }): Promise<boolean> {
+        const result = await usersCollection.updateOne({_id: userId}, updateFilter)
+        return result.matchedCount === 1;
     }
 }
