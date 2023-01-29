@@ -13,7 +13,6 @@ const transporter = nodemailer.createTransport({
 
 export const emailAdapter = {
     async sendMail(preparedMail: EmailFormType): Promise<true | never> {
-
         await transporter.sendMail(preparedMail, function (error, info) {
             if (error) throw new MailIsNotSent(`Email with subject: ${preparedMail.subject} is not sent to ${preparedMail.to}`)
         });

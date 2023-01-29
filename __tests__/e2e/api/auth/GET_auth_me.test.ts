@@ -5,8 +5,7 @@ import request from "supertest";
 import {app} from "../../../../src";
 import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
 
-
-describe('/auth/me', () => {
+describe('GET => /auth/me', () => {
     let token: string;
     beforeAll(async () => {
         await userRepository.deleteAllUsers();
@@ -28,15 +27,7 @@ describe('/auth/me', () => {
         token = responseWithToken.body.accessToken;
     })
 
-    it('get 401 without JWT token', async () => {
-        await request(app)
-            .get('/auth/me')
-            .auth('', {type: "bearer"})
-            .send()
-            .expect(HTTP_STATUSES.UNAUTHORIZED_401)
-    })
-
-    it('get 200 and userViewModel', async () => {
+    it('return info about login user, status 200', async () => {
         const meResponse = await request(app)
             .get('/auth/me')
             .auth(token, {type: "bearer"})
@@ -44,9 +35,17 @@ describe('/auth/me', () => {
             .expect(HTTP_STATUSES.OK_200)
 
         expect(meResponse.body).toEqual({
-            email:	'user1@gmail.com',
-            login:	'user1',
-            userId:	expect.any(String),
+            email: 'user1@gmail.com',
+            login: 'user1',
+            userId: expect.any(String),
         })
+    })
+
+    it('request without JWT token, status 401', async () => {
+        await request(app)
+            .get('/auth/me')
+            .auth('', {type: "bearer"})
+            .send()
+            .expect(HTTP_STATUSES.UNAUTHORIZED_401)
     })
 });
