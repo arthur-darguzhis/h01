@@ -13,7 +13,7 @@ export const validateUser = {
 
         email: body('email').trim().matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/).custom(async email => {
             const user = await userQueryRepository.findByEmail(email);
-            if(user) throw new Error(`User with email: ${email} is already exists`);
+            if(user && user.isActive && user.emailConfirmation.isConfirmed) throw new Error(`User with email: ${email} is already exists`);
             return true;
         }),
     },

@@ -1,5 +1,5 @@
 import {UserInputModel} from "../../routes/inputModels/UserInputModel";
-import {UserEmailConfirmation, UserType} from "../types/UserType";
+import {UserType} from "../types/UserType";
 import {ObjectId} from "mongodb";
 import {userRepository} from "../../repository/userMongoDbRepository";
 import bcrypt from 'bcrypt'
@@ -68,6 +68,7 @@ export const usersService = {
         const user = await userRepository.getUser(userId);
         try {
             await emailsManager.sendConfirmationLetter(user)
+            await userRepository.updateUser(userId, {"emailConfirmation.sendingTime": new Date().getTime()})
         } catch (e) {
             if (e instanceof MailIsNotSent) {
                 await userRepository.deleteUser(userId);

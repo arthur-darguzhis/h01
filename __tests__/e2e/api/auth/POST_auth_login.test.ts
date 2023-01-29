@@ -15,15 +15,22 @@ describe('POST => /auth/login', () => {
         }, true)
     })
 
-    it('return JWT token, status 201 code', async () => {
-        const logInputModel: LoginInputModel = {
-            "loginOrEmail": "user1",
-            "password": "123456"
-        }
+    const correctLoginAndPassword: LoginInputModel = {
+        "loginOrEmail": "user1",
+        "password": "123456"
+    }
 
+    const incorrectLoginAndPassword: LoginInputModel = {
+        "loginOrEmail": "user100",
+        "password": "123456"
+    }
+
+    const emptyLoginAndPassword = {}
+
+    it('return JWT token, status 201 code', async () => {
         const token = await request(app)
             .post('/auth/login')
-            .send(logInputModel)
+            .send(correctLoginAndPassword)
             .expect(HTTP_STATUSES.OK_200)
 
         expect(token.body).toEqual({
@@ -32,10 +39,9 @@ describe('POST => /auth/login', () => {
     })
 
     it('login and password are empty, status 400', async () => {
-        const logInputModel = {}
         const validationResult = await request(app)
             .post('/auth/login')
-            .send(logInputModel)
+            .send(emptyLoginAndPassword)
             .expect(HTTP_STATUSES.BAD_REQUEST_400)
 
         expect(validationResult.body).toEqual({
@@ -46,14 +52,9 @@ describe('POST => /auth/login', () => {
     })
 
     it('login or password is wrong, status 401', async () => {
-        const logInputModel: LoginInputModel = {
-            "loginOrEmail": "user100",
-            "password": "123456"
-        }
-
         await request(app)
             .post('/auth/login')
-            .send(logInputModel)
+            .send(incorrectLoginAndPassword)
             .expect(HTTP_STATUSES.UNAUTHORIZED_401)
     })
 })

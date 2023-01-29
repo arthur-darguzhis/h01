@@ -68,8 +68,8 @@ export const userRepository = {
         return user
     },
 
-    async updateUser(userId: string, updateFilter: { emailConfirmation: UserEmailConfirmation }): Promise<boolean> {
-        const result = await usersCollection.updateOne({_id: userId}, updateFilter)
+    async updateUser(userId: string, updateFilter: object): Promise<boolean> {
+        const result = await usersCollection.updateOne({_id: userId}, {$set: updateFilter})
         return result.matchedCount === 1;
     }
 }
