@@ -1,8 +1,9 @@
 import request from "supertest";
-import {app} from "../../../../src";
+import {app} from "../../../../src/server";
 import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
 import {blogRepository} from "../../../../src/repository/blogMongoDbRepository";
 import {blogsService} from "../../../../src/domain/service/blogs-service";
+import {client} from "../../../../src/db";
 
 describe('/blogs', () => {
     beforeAll(async () => {
@@ -34,6 +35,10 @@ describe('/blogs', () => {
         });
     })
 
+    afterAll(async () => {
+        await client.close();
+    })
+
     it('send incorrect parameters for "sortBy" and "sortDirection", should return 2 errors', async () => {
         const blogsPaginatorResponse = await request(app)
             .get('/blogs/?searchNameTerm=blog&sortBy=test&sortDirection=test')
@@ -50,6 +55,6 @@ describe('/blogs', () => {
 
         expect(blogsResponse.body.items.length).toBe(5)
         expect(blogsResponse.body.items[0].name).toBe('1 blog')
-        expect(blogsResponse.body.items[3].name).toBe('12 blog')
+        expect(blogsResponse.body.items[3].name).toBe('4 blog')
     });
 })

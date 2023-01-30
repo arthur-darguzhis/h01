@@ -2,8 +2,9 @@ import {userRepository} from "../../../../src/repository/userMongoDbRepository";
 import {usersService} from "../../../../src/domain/service/users-service";
 import {LoginInputModel} from "../../../../src/routes/inputModels/LoginInputModel";
 import request from "supertest";
-import {app} from "../../../../src";
 import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
+import {app} from "../../../../src/server";
+import {client} from "../../../../src/db";
 
 describe('GET => /auth/me', () => {
     let token: string;
@@ -25,6 +26,10 @@ describe('GET => /auth/me', () => {
             .send(logInputModel)
             .expect(HTTP_STATUSES.OK_200)
         token = responseWithToken.body.accessToken;
+    })
+
+    afterAll(async () => {
+        await client.close();
     })
 
     it('return info about login user, status 200', async () => {

@@ -10,6 +10,7 @@ import {HTTP_STATUSES} from "./types/HttpStatuses";
 import {UserViewModel} from "../queryRepository/types/User/UserViewModel";
 import {validatePaginator} from "../middlewares/validators/validatePaginator";
 import {UserPaginatorType} from "../queryRepository/types/User/UserPaginatorType";
+import {UserType} from "../domain/types/UserType";
 
 export const usersRouter = Router({})
 
@@ -20,9 +21,9 @@ usersRouter.post('/',
     validateUser.body.password,
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithBody<UserInputModel>, res) => {
-        const newUserId = await usersService.createUser(req.body, true)
-        const newUser = await userQueryRepository.findUser(newUserId) as UserViewModel
-        res.status(HTTP_STATUSES.CREATED_201).json(newUser)
+        const newUser: UserType = await usersService.createUser(req.body, true)
+        const viewUser = await userQueryRepository.findUser(newUser._id) as UserViewModel
+        res.status(HTTP_STATUSES.CREATED_201).json(viewUser)
     })
 
 usersRouter.delete('/:id', authGuardMiddleware,

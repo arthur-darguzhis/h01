@@ -11,8 +11,9 @@ import {postQueryRepository} from "../../../../src/queryRepository/postQueryRepo
 import {usersService} from "../../../../src/domain/service/users-service";
 import {LoginInputModel} from "../../../../src/routes/inputModels/LoginInputModel";
 import request from "supertest";
-import {app} from "../../../../src";
+import {app} from "../../../../src/server";
 import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
+import {client} from "../../../../src/db";
 
 describe('/posts/:id/comments', () => {
     let blogId: string;
@@ -20,7 +21,6 @@ describe('/posts/:id/comments', () => {
     let postId: string;
     let post: PostViewModel;
     let token: string;
-    let userId: string;
     beforeAll(async () => {
         await postRepository.deleteAllPosts();
         await blogRepository.deleteAllBlogs();
@@ -43,7 +43,7 @@ describe('/posts/:id/comments', () => {
         })
         post = await postQueryRepository.findPost(postId) as PostViewModel;
 
-        userId = await usersService.createUser({
+        await usersService.createUser({
             "login": "user1",
             "password": "123456",
             "email": "user1@gmail.com"
@@ -67,6 +67,10 @@ describe('/posts/:id/comments', () => {
                 .send({content: 'comment №:' + i + ' this is a sample of a correct comment that can be saved'})
                 .expect(HTTP_STATUSES.CREATED_201)
         }
+    })
+
+    afterAll(async () => {
+        await client.close();
     })
 
     it('return 404 if there is not blog with ID:63d11d0962ede10be4f024ac', async () => {

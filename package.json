@@ -9,7 +9,7 @@
     "debug": "nodemon --inspect src/index.ts",
     "build": "tsc",
     "start": "node dist/src/index.js",
-    "test": "jest"
+    "test": "jest --runInBand --detectOpenHandles"
   },
   "dependencies": {
     "@types/bcrypt": "^5.0.0",

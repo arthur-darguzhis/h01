@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 import {settings} from "../settings";
-import {MailIsNotSent} from "../domain/exceptions/MailIsNotSent";
 import {EmailFormType} from "../managers/types/EmailFormType";
+import {MailIsNotSent} from "../domain/exceptions/MailIsNotSent";
 
 const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -13,9 +13,11 @@ const transporter = nodemailer.createTransport({
 
 export const emailAdapter = {
     async sendMail(preparedMail: EmailFormType): Promise<true | never> {
-        await transporter.sendMail(preparedMail, function (error, info) {
-            if (error) throw new MailIsNotSent(`Email with subject: ${preparedMail.subject} is not sent to ${preparedMail.to}`)
-        });
+        try{
+            await transporter.sendMail(preparedMail);
+        } catch (e) {
+            throw new MailIsNotSent('Mail is not sent');
+        }
         return true;
     }
 }

@@ -11,7 +11,7 @@ import {emailsManager} from "../../managers/emailsManager";
 import {UnprocessableEntity} from "../exceptions/UnprocessableEntity";
 
 export const usersService = {
-    async createUser(userInputModel: UserInputModel, isUserActive: boolean): Promise<string> {
+    async createUser(userInputModel: UserInputModel, isUserActive: boolean): Promise<UserType> {
         const passwordHash = await this._generatePasswordHash(userInputModel.password)
 
         const newUser: UserType = {
@@ -28,16 +28,15 @@ export const usersService = {
             }
         }
 
-        const user = await userRepository.addUser(newUser);
-        return user._id.toString();
+        return await userRepository.addUser(newUser);
     },
 
     async findUserById(id: string): Promise<UserType | null> {
-        return await userRepository.findUser(id);
+        return userRepository.findUser(id);
     },
 
     async deleteUser(id: string): Promise<boolean> {
-        return await userRepository.deleteUser(id)
+        return userRepository.deleteUser(id)
     },
 
     async deleteAllUsers(): Promise<void> {
@@ -64,18 +63,9 @@ export const usersService = {
             throw new EntityAlreadyExists('User with the same "email" or "login" is already exists')
         }
 
-        const userId = await this.createUser(userInputModel, false);
-        const user = await userRepository.getUser(userId);
-        try {
-            await emailsManager.sendConfirmationLetter(user)
-            await userRepository.updateUser(userId, {"emailConfirmation.sendingTime": new Date().getTime()})
-        } catch (e) {
-            if (e instanceof MailIsNotSent) {
-                await userRepository.deleteUser(userId);
-                throw e;
-            }
-        }
-
+        const user: UserType = await this.createUser(userInputModel, false);
+        await emailsManager.sendConfirmationLetter(user)
+        // await userRepository.updateUser(user._id, {"emailConfirmation.sendingTime": new Date().getTime()})
         return true;
     },
 
@@ -107,9 +97,12 @@ export const usersService = {
             throw new UnprocessableEntity('The email is already confirmed')
         }
 
-        if (user.emailConfirmation.expirationDate && user.emailConfirmation.sendingTime) {
+        if (user.emailConfirmation.expirationDate
+            && user.emailConfirmation.expirationDate > new Date().getTime()
+            && user.emailConfirmation.sendingTime) {
+
             const minutesLastResendWas = (new Date().getTime() - user.emailConfirmation.sendingTime) / 60
-            if (minutesLastResendWas <= 15) {
+            if (Math.ceil(minutesLastResendWas) <= 15) {
                 const tryAfterMinutes = Math.ceil(15 - minutesLastResendWas);
                 throw new UnprocessableEntity(`Try to resend email in ${tryAfterMinutes} min`)
             }

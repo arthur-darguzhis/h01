@@ -1,8 +1,9 @@
 import request from "supertest";
-import {app} from "../../../../src";
+import {app} from "../../../../src/server";
 import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
 import {blogRepository} from "../../../../src/repository/blogMongoDbRepository";
 import {blogsService} from "../../../../src/domain/service/blogs-service";
+import {client} from "../../../../src/db";
 
 describe('/blogs', () => {
     beforeAll(async () => {
@@ -33,6 +34,10 @@ describe('/blogs', () => {
             "websiteUrl": "https://habr.com/ru/users/AlekDikarev/",
         });
     });
+
+    afterAll(async () => {
+        await client.close();
+    })
 
     it('send incorrect parameters for "pageNumber" and "pageSize". should fail with 2 errors', async () => {
         const blogsPaginatorResponse = await request(app)

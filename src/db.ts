@@ -36,7 +36,6 @@ export async function runDb() {
     }
 }
 
-
 export const db: { users: UserType[] } = {
     users: [
         {

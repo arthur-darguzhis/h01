@@ -1,5 +1,5 @@
 import request from "supertest";
-import {app} from "../../../../src";
+import {app} from "../../../../src/server";
 import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
 import {blogRepository} from "../../../../src/repository/blogMongoDbRepository";
 import {blogsService} from "../../../../src/domain/service/blogs-service";
@@ -8,6 +8,7 @@ import {PostInputModel} from "../../../../src/routes/inputModels/PostInputModel"
 import {blogQueryRepository} from "../../../../src/queryRepository/blogQueryRepository";
 import {BlogViewModel} from "../../../../src/queryRepository/types/Blog/BlogViewModel";
 import {postsService} from "../../../../src/domain/service/posts-service";
+import {client} from "../../../../src/db";
 
 describe('/blogs/:id/post', () => {
     let blogId: string;
@@ -33,6 +34,10 @@ describe('/blogs/:id/post', () => {
             await postsService.createPostInBlog(blogId, postInputModel);
         }
     }, 30000)
+
+    afterAll(async () => {
+        await client.close();
+    })
 
     it('return 404 if there is not blog with ID:63d11d0962ede10be4f024ac', async () => {
         await request(app)

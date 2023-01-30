@@ -1,10 +1,11 @@
 import request from "supertest";
-import {app} from "../../../../src";
+import {app} from "../../../../src/server";
 import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
 import {userRepository} from "../../../../src/repository/userMongoDbRepository";
 import {usersService} from "../../../../src/domain/service/users-service";
 import {UserType} from "../../../../src/domain/types/UserType";
 import {v4 as uuidv4} from "uuid";
+import {client} from "../../../../src/db";
 
 describe('POST => /auth/registration-confirmation', () => {
     let realConfirmationCode: string;
@@ -12,15 +13,17 @@ describe('POST => /auth/registration-confirmation', () => {
 
     beforeAll(async () => {
         await userRepository.deleteAllUsers();
-        const userId = await usersService.createUser({
+        const user: UserType = await usersService.createUser({
             login: 'infovoin',
             password: '12345678',
             email: "artur.dargujis@yandex.com"
         }, false)
-        const user: UserType = await userRepository.getUser(userId)
         realConfirmationCode = user.emailConfirmation.confirmationCode!
     })
 
+    afterAll(async () => {
+        await client.close();
+    })
 
     it('Verify email, activate account, status 204', async () => {
         await request(app)

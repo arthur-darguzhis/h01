@@ -11,8 +11,10 @@ import {postQueryRepository} from "../../../../src/queryRepository/postQueryRepo
 import {usersService} from "../../../../src/domain/service/users-service";
 import {LoginInputModel} from "../../../../src/routes/inputModels/LoginInputModel";
 import request from "supertest";
-import {app} from "../../../../src";
+import {app} from "../../../../src/server";
 import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
+import {client} from "../../../../src/db";
+import {UserType} from "../../../../src/domain/types/UserType";
 
 describe('/posts/:id/comments', () => {
     let blogId: string;
@@ -20,7 +22,7 @@ describe('/posts/:id/comments', () => {
     let postId: string;
     let post: PostViewModel;
     let token: string;
-    let userId: string;
+    let user: UserType;
     beforeAll(async () => {
         await postRepository.deleteAllPosts();
         await blogRepository.deleteAllBlogs();
@@ -43,7 +45,7 @@ describe('/posts/:id/comments', () => {
         })
         post = await postQueryRepository.findPost(postId) as PostViewModel;
 
-        userId = await usersService.createUser({
+        user = await usersService.createUser({
             "login": "user1",
             "password": "123456",
             "email": "user1@gmail.com"
@@ -68,6 +70,10 @@ describe('/posts/:id/comments', () => {
                 .expect(HTTP_STATUSES.CREATED_201)
         }
     }, 30000)
+
+    afterAll(async () => {
+        await client.close();
+    })
 
     it('return 200 and paginated list of 5 comments sorted by "content"', async () => {
         const postsCommentsPaginatorResponse = await request(app)

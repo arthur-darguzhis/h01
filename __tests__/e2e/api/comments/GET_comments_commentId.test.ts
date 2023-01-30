@@ -11,8 +11,10 @@ import {postQueryRepository} from "../../../../src/queryRepository/postQueryRepo
 import {usersService} from "../../../../src/domain/service/users-service";
 import {LoginInputModel} from "../../../../src/routes/inputModels/LoginInputModel";
 import request from "supertest";
-import {app} from "../../../../src";
+import {app} from "../../../../src/server";
 import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
+import {client} from "../../../../src/db";
+import {UserType} from "../../../../src/domain/types/UserType";
 
 describe('/posts/:id/comments', () => {
     let blogId: string;
@@ -20,7 +22,7 @@ describe('/posts/:id/comments', () => {
     let postId: string;
     let post: PostViewModel;
     let token: string;
-    let userId: string;
+    let user: UserType;
     let commentId: string;
     beforeAll(async () => {
         await postRepository.deleteAllPosts();
@@ -44,7 +46,7 @@ describe('/posts/:id/comments', () => {
         })
         post = await postQueryRepository.findPost(postId) as PostViewModel;
 
-        userId = await usersService.createUser({
+        user = await usersService.createUser({
             "login": "user1",
             "password": "123456",
             "email": "user1@gmail.com"
@@ -69,6 +71,10 @@ describe('/posts/:id/comments', () => {
         commentId = postCommentResponse.body.id;
     })
 
+    afterAll(async () => {
+        await client.close();
+    })
+
     it('get 404 when comment is not exists', async () => {
         await request(app).get('/comments/' + '63d11d1562ede10be4f024ad')
             .expect(HTTP_STATUSES.NOT_FOUND_404)
@@ -82,8 +88,10 @@ describe('/posts/:id/comments', () => {
             {
                 "id": expect.any(String),
                 "content": "this is a sample of a correct comment that can be saved",
-                "userId": userId,
-                "userLogin": "user1",
+                "commentatorInfo": {
+                    "userId": user._id,
+                    "userLogin": "user1",
+                },
                 "createdAt": expect.any(String)
             }
         )

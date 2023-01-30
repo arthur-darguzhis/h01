@@ -8,11 +8,13 @@ import {blogQueryRepository} from "../../../../src/queryRepository/blogQueryRepo
 import {PostViewModel} from "../../../../src/queryRepository/types/Post/PostViewModel";
 import {postQueryRepository} from "../../../../src/queryRepository/postQueryRepository";
 import request from "supertest";
-import {app} from "../../../../src";
+import {app} from "../../../../src/server";
 import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
 import {userRepository} from "../../../../src/repository/userMongoDbRepository";
 import {usersService} from "../../../../src/domain/service/users-service";
 import {LoginInputModel} from "../../../../src/routes/inputModels/LoginInputModel";
+import {client} from "../../../../src/db";
+import {UserType} from "../../../../src/domain/types/UserType";
 
 describe('/posts/:id/comments', () => {
     let blogId: string;
@@ -20,7 +22,7 @@ describe('/posts/:id/comments', () => {
     let postId: string;
     let post: PostViewModel;
     let token: string;
-    let userId: string;
+    let user: UserType;
     beforeAll(async () => {
         await postRepository.deleteAllPosts();
         await blogRepository.deleteAllBlogs();
@@ -43,7 +45,7 @@ describe('/posts/:id/comments', () => {
         })
         post = await postQueryRepository.findPost(postId) as PostViewModel;
 
-        userId = await usersService.createUser({
+        user = await usersService.createUser({
             "login": "user1",
             "password": "123456",
             "email": "user1@gmail.com"
@@ -59,6 +61,10 @@ describe('/posts/:id/comments', () => {
             .send(logInputModel)
             .expect(HTTP_STATUSES.OK_200)
         token = responseWithToken.body.accessToken;
+    })
+
+    afterAll(async () => {
+        await client.close();
     })
 
     it('get 401 without JWT token', async () => {
@@ -102,7 +108,7 @@ describe('/posts/:id/comments', () => {
             id: expect.any(String),
             content: 'this is a sample of a correct comment that can be saved',
             commentatorInfo: {
-                userId: userId,
+                userId: user._id,
                 userLogin: 'user1'
             },
             createdAt: expect.any(String)

@@ -1,5 +1,5 @@
 import request from "supertest";
-import {app} from "../../../../src";
+import {app} from "../../../../src/server";
 import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
 import {blogRepository} from "../../../../src/repository/blogMongoDbRepository";
 import {blogsService} from "../../../../src/domain/service/blogs-service";
@@ -7,6 +7,7 @@ import {postRepository} from "../../../../src/repository/postMongoDbRepository";
 import {PostInputModel} from "../../../../src/routes/inputModels/PostInputModel";
 import {blogQueryRepository} from "../../../../src/queryRepository/blogQueryRepository";
 import {BlogViewModel} from "../../../../src/queryRepository/types/Blog/BlogViewModel";
+import {client} from "../../../../src/db";
 
 describe('/blogs/:id/post', () => {
     let blogId: string;
@@ -20,6 +21,10 @@ describe('/blogs/:id/post', () => {
             "websiteUrl": "https://habr.com/ru/users/AlekDikarev/",
         });
         blog = await blogQueryRepository.findBlog(blogId) as BlogViewModel;
+    })
+
+    afterAll(async () => {
+        await client.close();
     })
 
     it('check that blog does not have any posts', async () => {

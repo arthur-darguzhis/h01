@@ -1,13 +1,18 @@
 import request from "supertest";
-import {app} from "../../../../src";
+import {app} from "../../../../src/server";
 import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
 import {blogRepository} from "../../../../src/repository/blogMongoDbRepository";
 import {BlogInputModel} from "../../../../src/routes/inputModels/BlogInputModel";
+import {client} from "../../../../src/db";
 
 describe('/blogs', () => {
     beforeAll(async () => {
         await blogRepository.deleteAllBlogs();
     });
+
+    afterAll(async () => {
+        await client.close();
+    })
 
     it('should return 200 and empty array', async () => {
         await request(app)

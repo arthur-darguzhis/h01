@@ -2,6 +2,7 @@ import {settings} from "../settings";
 import {UserType} from "../domain/types/UserType";
 import {MailIsNotSent} from "../domain/exceptions/MailIsNotSent";
 import {emailAdapter} from "../adapters/emailAdapter";
+import {userRepository} from "../repository/userMongoDbRepository";
 
 export const emailsManager = {
     async sendConfirmationLetter(user: UserType): Promise<true | never> {
@@ -21,6 +22,8 @@ export const emailsManager = {
                    </p>`
         };
 
-        return await emailAdapter.sendMail(preparedMail)
+        await emailAdapter.sendMail(preparedMail)
+        await userRepository.updateUser(user._id, {"emailConfirmation.sendingTime": new Date().getTime()})
+        return true;
     }
 }

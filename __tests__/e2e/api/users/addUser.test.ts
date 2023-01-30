@@ -1,13 +1,18 @@
 import {userRepository} from "../../../../src/repository/userMongoDbRepository";
 import request from "supertest";
-import {app} from "../../../../src";
+import {app} from "../../../../src/server";
 import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
 import {UserInputModel} from "../../../../src/routes/inputModels/UserInputModel";
+import {client} from "../../../../src/db";
 
 describe('/users', () => {
     beforeAll(async () => {
         await userRepository.deleteAllUsers();
     });
+
+    afterAll(async () => {
+        await client.close();
+    })
 
     it('check that only admin can add new user', async () => {
         const inputUserModel: UserInputModel = {

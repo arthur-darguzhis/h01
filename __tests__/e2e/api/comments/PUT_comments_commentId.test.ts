@@ -11,9 +11,10 @@ import {postQueryRepository} from "../../../../src/queryRepository/postQueryRepo
 import {usersService} from "../../../../src/domain/service/users-service";
 import {LoginInputModel} from "../../../../src/routes/inputModels/LoginInputModel";
 import request from "supertest";
-import {app} from "../../../../src";
+import {app} from "../../../../src/server";
 import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
 import {CommentInputModel} from "../../../../src/routes/inputModels/CommentInputModel";
+import {client} from "../../../../src/db";
 
 describe('/posts/:id/comments', () => {
     let blogId: string;
@@ -21,9 +22,7 @@ describe('/posts/:id/comments', () => {
     let postId: string;
     let post: PostViewModel;
     let token: string;
-    let userId: string;
     let commentId: string;
-    let someUserId: string;
     let someUserToken: string;
     let someUserCommentId: string;
 
@@ -50,7 +49,7 @@ describe('/posts/:id/comments', () => {
         post = await postQueryRepository.findPost(postId) as PostViewModel;
 
 
-        someUserId = await usersService.createUser({
+        await usersService.createUser({
             "login": "user2",
             "password": "123456",
             "email": "user2@gmail.com"
@@ -75,7 +74,8 @@ describe('/posts/:id/comments', () => {
         someUserCommentId = postSomeUserCommentResponse.body.id;
 
 
-        userId = await usersService.createUser({
+
+        await usersService.createUser({
             "login": "user1",
             "password": "123456",
             "email": "user1@gmail.com"
@@ -98,6 +98,10 @@ describe('/posts/:id/comments', () => {
             .send({content: 'this is a sample of a correct comment that can be saved'})
             .expect(HTTP_STATUSES.CREATED_201)
         commentId = postCommentResponse.body.id;
+    })
+
+    afterAll(async () => {
+        await client.close();
     })
 
     it('get 401 UNAUTHORIZED', async () => {
@@ -153,8 +157,10 @@ describe('/posts/:id/comments', () => {
         expect(updatedCommentResponse.body).toEqual({
             "id": expect.any(String),
             "content": "this is a correct value for comment",
-            "userId": expect.any(String),
-            "userLogin": "user1",
+            "commentatorInfo": {
+                "userId": expect.any(String),
+                "userLogin": "user1",
+            },
             "createdAt": expect.any(String),
         })
     })

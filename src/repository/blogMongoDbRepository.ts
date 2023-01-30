@@ -1,6 +1,7 @@
 import {blogsCollection} from "../db";
 import {BlogInputModel} from "../routes/inputModels/BlogInputModel";
 import {BlogType} from "../domain/types/BlogType";
+import {DeleteResult} from "mongodb";
 
 export const blogRepository = {
 
@@ -26,7 +27,7 @@ export const blogRepository = {
         return result.deletedCount === 1
     },
 
-    async deleteAllBlogs(): Promise<void> {
-        await blogsCollection.deleteMany({})
+    async deleteAllBlogs(): Promise<DeleteResult> {
+        return await blogsCollection.deleteMany({})
     }
 }

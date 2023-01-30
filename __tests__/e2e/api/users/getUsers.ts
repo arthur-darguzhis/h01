@@ -1,8 +1,9 @@
 import {userRepository} from "../../../../src/repository/userMongoDbRepository";
 import request from "supertest";
-import {app} from "../../../../src";
+import {app} from "../../../../src/server";
 import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
 import {usersService} from "../../../../src/domain/service/users-service";
+import {client} from "../../../../src/db";
 
 describe('/users', () => {
     beforeAll(async () => {
@@ -16,6 +17,10 @@ describe('/users', () => {
             }, true)
         }
     });
+
+    afterAll(async () => {
+        await client.close();
+    })
 
     it('only admin can read users list', async () => {
         await request(app)

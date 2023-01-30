@@ -44,7 +44,6 @@ authRouter.post('/registration-confirmation', async (req: RequestWithBody<Regist
     try {
         await usersService.confirmEmail(req.body.code);
     } catch (err) {
-        //TODO Как пофиксить? по тмоу как (он не может отловить исключение класса UnprocessableEntity все думает что это Error)
         if (err instanceof Error) {
             const apiErrorResult: APIErrorResultType = {
                 errorsMessages: [{

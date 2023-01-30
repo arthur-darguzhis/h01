@@ -1,8 +1,9 @@
 import {userRepository} from "../../../../src/repository/userMongoDbRepository";
 import request from "supertest";
-import {app} from "../../../../src";
+import {app} from "../../../../src/server";
 import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
 import {UserInputModel} from "../../../../src/routes/inputModels/UserInputModel";
+import {client} from "../../../../src/db";
 
 let userIdForDelete: string;
 describe('/users', () => {
@@ -22,6 +23,10 @@ describe('/users', () => {
 
         userIdForDelete = newUser.body.id
     });
+
+    afterAll(async () => {
+        await client.close();
+    })
 
     it('check that only admin can delete a user', async () => {
         await request(app)

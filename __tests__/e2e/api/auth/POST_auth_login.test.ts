@@ -1,9 +1,10 @@
 import {userRepository} from "../../../../src/repository/userMongoDbRepository";
 import {usersService} from "../../../../src/domain/service/users-service";
 import request from "supertest";
-import {app} from "../../../../src";
+import {app} from "../../../../src/server";
 import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
 import {LoginInputModel} from "../../../../src/routes/inputModels/LoginInputModel";
+import {client} from "../../../../src/db";
 
 describe('POST => /auth/login', () => {
     beforeAll(async () => {
@@ -13,6 +14,10 @@ describe('POST => /auth/login', () => {
             "password": "123456",
             "email": "user1@gmail.com",
         }, true)
+    })
+
+    afterAll(async () => {
+        await client.close();
     })
 
     const correctLoginAndPassword: LoginInputModel = {

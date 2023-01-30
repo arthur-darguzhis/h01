@@ -1,10 +1,11 @@
 import request from "supertest";
-import {app} from "../../../../src";
+import {app} from "../../../../src/server";
 import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
 import {blogRepository} from "../../../../src/repository/blogMongoDbRepository";
 import {postsService} from "../../../../src/domain/service/posts-service";
 import {blogsService} from "../../../../src/domain/service/blogs-service";
 import {postRepository} from "../../../../src/repository/postMongoDbRepository";
+import {client} from "../../../../src/db";
 
 describe('/blogs', () => {
     beforeAll(async () => {
@@ -55,6 +56,10 @@ describe('/blogs', () => {
             blogId: blogId,
             blogName: '1 blog',
         });
+    })
+
+    afterAll(async () => {
+        await client.close();
     })
 
     it('send incorrect parameters for "pageNumber" and "pageSize". should fail with 2 errors', async () => {

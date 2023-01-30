@@ -1,8 +1,9 @@
 import request from "supertest";
-import {app} from "../../../../src";
+import {app} from "../../../../src/server";
 import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
 import {blogRepository} from "../../../../src/repository/blogMongoDbRepository";
 import {blogsService} from "../../../../src/domain/service/blogs-service";
+import {client} from "../../../../src/db";
 
 describe('/blogs', () => {
     beforeAll(async () => {
@@ -32,6 +33,10 @@ describe('/blogs', () => {
             "description": "some description",
             "websiteUrl": "https://habr.com/ru/users/AlekDikarev/",
         });
+    })
+
+    afterAll(async () => {
+        await client.close();
     })
 
     it('should return 0 documents when query param "searchNameTerm" does not match with any blog name', async () => {
