@@ -9,7 +9,7 @@ export const emailsManager = {
             throw new MailIsNotSent('something wrong with confirmationCode or user email is empty');
         }
 
-        const confirmUrl = settings.APP_HOST + 'confirm-email/?code=' + user.emailConfirmation!.confirmationCode;
+        const confirmUrl = settings.APP_HOST + 'confirm-email?code=' + user.emailConfirmation!.confirmationCode;
 
         const preparedMail = {
             from: `"Artur Darguzhis" <${settings.GMAIL_APP_LOGIN}>`,
