@@ -3,7 +3,8 @@ dotenv.config()
 
 export const settings = {
     PORT: process.env.PORT || 3000,
-    JWT_SECRET: process.env.JWT_SECRET || "iej_ahBn5!k2#",
+    JWT_AUTH_SECRET: process.env.JWT_AUTH_SECRET || "iej_ahBn5!k2#",
+    JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET || "ek4j2m_u*!.^",
     MONGO_URI: process.env.MONGO_URI || 'mongodb://localhost:27017/',
     APP_HOST: process.env.APP_HOST || 'http://localhost:3000/',
     GMAIL_APP_LOGIN: process.env.GMAIL_APP_LOGIN,

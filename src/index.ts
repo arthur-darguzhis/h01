@@ -3,7 +3,7 @@ import {RequestWithQuery} from "./routes/types/RequestTypes";
 import {RegistrationConfirmationCodeModel} from "./routes/types/RegistrationConfirmationCodeModel";
 import {app, startApp} from "./server";
 
-app.get('/confirm-email', async (req: RequestWithQuery<RegistrationConfirmationCodeModel>, res) => {
+app.get('/confirm-registration', async (req: RequestWithQuery<RegistrationConfirmationCodeModel>, res) => {
     const url = settings.APP_HOST + 'auth/registration-confirmation'
     const result = await fetch(url, {
         method: 'POST',

@@ -7,10 +7,11 @@ import {commentsRouter} from "./routes/commentsRouter";
 import {testingRouter} from "./routes/testingRouter";
 import {settings} from "./settings";
 import {runDb} from "./db";
-
+import cookieParser from "cookie-parser";
 export const app = express()
 
 app.use(express.json());
+app.use(cookieParser())
 app.use('/blogs', blogsRouter)
 app.use('/posts', postsRouter)
 app.use('/users', usersRouter)

@@ -8,9 +8,9 @@ export const userRepository = {
         return newUser
     },
 
-    async getUser(id: string): Promise<UserType | never> {
-        const user = await usersCollection.findOne({_id: id});
-        if (!user) throw new EntityNotFound(`User with id: ${id} is not exists`)
+    async getUser(userId: string): Promise<UserType | never> {
+        const user = await usersCollection.findOne({_id: userId});
+        if (!user) throw new EntityNotFound(`User with id: ${userId} is not exists`)
         return user
     },
 

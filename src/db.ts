@@ -4,6 +4,7 @@ import {UserType} from "./domain/types/UserType";
 import {MongoClient} from "mongodb";
 import {CommentType} from "./domain/types/CommentType";
 import {settings} from "./settings";
+import {JWT} from "./application/types/JWT";
 
 const mongoUri = settings.MONGO_URI;
 if (!mongoUri) {
@@ -19,6 +20,7 @@ export const blogsCollection = dbConnection.collection<BlogType>("blogs");
 export const postsCollection = dbConnection.collection<PostType>("posts");
 export const usersCollection = dbConnection.collection<UserType>("users");
 export const commentsCollection = dbConnection.collection<CommentType>("comments")
+export const refreshTokenBlackListCollection = dbConnection.collection<JWT>("refreshTokenBlackList")
 
 //Расскажите почему эта функция не стрелочная и при чем здесь замыкание и переменная client? =)
 export async function runDb() {

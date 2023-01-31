@@ -15,6 +15,7 @@ import {validateUser} from "../middlewares/validators/validateUser";
 import {APIErrorResultType} from "./types/apiError/APIErrorResultType";
 import {MailIsNotSent} from "../domain/exceptions/MailIsNotSent";
 import {RegistrationConfirmationCodeModel} from "./types/RegistrationConfirmationCodeModel";
+import {jwtRefreshGuardMiddleware} from "../middlewares/jwtRefreshGuardMiddleware";
 
 export const authRouter = Router({});
 
@@ -83,16 +84,42 @@ authRouter.post('/login',
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithBody<LoginInputModel>, res) => {
         const user = await usersService.checkCredentials(req.body.loginOrEmail, req.body.password)
-
         if (!user || !user.emailConfirmation.isConfirmed || !user.isActive) {
             return res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401);
         }
 
-        const token = await jwtService.createJWT(user)
+        const authToken = jwtService.createAuthJWT(user);
+        const refreshToken = jwtService.createRefreshJWT(user)
         const loginSuccessViewModel: LoginSuccessViewModel = {
-            "accessToken": token
+            "accessToken": authToken
         }
-        res.status(HTTP_STATUSES.OK_200).json(loginSuccessViewModel)
+
+        res.status(HTTP_STATUSES.OK_200)
+            .cookie('refreshToken', refreshToken, {httpOnly: true, secure: true, maxAge: 20 * 1000})
+            .json(loginSuccessViewModel)
+    })
+
+authRouter.post('/refresh-token', jwtRefreshGuardMiddleware, async (req, res) => {
+    await jwtService.addRefreshJWTtoBlackList(req.user!, req.cookies.refreshToken);
+    const authToken = jwtService.createAuthJWT(req.user!);
+    const refreshToken = jwtService.createRefreshJWT(req.user!)
+    const loginSuccessViewModel: LoginSuccessViewModel = {
+        "accessToken": authToken
+    }
+    res.status(HTTP_STATUSES.OK_200)
+        .cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: true,
+            maxAge: 20 * 1000
+        })
+        .json(loginSuccessViewModel)
+})
+
+authRouter.post('/logout',
+    jwtRefreshGuardMiddleware,
+    async (req: Request, res: Response) => {
+        await jwtService.addRefreshJWTtoBlackList(req.user!, req.cookies.refreshToken);
+        res.clearCookie('refreshToken').sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     })
 
 authRouter.get('/me', jwtAuthGuardMiddleware,
