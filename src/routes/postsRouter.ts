@@ -14,16 +14,18 @@ import {authGuardMiddleware} from "../middlewares/authGuardMiddleware";
 import {postsService} from "../domain/service/posts-service";
 import {postRepository} from "../repository/postMongoDbRepository";
 import {HTTP_STATUSES} from "./types/HttpStatuses";
-import {PostPaginatorType} from "../queryRepository/types/Post/PostPaginatorType";
 import {validatePost} from "../middlewares/validators/validatePost";
 import {validatePaginator} from "../middlewares/validators/validatePaginator";
-import {PostViewModel} from "../queryRepository/types/Post/PostViewModel";
 import {CommentInputModel} from "./inputModels/CommentInputModel";
 import {validateComment} from "../middlewares/validators/validateComment";
 import {jwtAuthGuardMiddleware} from "../middlewares/jwtAuthGuardMiddleware";
 import {commentsService} from "../domain/service/comments-service";
 import {commentQueryRepository} from "../queryRepository/commentQueryRepository";
-import {CommentViewModel} from "../queryRepository/types/Comment/CommentViewModel";
+import {mapCommentToViewModel} from "../modules/comment/comment.mapper";
+import {mapPostToViewModel} from "../modules/post/post.mapper";
+import {PaginatorResponse} from "./types/paginator/PaginatorResponse";
+import {PostViewModel} from "../queryRepository/types/Post/PostViewModel";
+import {PaginatorParams} from "./types/paginator/PaginatorParams";
 
 export const postsRouter = Router({})
 
@@ -33,12 +35,9 @@ postsRouter.get('/',
     validatePaginator.pageNumber,
     validatePaginator.pageSize,
     checkErrorsInRequestDataMiddleware,
-    async (req: RequestWithQuery<{ sortBy: string, sortDirection: string, pageSize: string, pageNumber: string }>,
-           res: Response<PostPaginatorType>) => {
-
-        const {sortBy, sortDirection, pageNumber, pageSize} = req.query
-        const posts = await postQueryRepository.findPosts(sortBy, sortDirection, +pageNumber, +pageSize);
-        res.status(HTTP_STATUSES.OK_200).json(posts)
+    async (req: RequestWithQuery<PaginatorParams>, res: Response<PaginatorResponse<PostViewModel>>) => {
+        const paginatedPostList = await postQueryRepository.findPosts(req.query);
+        res.status(HTTP_STATUSES.OK_200).json(paginatedPostList)
     })
 
 postsRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res) => {
@@ -58,9 +57,8 @@ postsRouter.post('/',
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithBody<PostInputModel>, res) => {
         try {
-            const newPostId = await postsService.createPost(req.body);
-            const newPost = await postQueryRepository.findPost(newPostId) as PostViewModel;
-            res.status(HTTP_STATUSES.CREATED_201).json(newPost);
+            const newPost = await postsService.createPost(req.body);
+            res.status(HTTP_STATUSES.CREATED_201).json(mapPostToViewModel(newPost));
         } catch (e) {
             const err = e as Error
             const apiErrorResult: APIErrorResultType = {
@@ -114,9 +112,8 @@ postsRouter.post('/:postId/comments',
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithParamsAndBody<{ postId: string }, CommentInputModel>, res) => {
         try {
-            const newCommentId = await commentsService.addComment(req.params.postId, req.body, req.user!);
-            const newComment = await commentQueryRepository.findComment(newCommentId) as CommentViewModel
-            return res.status(HTTP_STATUSES.CREATED_201).json(newComment);
+            const newComment = await commentsService.addComment(req.params.postId, req.body, req.user!);
+            return res.status(HTTP_STATUSES.CREATED_201).json(mapCommentToViewModel(newComment));
         } catch (e) {
             const err = e as Error
             const apiErrorResult: APIErrorResultType = {
@@ -135,15 +132,11 @@ postsRouter.get('/:postId/comments',
     validatePaginator.pageSize,
     validatePaginator.pageNumber,
     checkErrorsInRequestDataMiddleware,
-    async (req: RequestWithParamsAndQuery<{ postId: string }, { sortBy: string, sortDirection: string, pageSize: string, pageNumber: string }>, res) => {
+    async (req: RequestWithParamsAndQuery<{ postId: string }, PaginatorParams>, res) => {
         const post = await postQueryRepository.findPost(req.params.postId);
-        if(!post){
+        if (!post) {
             return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
         }
-
-        const {sortBy, sortDirection, pageNumber, pageSize} = req.query
-        const comments = await commentQueryRepository.findCommentsByPostId(req.params.postId, sortBy, sortDirection, +pageNumber, +pageSize)
-
-        res.status(HTTP_STATUSES.OK_200).json(comments);
+        const paginatedCommentsList = await commentQueryRepository.findCommentsByPostId(req.params.postId, req.query)
+        res.status(HTTP_STATUSES.OK_200).json(paginatedCommentsList);
     })
-

@@ -16,6 +16,7 @@ import {APIErrorResultType} from "./types/apiError/APIErrorResultType";
 import {MailIsNotSent} from "../domain/exceptions/MailIsNotSent";
 import {RegistrationConfirmationCodeModel} from "./types/RegistrationConfirmationCodeModel";
 import {jwtRefreshGuardMiddleware} from "../middlewares/jwtRefreshGuardMiddleware";
+import {UnprocessableEntity} from "../domain/exceptions/UnprocessableEntity";
 
 export const authRouter = Router({});
 
@@ -65,7 +66,7 @@ authRouter.post('/registration-email-resending',
         try {
             await usersService.resendConfirmEmail(req.body.email)
         } catch (err) {
-            if (err instanceof Error) {
+            if (err instanceof UnprocessableEntity) {
                 const apiErrorResult: APIErrorResultType = {
                     errorsMessages: [{
                         field: 'email',
@@ -73,6 +74,8 @@ authRouter.post('/registration-email-resending',
                     }]
                 }
                 return res.status(HTTP_STATUSES.BAD_REQUEST_400).json(apiErrorResult)
+            } else {
+
             }
         }
         return res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)

@@ -8,7 +8,7 @@ import {EntityNotFound} from "../exceptions/EntityNotFound";
 import {Forbidden} from "../exceptions/Forbidden";
 
 export const commentsService = {
-    async addComment(postId: string, commentInputModel: CommentInputModel, currentUser: UserType): Promise<string> {
+    async addComment(postId: string, commentInputModel: CommentInputModel, currentUser: UserType): Promise<CommentType> {
         const post = await postRepository.findPost(postId);
         if (!post) {
             throw new Error(`Post with ID: ${postId} is not exists`);
@@ -25,8 +25,7 @@ export const commentsService = {
             createdAt: new Date().toISOString()
         }
 
-        await commentRepository.addComment(newComment);
-        return newComment._id;
+        return await commentRepository.addComment(newComment);
     },
 
     async updateUsersComment(commentId: string, userId: string, commentInputModel: CommentInputModel): Promise<boolean | never> {
@@ -38,7 +37,7 @@ export const commentsService = {
         if (comment.commentatorInfo.userId !== userId) {
             throw new Forbidden("You can update only your comments")
         }
-        return await commentRepository.updateComment(commentId, userId,commentInputModel)
+        return await commentRepository.updateComment(commentId, userId, commentInputModel)
     },
 
     async deleteUserComment(commentId: string, userId: string): Promise<boolean | never> {

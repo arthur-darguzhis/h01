@@ -1,5 +1,5 @@
 import {body, query} from "express-validator";
-import {sortDirections} from "../../routes/types/SortDirections";
+import {sortDirections} from "../../routes/types/paginator/SortDirections";
 
 export const validateComment = {
     body: {

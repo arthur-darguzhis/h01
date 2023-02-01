@@ -1,13 +1,9 @@
-import {BlogViewModel} from "../../../../src/queryRepository/types/Blog/BlogViewModel";
-import {PostViewModel} from "../../../../src/queryRepository/types/Post/PostViewModel";
 import {postRepository} from "../../../../src/repository/postMongoDbRepository";
 import {blogRepository} from "../../../../src/repository/blogMongoDbRepository";
 import {commentRepository} from "../../../../src/repository/commentMongoDbRepository";
 import {userRepository} from "../../../../src/repository/userMongoDbRepository";
 import {blogsService} from "../../../../src/domain/service/blogs-service";
-import {blogQueryRepository} from "../../../../src/queryRepository/blogQueryRepository";
 import {postsService} from "../../../../src/domain/service/posts-service";
-import {postQueryRepository} from "../../../../src/queryRepository/postQueryRepository";
 import {usersService} from "../../../../src/domain/service/users-service";
 import {LoginInputModel} from "../../../../src/routes/inputModels/LoginInputModel";
 import request from "supertest";
@@ -15,12 +11,12 @@ import {app} from "../../../../src/server";
 import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
 import {client} from "../../../../src/db";
 import {UserType} from "../../../../src/domain/types/UserType";
+import {BlogType} from "../../../../src/domain/types/BlogType";
+import {PostType} from "../../../../src/domain/types/PostType";
 
 describe('/posts/:id/comments', () => {
-    let blogId: string;
-    let blog: BlogViewModel;
-    let postId: string;
-    let post: PostViewModel;
+    let blog: BlogType;
+    let post: PostType;
     let token: string;
     let user: UserType;
     let commentId: string;
@@ -30,21 +26,19 @@ describe('/posts/:id/comments', () => {
         await commentRepository.deleteAllComments();
         await userRepository.deleteAllUsers();
 
-        blogId = await blogsService.createBlog({
+        blog = await blogsService.createBlog({
             "name": "first blog",
             "description": "some description",
             "websiteUrl": "https://habr.com/ru/users/AlekDikarev/",
         });
-        blog = await blogQueryRepository.findBlog(blogId) as BlogViewModel;
 
-        postId = await postsService.createPost({
+        post = await postsService.createPost({
             title: '5 post',
             shortDescription: 'short description',
             content: 'some content',
-            blogId: blogId,
+            blogId: blog._id,
             blogName: '1 blog',
         })
-        post = await postQueryRepository.findPost(postId) as PostViewModel;
 
         user = await usersService.createUser({
             "login": "user1",
@@ -64,7 +58,7 @@ describe('/posts/:id/comments', () => {
         token = responseWithToken.body.accessToken;
 
         const postCommentResponse = await request(app)
-            .post('/posts/' + postId + '/comments')
+            .post('/posts/' + post._id + '/comments')
             .auth(token, {type: "bearer"})
             .send({content: 'this is a sample of a correct comment that can be saved'})
             .expect(HTTP_STATUSES.CREATED_201)

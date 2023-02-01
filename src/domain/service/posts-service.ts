@@ -3,9 +3,10 @@ import {blogRepository} from '../../repository/blogMongoDbRepository'
 import {PostInputModel} from "../../routes/inputModels/PostInputModel";
 import {BlogPostInputModel} from "../../routes/inputModels/BlogPostInputModel";
 import {ObjectId} from "mongodb";
+import {PostType} from "../types/PostType";
 
 export const postsService = {
-    async createPost(postInputModel: PostInputModel): Promise<string | never> {
+    async createPost(postInputModel: PostInputModel): Promise<PostType | never> {
         const blog = await blogRepository.findBlog(postInputModel.blogId);
         if (!blog) {
             throw new Error(`Blog with ID: ${postInputModel.blogId} is not exists`);
@@ -21,11 +22,10 @@ export const postsService = {
             createdAt: new Date().toISOString()
         }
 
-        const post = await postRepository.addPost(newPost)
-        return post._id
+        return await postRepository.addPost(newPost);
     },
 
-    async createPostInBlog(blogId: string, body: BlogPostInputModel): Promise<string | never> {
+    async createPostInBlog(blogId: string, body: BlogPostInputModel): Promise<PostType | never> {
         const blog = await blogRepository.findBlog(blogId);
         if (!blog) {
             throw new Error(`Blog with ID: ${blogId} is not exists`);
@@ -41,8 +41,7 @@ export const postsService = {
             createdAt: new Date().toISOString()
         }
 
-        const post = await postRepository.addPost(newPost)
-        return post._id
+        return await postRepository.addPost(newPost)
     },
 
     async updatePost(id: string, postInputModel: PostInputModel): Promise<boolean | never> {

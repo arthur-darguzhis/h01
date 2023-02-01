@@ -5,22 +5,19 @@ import {blogRepository} from "../../../../src/repository/blogMongoDbRepository";
 import {blogsService} from "../../../../src/domain/service/blogs-service";
 import {postRepository} from "../../../../src/repository/postMongoDbRepository";
 import {PostInputModel} from "../../../../src/routes/inputModels/PostInputModel";
-import {blogQueryRepository} from "../../../../src/queryRepository/blogQueryRepository";
-import {BlogViewModel} from "../../../../src/queryRepository/types/Blog/BlogViewModel";
 import {client} from "../../../../src/db";
+import {BlogType} from "../../../../src/domain/types/BlogType";
 
 describe('/blogs/:id/post', () => {
-    let blogId: string;
-    let blog: BlogViewModel;
+    let blog: BlogType;
     beforeAll(async () => {
         await postRepository.deleteAllPosts();
         await blogRepository.deleteAllBlogs();
-        blogId = await blogsService.createBlog({
+        blog = await blogsService.createBlog({
             "name": "first blog",
             "description": "some description",
             "websiteUrl": "https://habr.com/ru/users/AlekDikarev/",
         });
-        blog = await blogQueryRepository.findBlog(blogId) as BlogViewModel;
     })
 
     afterAll(async () => {
@@ -29,7 +26,7 @@ describe('/blogs/:id/post', () => {
 
     it('check that blog does not have any posts', async () => {
         await request(app)
-            .get('/blogs/' + blogId + '/posts')
+            .get('/blogs/' + blog._id + '/posts')
             .expect(HTTP_STATUSES.OK_200, {pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: []})
     })
 
@@ -38,11 +35,11 @@ describe('/blogs/:id/post', () => {
             title: 'Управление состоянием в React',
             shortDescription: 'Все мы прекрасно знаем что построить полноценный стор на react context достаточно тяжело',
             content: 'Буквально каждую конференцию мы слышим от спикеров, а вы знаете как работают контексты? а вы знаете что каждый ваш слушатель перерисовывает ваш умный компонент (useContext) Пора решить эту проблему раз и на всегда!',
-            blogId: blogId,
+            blogId: blog._id,
         }
 
         const createPostResponse = await request(app)
-            .post('/blogs/' + blogId + '/posts')
+            .post('/blogs/' + blog._id + '/posts')
             .auth('admin', 'qwerty', {type: "basic"})
             .send(PostInputModel)
             .expect(HTTP_STATUSES.CREATED_201)
@@ -53,7 +50,7 @@ describe('/blogs/:id/post', () => {
             title: 'Управление состоянием в React',
             shortDescription: 'Все мы прекрасно знаем что построить полноценный стор на react context достаточно тяжело',
             content: 'Буквально каждую конференцию мы слышим от спикеров, а вы знаете как работают контексты? а вы знаете что каждый ваш слушатель перерисовывает ваш умный компонент (useContext) Пора решить эту проблему раз и на всегда!',
-            blogId: blog.id,
+            blogId: blog._id,
             blogName: blog.name,
             createdAt: expect.any(String)
         })
@@ -61,7 +58,7 @@ describe('/blogs/:id/post', () => {
 
     it('reads posts of blog witch has only one post', async () => {
         const BlogsPostsResponse = await request(app)
-            .get('/blogs/' + blogId + '/posts')
+            .get('/blogs/' + blog._id + '/posts')
             .expect(HTTP_STATUSES.OK_200)
 
         expect(BlogsPostsResponse.body).toEqual({

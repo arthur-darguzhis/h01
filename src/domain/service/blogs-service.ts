@@ -5,7 +5,7 @@ import {ObjectId} from "mongodb";
 
 export const blogsService = {
 
-    async createBlog(blogInputModel: BlogInputModel): Promise<string> {
+    async createBlog(blogInputModel: BlogInputModel): Promise<BlogType> {
         const newBlog: BlogType = {
             _id: new ObjectId().toString(),
             name: blogInputModel.name,
@@ -13,8 +13,7 @@ export const blogsService = {
             websiteUrl: blogInputModel.websiteUrl,
             createdAt: new Date().toISOString()
         }
-        const blog = await blogRepository.addBlog(newBlog)
-        return blog._id.toString()
+        return await blogRepository.addBlog(newBlog)
     },
 
     async updateBlog(id: string, blogInputModel: BlogInputModel): Promise<boolean> {

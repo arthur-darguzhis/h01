@@ -7,10 +7,12 @@ import {validateUser} from "../middlewares/validators/validateUser";
 import {usersService} from "../domain/service/users-service";
 import {userQueryRepository} from "../queryRepository/userQueryRepository";
 import {HTTP_STATUSES} from "./types/HttpStatuses";
-import {UserViewModel} from "../queryRepository/types/User/UserViewModel";
 import {validatePaginator} from "../middlewares/validators/validatePaginator";
-import {UserPaginatorType} from "../queryRepository/types/User/UserPaginatorType";
 import {UserType} from "../domain/types/UserType";
+import {mapUserToViewModel} from "../modules/user/user.mapper";
+import {PaginatorResponse} from "./types/paginator/PaginatorResponse";
+import {UserViewModel} from "../queryRepository/types/User/UserViewModel";
+import {UserPaginatorParams} from "./types/paginator/UserPaginatorParams";
 
 export const usersRouter = Router({})
 
@@ -22,8 +24,7 @@ usersRouter.post('/',
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithBody<UserInputModel>, res) => {
         const newUser: UserType = await usersService.createUser(req.body, true)
-        const viewUser = await userQueryRepository.findUser(newUser._id) as UserViewModel
-        res.status(HTTP_STATUSES.CREATED_201).json(viewUser)
+        res.status(HTTP_STATUSES.CREATED_201).json(mapUserToViewModel(newUser))
     })
 
 usersRouter.delete('/:id', authGuardMiddleware,
@@ -44,19 +45,7 @@ usersRouter.get('/',
     validatePaginator.pageSize,
     validatePaginator.pageNumber,
     checkErrorsInRequestDataMiddleware,
-    async (req: RequestWithQuery<{
-               searchLoginTerm: string,
-               searchEmailTerm: string,
-               sortBy: string,
-               sortDirection: string,
-               pageSize: string,
-               pageNumber: string
-           }>,
-           res: Response<UserPaginatorType>) => {
-
-        const {searchLoginTerm, searchEmailTerm, sortBy, sortDirection, pageSize, pageNumber} = req.query
-        const users = await userQueryRepository.findUsers(searchLoginTerm, searchEmailTerm, sortBy, sortDirection, +pageSize, +pageNumber)
-
-        res.status(HTTP_STATUSES.OK_200).json(users)
+    async (req: RequestWithQuery<UserPaginatorParams>, res: Response<PaginatorResponse<UserViewModel>>) => {
+        const paginatedUserList = await userQueryRepository.findUsers(req.query)
+        res.status(HTTP_STATUSES.OK_200).json(paginatedUserList)
     })
-

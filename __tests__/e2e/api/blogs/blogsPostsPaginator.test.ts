@@ -5,33 +5,30 @@ import {blogRepository} from "../../../../src/repository/blogMongoDbRepository";
 import {blogsService} from "../../../../src/domain/service/blogs-service";
 import {postRepository} from "../../../../src/repository/postMongoDbRepository";
 import {PostInputModel} from "../../../../src/routes/inputModels/PostInputModel";
-import {blogQueryRepository} from "../../../../src/queryRepository/blogQueryRepository";
-import {BlogViewModel} from "../../../../src/queryRepository/types/Blog/BlogViewModel";
 import {postsService} from "../../../../src/domain/service/posts-service";
 import {client} from "../../../../src/db";
+import {BlogType} from "../../../../src/domain/types/BlogType";
 
 describe('/blogs/:id/post', () => {
-    let blogId: string;
-    let blog: BlogViewModel;
+    let blog: BlogType;
     beforeAll(async () => {
         await postRepository.deleteAllPosts();
         await blogRepository.deleteAllBlogs();
-        blogId = await blogsService.createBlog({
+        blog = await blogsService.createBlog({
             "name": "new blog",
             "description": "some description",
             "websiteUrl": "https://habr.com/ru/users/AlekDikarev/",
         });
-        blog = await blogQueryRepository.findBlog(blogId) as BlogViewModel;
 
         for (let i = 0; i < 12; i++) {
             const postInputModel: PostInputModel = {
                 title: i + 'post title',
                 shortDescription: 'description',
                 content: 'new post content',
-                blogId: blogId,
+                blogId: blog._id,
             }
 
-            await postsService.createPostInBlog(blogId, postInputModel);
+            await postsService.createPostInBlog(blog._id, postInputModel);
         }
     }, 30000)
 
@@ -47,7 +44,7 @@ describe('/blogs/:id/post', () => {
 
     it('send request to take documents paginator with sorted data by "createdAt desc"', async () => {
         const blogsPaginatorResponse = await request(app)
-            .get('/blogs/' + blogId + '/posts')
+            .get('/blogs/' + blog._id + '/posts')
             .expect(HTTP_STATUSES.OK_200)
 
         expect(blogsPaginatorResponse.body.items.length).toBe(10)

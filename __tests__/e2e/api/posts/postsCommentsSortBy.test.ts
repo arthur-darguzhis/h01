@@ -15,12 +15,12 @@ import {app} from "../../../../src/server";
 import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
 import {client} from "../../../../src/db";
 import {UserType} from "../../../../src/domain/types/UserType";
+import {BlogType} from "../../../../src/domain/types/BlogType";
+import {PostType} from "../../../../src/domain/types/PostType";
 
 describe('/posts/:id/comments', () => {
-    let blogId: string;
-    let blog: BlogViewModel;
-    let postId: string;
-    let post: PostViewModel;
+    let blog: BlogType;
+    let post: PostType;
     let token: string;
     let user: UserType;
     beforeAll(async () => {
@@ -29,21 +29,19 @@ describe('/posts/:id/comments', () => {
         await commentRepository.deleteAllComments();
         await userRepository.deleteAllUsers();
 
-        blogId = await blogsService.createBlog({
+        blog = await blogsService.createBlog({
             "name": "first blog",
             "description": "some description",
             "websiteUrl": "https://habr.com/ru/users/AlekDikarev/",
         });
-        blog = await blogQueryRepository.findBlog(blogId) as BlogViewModel;
 
-        postId = await postsService.createPost({
+        post = await postsService.createPost({
             title: '5 post',
             shortDescription: 'short description',
             content: 'some content',
-            blogId: blogId,
+            blogId: blog._id,
             blogName: '1 blog',
         })
-        post = await postQueryRepository.findPost(postId) as PostViewModel;
 
         user = await usersService.createUser({
             "login": "user1",
@@ -64,7 +62,7 @@ describe('/posts/:id/comments', () => {
 
         for (let i = 1; i <= 12; i++) {
             await request(app)
-                .post('/posts/' + postId + '/comments')
+                .post('/posts/' + post._id + '/comments')
                 .auth(token, {type: "bearer"})
                 .send({content: 'comment №:' + i + ' this is a sample of a correct comment that can be saved'})
                 .expect(HTTP_STATUSES.CREATED_201)
@@ -77,7 +75,7 @@ describe('/posts/:id/comments', () => {
 
     it('return 200 and paginated list of 5 comments sorted by "content"', async () => {
         const postsCommentsPaginatorResponse = await request(app)
-            .get('/posts/' + postId + '/comments/?sortBy=content&sortDirection=asc')
+            .get('/posts/' + post._id + '/comments/?sortBy=content&sortDirection=asc')
             .expect(HTTP_STATUSES.OK_200)
 
         expect(postsCommentsPaginatorResponse.body.items.length).toBe(10)

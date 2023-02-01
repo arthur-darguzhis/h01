@@ -10,7 +10,6 @@ import {checkErrorsInRequestDataMiddleware} from "../middlewares/checkErrorsInRe
 import {authGuardMiddleware} from "../middlewares/authGuardMiddleware";
 import {blogsService} from "../domain/service/blogs-service";
 import {blogQueryRepository} from "../queryRepository/blogQueryRepository";
-import {BlogPaginatorType} from "../queryRepository/types/Blog/BlogPaginatorType";
 import {HTTP_STATUSES} from "./types/HttpStatuses";
 import {postQueryRepository} from "../queryRepository/postQueryRepository";
 import {validatePaginator} from "../middlewares/validators/validatePaginator";
@@ -19,9 +18,12 @@ import {validatePost} from "../middlewares/validators/validatePost";
 import {postsService} from "../domain/service/posts-service";
 import {APIErrorResultType} from "./types/apiError/APIErrorResultType";
 import {BlogPostInputModel} from "./inputModels/BlogPostInputModel";
-import {PostViewModel} from "../queryRepository/types/Post/PostViewModel";
-import {BlogViewModel} from "../queryRepository/types/Blog/BlogViewModel";
 import {postRepository} from "../repository/postMongoDbRepository";
+import {mapPostToViewModel} from "../modules/post/post.mapper";
+import {mapBlogToViewModel} from "../modules/blog/blog.mapper";
+import {PaginatorResponse} from "./types/paginator/PaginatorResponse";
+import {BlogViewModel} from "../queryRepository/types/Blog/BlogViewModel";
+import {BlogPaginatorParams} from "./types/paginator/BlogPaginatorParams";
 
 export const blogsRouter = Router({})
 
@@ -32,13 +34,9 @@ blogsRouter.get('/',
     validatePaginator.pageSize,
     validatePaginator.pageNumber,
     checkErrorsInRequestDataMiddleware,
-    async (req: RequestWithQuery<{ searchNameTerm: string, sortBy: string, sortDirection: string, pageSize: string, pageNumber: string }>,
-           res: Response<BlogPaginatorType>) => {
-
-        const {searchNameTerm, sortBy, sortDirection, pageSize, pageNumber} = req.query
-        const blogs = await blogQueryRepository.findBlogs(searchNameTerm, sortBy, sortDirection, +pageNumber, +pageSize);
-
-        res.status(HTTP_STATUSES.OK_200).json(blogs)
+    async (req: RequestWithQuery<BlogPaginatorParams>, res: Response<PaginatorResponse<BlogViewModel>>) => {
+        const PaginatedBlogList = await blogQueryRepository.findBlogs(req.query);
+        res.status(HTTP_STATUSES.OK_200).json(PaginatedBlogList)
     })
 
 blogsRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res) => {
@@ -63,9 +61,9 @@ blogsRouter.get('/:id/posts',
         }
 
         const {sortBy, sortDirection, pageNumber, pageSize} = req.query
-        const posts = await postQueryRepository.findPostsByBlogId(req.params.id, sortBy, sortDirection, +pageNumber, +pageSize);
+        const paginatedPostList = await postQueryRepository.findPostsByBlogId(req.params.id, sortBy, sortDirection, +pageNumber, +pageSize);
 
-        res.status(HTTP_STATUSES.OK_200).json(posts)
+        res.status(HTTP_STATUSES.OK_200).json(paginatedPostList)
     })
 
 blogsRouter.post('/',
@@ -75,9 +73,8 @@ blogsRouter.post('/',
     validateBlog.body.websiteUrl,
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithBody<BlogInputModel>, res) => {
-        const newBlogId = await blogsService.createBlog(req.body);
-        const newBlog = await blogQueryRepository.findBlog(newBlogId) as BlogViewModel;
-        res.status(HTTP_STATUSES.CREATED_201).json(newBlog);
+        const newBlog = await blogsService.createBlog(req.body);
+        res.status(HTTP_STATUSES.CREATED_201).json(mapBlogToViewModel(newBlog));
     })
 
 
@@ -89,9 +86,8 @@ blogsRouter.post('/:id/posts',
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithParamsAndBody<{ id: string }, BlogPostInputModel>, res) => {
         try {
-            const newPostId = await postsService.createPostInBlog(req.params.id, req.body);
-            const newPost = await postQueryRepository.findPost(newPostId) as PostViewModel;
-            res.status(HTTP_STATUSES.CREATED_201).json(newPost);
+            const newPost = await postsService.createPostInBlog(req.params.id, req.body);
+            res.status(HTTP_STATUSES.CREATED_201).json(mapPostToViewModel(newPost));
         } catch (e) {
             const err = e as Error
             const apiErrorResult: APIErrorResultType = {

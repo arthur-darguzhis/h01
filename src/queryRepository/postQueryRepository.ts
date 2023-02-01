@@ -1,28 +1,16 @@
 import {PostViewModel} from "./types/Post/PostViewModel";
-import {PostType} from "../domain/types/PostType";
 import {postsCollection} from "../db";
-import {PostPaginatorType} from "./types/Post/PostPaginatorType";
 import {BlogPostFilterType} from "./types/BlogPost/BlogPostFilterType";
-
-const _mapPostToViewModel = (post: PostType): PostViewModel => {
-    return {
-        id: post._id,
-        title: post.title,
-        shortDescription: post.shortDescription,
-        content: post.content,
-        blogId: post.blogId,
-        blogName: post.blogName,
-        createdAt: post.createdAt
-    }
-}
+import {mapPostToViewModel} from "../modules/post/post.mapper";
+import {PaginatorResponse} from "../routes/types/paginator/PaginatorResponse";
+import {PaginatorParams} from "../routes/types/paginator/PaginatorParams";
 
 export const postQueryRepository = {
-    async findPosts(
-        sortBy: string,
-        sortDirection: string,
-        pageNumber: number,
-        pageSize: number
-    ): Promise<PostPaginatorType> {
+    async findPosts(paginatorParams: PaginatorParams): Promise<PaginatorResponse<PostViewModel>> {
+        const {sortBy, sortDirection} = paginatorParams
+        const pageNumber = +paginatorParams.pageNumber
+        const pageSize = +paginatorParams.pageSize
+
         const direction = sortDirection === 'asc' ? 1 : -1;
         const count = await postsCollection.countDocuments({});
         const howManySkip = (pageNumber - 1) * pageSize;
@@ -33,13 +21,13 @@ export const postQueryRepository = {
             "page": pageNumber,
             "pageSize": pageSize,
             "totalCount": count,
-            "items": blogs.map(_mapPostToViewModel)
+            "items": blogs.map(mapPostToViewModel)
         }
     },
 
     async findPost(postId: string): Promise<PostViewModel | null> {
         const post = await postsCollection.findOne({_id: postId});
-        return post ? _mapPostToViewModel(post) : null
+        return post ? mapPostToViewModel(post) : null
     },
 
     async findPostsByBlogId(
@@ -47,7 +35,7 @@ export const postQueryRepository = {
         sortBy: string,
         sortDirection: string,
         pageNumber: number,
-        pageSize: number): Promise<PostPaginatorType> {
+        pageSize: number): Promise<PaginatorResponse<PostViewModel>> {
 
         const direction = sortDirection === 'asc' ? 1 : -1;
 
@@ -61,7 +49,7 @@ export const postQueryRepository = {
             "page": pageNumber,
             "pageSize": pageSize,
             "totalCount": count,
-            "items": blogs.map(_mapPostToViewModel)
+            "items": blogs.map(mapPostToViewModel)
         }
 
     }

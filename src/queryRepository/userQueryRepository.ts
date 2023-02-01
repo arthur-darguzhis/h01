@@ -1,47 +1,27 @@
 import {UserViewModel} from "./types/User/UserViewModel";
 import {usersCollection} from "../db";
 import {UserType} from "../domain/types/UserType";
-import {UserPaginatorType} from "./types/User/UserPaginatorType";
 import {UserFilterType} from "./types/User/UserFilterType";
 import {MeViewModel} from "./types/User/MeViewModel";
-
-const _mapUserToViewModel = (user: UserType): UserViewModel => {
-    return {
-        id: user._id,
-        login: user.login,
-        email: user.email,
-        createdAt: user.createdAt
-    }
-}
-
-const _mapUserToMeViewModel = (user: UserType): MeViewModel => {
-    return {
-        email: user.email,
-        login: user.login,
-        userId: user._id
-    }
-}
+import {mapUserToMeViewModel, mapUserToViewModel} from "../modules/user/user.mapper";
+import {PaginatorResponse} from "../routes/types/paginator/PaginatorResponse";
+import {UserPaginatorParams} from "../routes/types/paginator/UserPaginatorParams";
 
 export const userQueryRepository = {
     async findUser(id: string): Promise<UserViewModel | null> {
         const user = await usersCollection.findOne({_id: id})
-        return user ? _mapUserToViewModel(user) : null
+        return user ? mapUserToViewModel(user) : null
     },
 
     async findMe(id: string): Promise<MeViewModel | null> {
         const user = await usersCollection.findOne({_id: id})
-        return user ? _mapUserToMeViewModel(user): null;
+        return user ? mapUserToMeViewModel(user) : null;
     },
 
-    async findUsers(
-        searchLoginTerm: string | null,
-        searchEmailTerm: string | null,
-        sortBy: string,
-        sortDirection: string,
-        pageSize: number,
-        pageNumber: number
-    ): Promise<UserPaginatorType> {
-
+    async findUsers(userPaginatorParams: UserPaginatorParams): Promise<PaginatorResponse<UserViewModel>> {
+        const {searchEmailTerm, searchLoginTerm, sortBy, sortDirection} = userPaginatorParams
+        const pageSize = +userPaginatorParams.pageSize
+        const pageNumber = +userPaginatorParams.pageNumber
         const filter: UserFilterType = {};
 
         if (searchLoginTerm) {
@@ -65,7 +45,7 @@ export const userQueryRepository = {
             "page": pageNumber,
             "pageSize": pageSize,
             "totalCount": count,
-            "items": users.map(_mapUserToViewModel)
+            "items": users.map(mapUserToViewModel)
         }
     },
     async findByLogin(login: string): Promise<UserType | null> {

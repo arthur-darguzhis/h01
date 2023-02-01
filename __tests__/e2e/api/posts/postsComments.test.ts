@@ -1,12 +1,8 @@
 import {postRepository} from "../../../../src/repository/postMongoDbRepository";
 import {commentRepository} from "../../../../src/repository/commentMongoDbRepository";
 import {postsService} from "../../../../src/domain/service/posts-service";
-import {BlogViewModel} from "../../../../src/queryRepository/types/Blog/BlogViewModel";
 import {blogRepository} from "../../../../src/repository/blogMongoDbRepository";
 import {blogsService} from "../../../../src/domain/service/blogs-service";
-import {blogQueryRepository} from "../../../../src/queryRepository/blogQueryRepository";
-import {PostViewModel} from "../../../../src/queryRepository/types/Post/PostViewModel";
-import {postQueryRepository} from "../../../../src/queryRepository/postQueryRepository";
 import request from "supertest";
 import {app} from "../../../../src/server";
 import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
@@ -15,12 +11,12 @@ import {usersService} from "../../../../src/domain/service/users-service";
 import {LoginInputModel} from "../../../../src/routes/inputModels/LoginInputModel";
 import {client} from "../../../../src/db";
 import {UserType} from "../../../../src/domain/types/UserType";
+import {BlogType} from "../../../../src/domain/types/BlogType";
+import {PostType} from "../../../../src/domain/types/PostType";
 
 describe('/posts/:id/comments', () => {
-    let blogId: string;
-    let blog: BlogViewModel;
-    let postId: string;
-    let post: PostViewModel;
+    let blog: BlogType;
+    let post: PostType;
     let token: string;
     let user: UserType;
     beforeAll(async () => {
@@ -29,21 +25,19 @@ describe('/posts/:id/comments', () => {
         await commentRepository.deleteAllComments();
         await userRepository.deleteAllUsers();
 
-        blogId = await blogsService.createBlog({
+        blog = await blogsService.createBlog({
             "name": "first blog",
             "description": "some description",
             "websiteUrl": "https://habr.com/ru/users/AlekDikarev/",
         });
-        blog = await blogQueryRepository.findBlog(blogId) as BlogViewModel;
 
-        postId = await postsService.createPost({
+        post = await postsService.createPost({
             title: '5 post',
             shortDescription: 'short description',
             content: 'some content',
-            blogId: blogId,
+            blogId: blog._id,
             blogName: '1 blog',
         })
-        post = await postQueryRepository.findPost(postId) as PostViewModel;
 
         user = await usersService.createUser({
             "login": "user1",
@@ -69,7 +63,7 @@ describe('/posts/:id/comments', () => {
 
     it('get 401 without JWT token', async () => {
         await request(app)
-            .post('/posts/' + postId + '/comments')
+            .post('/posts/' + post._id + '/comments')
             .auth('', {type: "bearer"})
             .send()
             .expect(HTTP_STATUSES.UNAUTHORIZED_401)
@@ -77,7 +71,7 @@ describe('/posts/:id/comments', () => {
 
     it('get 400 when body data are invalid', async () => {
         const postCommentResponse =  await request(app)
-            .post('/posts/' + postId + '/comments')
+            .post('/posts/' + post._id + '/comments')
             .auth(token, {type: "bearer"})
             .send({content: 'too short'})
             .expect(HTTP_STATUSES.BAD_REQUEST_400)
@@ -99,7 +93,7 @@ describe('/posts/:id/comments', () => {
 
     it('get 201 and create comment successfully', async () => {
         const postCommentResponse =  await request(app)
-            .post('/posts/' + postId + '/comments')
+            .post('/posts/' + post._id + '/comments')
             .auth(token, {type: "bearer"})
             .send({content: 'this is a sample of a correct comment that can be saved'})
             .expect(HTTP_STATUSES.CREATED_201)

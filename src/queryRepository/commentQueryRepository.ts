@@ -1,33 +1,20 @@
-import {CommentType} from "../domain/types/CommentType";
 import {commentsCollection} from "../db";
 import {CommentViewModel} from "./types/Comment/CommentViewModel";
 import {PostCommentFilterType} from "./types/PostComment/PostCommentFilterType";
-import {CommentPaginatorType} from "./types/Comment/CommentPaginatorType";
-
-const _mapCommentToViewModel = (comment: CommentType): CommentViewModel => {
-    return {
-        id: comment._id,
-        content: comment.content,
-        commentatorInfo: {
-            userId: comment.commentatorInfo.userId,
-            userLogin: comment.commentatorInfo.userLogin
-        },
-        createdAt: comment.createdAt
-    }
-}
+import {mapCommentToViewModel} from "../modules/comment/comment.mapper";
+import {PaginatorResponse} from "../routes/types/paginator/PaginatorResponse";
+import {PaginatorParams} from "../routes/types/paginator/PaginatorParams";
 
 export const commentQueryRepository = {
     async findComment(commentId: string): Promise<CommentViewModel | null> {
         const comment = await commentsCollection.findOne({_id: commentId})
-        return comment ? _mapCommentToViewModel(comment) : null
+        return comment ? mapCommentToViewModel(comment) : null
     },
 
-    async findCommentsByPostId(
-        postId: string,
-        sortBy: string,
-        sortDirection: string,
-        pageNumber: number,
-        pageSize: number): Promise<CommentPaginatorType> {
+    async findCommentsByPostId(postId: string, paginatorParams: PaginatorParams): Promise<PaginatorResponse<CommentViewModel>> {
+        const {sortBy, sortDirection} = paginatorParams
+        const pageNumber = +paginatorParams.pageNumber
+        const pageSize = +paginatorParams.pageSize
 
         const direction = sortDirection === 'asc' ? 1 : -1;
 
@@ -41,8 +28,7 @@ export const commentQueryRepository = {
             "page": pageNumber,
             "pageSize": pageSize,
             "totalCount": count,
-            // "items": comments.map(_mapCommentToViewModel)
-            "items": comments.map(_mapCommentToViewModel)
+            "items": comments.map(mapCommentToViewModel)
         }
     }
 }

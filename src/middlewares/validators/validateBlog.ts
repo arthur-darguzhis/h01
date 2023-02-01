@@ -1,5 +1,5 @@
 import {body, query} from "express-validator";
-import {sortDirections} from "../../routes/types/SortDirections";
+import {sortDirections} from "../../routes/types/paginator/SortDirections";
 
 export const validateBlog = {
     body: {
@@ -24,7 +24,7 @@ export const validateBlog = {
     },
 
     query: {
-        searchNameTerm: query('searchNameTerm').default(null).trim(),
+        searchNameTerm: query('searchNameTerm').trim(),
 
         sortBy: query('sortBy').default('createdAt').custom(sortBy => {
             const allowedFields = ['id', 'name', 'description', 'websiteUrl', 'createdAt'];

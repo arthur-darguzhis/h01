@@ -1,29 +1,16 @@
 import {BlogViewModel} from "./types/Blog/BlogViewModel";
-import {BlogType} from "../domain/types/BlogType";
 import {blogsCollection} from "../db";
-import {BlogPaginatorType} from "./types/Blog/BlogPaginatorType";
 import {BlogFilterType} from "./types/Blog/BlogFilterType";
-
-const _mapBlogToViewModel = (blog: BlogType): BlogViewModel => {
-    //Делаем ручной маппинг почему?)
-    return {
-        id: blog._id,
-        name: blog.name,
-        description: blog.description,
-        websiteUrl: blog.websiteUrl,
-        createdAt: blog.createdAt,
-    }
-}
+import {mapBlogToViewModel} from "../modules/blog/blog.mapper";
+import {PaginatorResponse} from "../routes/types/paginator/PaginatorResponse";
+import {BlogPaginatorParams} from "../routes/types/paginator/BlogPaginatorParams";
 
 export const blogQueryRepository = {
 
-    async findBlogs(
-        searchNameTerm: string | null,
-        sortBy: string,
-        sortDirection: string,
-        pageNumber: number,
-        pageSize: number
-    ): Promise<BlogPaginatorType> {
+    async findBlogs(blogPaginatorParams: BlogPaginatorParams): Promise<PaginatorResponse<BlogViewModel>> {
+        const {searchNameTerm, sortBy, sortDirection} = blogPaginatorParams
+        const pageSize = +blogPaginatorParams.pageSize
+        const pageNumber = +blogPaginatorParams.pageNumber
 
         const filter: BlogFilterType = {};
         if (searchNameTerm) {
@@ -41,12 +28,12 @@ export const blogQueryRepository = {
             "page": pageNumber,
             "pageSize": pageSize,
             "totalCount": count,
-            "items": blogs.map(_mapBlogToViewModel)
+            "items": blogs.map(mapBlogToViewModel)
         }
     },
 
     async findBlog(id: string): Promise<BlogViewModel | null> {
         const blog = await blogsCollection.findOne({_id: id});
-        return blog ? _mapBlogToViewModel(blog) : null;
+        return blog ? mapBlogToViewModel(blog) : null;
     },
 }

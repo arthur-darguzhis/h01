@@ -11,7 +11,7 @@ describe('/blogs', () => {
     beforeAll(async () => {
         await blogRepository.deleteAllBlogs();
         await postRepository.deleteAllPosts();
-        const blogId = await blogsService.createBlog({
+        const blog = await blogsService.createBlog({
             name: "1 blog",
             description: "some description",
             websiteUrl: "https://habr.com/ru/users/AlekDikarev/",
@@ -21,7 +21,7 @@ describe('/blogs', () => {
             title: '5 post',
             shortDescription: 'short description',
             content: 'some content',
-            blogId: blogId,
+            blogId: blog._id,
             blogName: '1 blog',
         });
 
@@ -29,7 +29,7 @@ describe('/blogs', () => {
             title: '2 post',
             shortDescription: 'short description',
             content: 'some content',
-            blogId: blogId,
+            blogId: blog._id,
             blogName: '1 blog',
         });
 
@@ -37,7 +37,7 @@ describe('/blogs', () => {
             title: '3 post',
             shortDescription: 'short description',
             content: 'some content',
-            blogId: blogId,
+            blogId: blog._id,
             blogName: '1 blog',
         });
 
@@ -45,7 +45,7 @@ describe('/blogs', () => {
             title: '4 post',
             shortDescription: 'short description',
             content: 'some content',
-            blogId: blogId,
+            blogId: blog._id,
             blogName: '1 blog',
         });
 
@@ -53,7 +53,7 @@ describe('/blogs', () => {
             title: '1 post',
             shortDescription: 'short description',
             content: 'some content',
-            blogId: blogId,
+            blogId: blog._id,
             blogName: '1 blog',
         });
     })

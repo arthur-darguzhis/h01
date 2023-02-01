@@ -1,5 +1,5 @@
 import {body, query} from "express-validator";
-import {sortDirections} from "../../routes/types/SortDirections";
+import {sortDirections} from "../../routes/types/paginator/SortDirections";
 import {userQueryRepository} from "../../queryRepository/userQueryRepository";
 
 export const validateUser = {
@@ -18,8 +18,8 @@ export const validateUser = {
         }),
     },
     query: {
-        searchLoginTerm: query('searchLoginTerm').default(null).trim(),
-        searchEmailTerm: query('searchEmailTerm').default(null).trim(),
+        searchLoginTerm: query('searchLoginTerm').trim(),
+        searchEmailTerm: query('searchEmailTerm').trim(),
         sortBy: query('sortBy').default('createdAt').custom(sortBy => {
             const allowedFields = ['id', 'login', 'email', 'createdAt'];
             if (!allowedFields.includes(sortBy)) {
