@@ -1,6 +1,6 @@
-import {blogsCollection} from "../db";
-import {BlogInputModel} from "../routes/inputModels/BlogInputModel";
-import {BlogType} from "../domain/types/BlogType";
+import {blogsCollection} from "../../db";
+import {BlogInputModel} from "../../routes/inputModels/BlogInputModel";
+import {BlogType} from "../../domain/types/BlogType";
 import {DeleteResult} from "mongodb";
 
 export const blogRepository = {

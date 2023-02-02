@@ -2,8 +2,8 @@ import {CommentType} from "../types/CommentType";
 import {ObjectId} from "mongodb";
 import {CommentInputModel} from "../../routes/inputModels/CommentInputModel";
 import {UserType} from "../types/UserType";
-import {commentRepository} from "../../repository/commentMongoDbRepository";
-import {postRepository} from "../../repository/postMongoDbRepository";
+import {commentRepository} from "../../modules/comment/comment.MongoDbRepository";
+import {postRepository} from "../../modules/post/post.MongoDbRepository";
 import {EntityNotFound} from "../exceptions/EntityNotFound";
 import {Forbidden} from "../exceptions/Forbidden";
 

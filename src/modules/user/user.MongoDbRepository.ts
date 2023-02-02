@@ -1,6 +1,6 @@
-import {UserEmailConfirmation, UserType} from "../domain/types/UserType";
-import {usersCollection} from "../db";
-import {EntityNotFound} from "../domain/exceptions/EntityNotFound";
+import {UserEmailConfirmation, UserType} from "../../domain/types/UserType";
+import {usersCollection} from "../../db";
+import {EntityNotFound} from "../../domain/exceptions/EntityNotFound";
 
 export const userRepository = {
     async addUser(newUser: UserType): Promise<UserType> {

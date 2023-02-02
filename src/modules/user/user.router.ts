@@ -1,22 +1,22 @@
 import {Response, Router} from "express";
-import {RequestWithBody, RequestWithParams, RequestWithQuery} from "./types/RequestTypes";
-import {UserInputModel} from "./inputModels/UserInputModel";
-import {checkErrorsInRequestDataMiddleware} from "../middlewares/checkErrorsInRequestDataMiddleware";
-import {authGuardMiddleware} from "../middlewares/authGuardMiddleware";
-import {validateUser} from "../middlewares/validators/validateUser";
-import {usersService} from "../domain/service/users-service";
-import {userQueryRepository} from "../queryRepository/userQueryRepository";
-import {HTTP_STATUSES} from "./types/HttpStatuses";
-import {validatePaginator} from "../middlewares/validators/validatePaginator";
-import {UserType} from "../domain/types/UserType";
-import {mapUserToViewModel} from "../modules/user/user.mapper";
-import {PaginatorResponse} from "./types/paginator/PaginatorResponse";
-import {UserViewModel} from "../queryRepository/types/User/UserViewModel";
-import {UserPaginatorParams} from "./types/paginator/UserPaginatorParams";
+import {RequestWithBody, RequestWithParams, RequestWithQuery} from "../../routes/types/RequestTypes";
+import {UserInputModel} from "../../routes/inputModels/UserInputModel";
+import {checkErrorsInRequestDataMiddleware} from "../../middlewares/checkErrorsInRequestDataMiddleware";
+import {authGuardMiddleware} from "../../middlewares/authGuardMiddleware";
+import {validateUser} from "../../middlewares/validators/validateUser";
+import {usersService} from "../../domain/service/users-service";
+import {userQueryRepository} from "./user.QueryRepository";
+import {HTTP_STATUSES} from "../../routes/types/HttpStatuses";
+import {validatePaginator} from "../../middlewares/validators/validatePaginator";
+import {UserType} from "../../domain/types/UserType";
+import {mapUserToViewModel} from "./user.mapper";
+import {PaginatorResponse} from "../../routes/types/paginator/PaginatorResponse";
+import {UserViewModel} from "../../queryRepository/types/User/UserViewModel";
+import {UserPaginatorParams} from "../../routes/types/paginator/UserPaginatorParams";
 
-export const usersRouter = Router({})
+export const userRouter = Router({})
 
-usersRouter.post('/',
+userRouter.post('/',
     authGuardMiddleware,
     validateUser.body.login,
     validateUser.body.email,
@@ -27,7 +27,7 @@ usersRouter.post('/',
         res.status(HTTP_STATUSES.CREATED_201).json(mapUserToViewModel(newUser))
     })
 
-usersRouter.delete('/:id', authGuardMiddleware,
+userRouter.delete('/:id', authGuardMiddleware,
     async (req: RequestWithParams<{ id: string }>, res) => {
         const isUserDeleted = await usersService.deleteUser(req.params.id)
         if (!isUserDeleted) {
@@ -36,7 +36,7 @@ usersRouter.delete('/:id', authGuardMiddleware,
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     })
 
-usersRouter.get('/',
+userRouter.get('/',
     authGuardMiddleware,
     validateUser.query.searchLoginTerm,
     validateUser.query.searchEmailTerm,

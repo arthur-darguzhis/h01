@@ -1,9 +1,9 @@
-import {PostViewModel} from "./types/Post/PostViewModel";
-import {postsCollection} from "../db";
-import {BlogPostFilterType} from "./types/BlogPost/BlogPostFilterType";
-import {mapPostToViewModel} from "../modules/post/post.mapper";
-import {PaginatorResponse} from "../routes/types/paginator/PaginatorResponse";
-import {PaginatorParams} from "../routes/types/paginator/PaginatorParams";
+import {PostViewModel} from "../../queryRepository/types/Post/PostViewModel";
+import {postsCollection} from "../../db";
+import {BlogPostFilterType} from "../../queryRepository/types/BlogPost/BlogPostFilterType";
+import {mapPostToViewModel} from "./post.mapper";
+import {PaginatorResponse} from "../../routes/types/paginator/PaginatorResponse";
+import {PaginatorParams} from "../../routes/types/paginator/PaginatorParams";
 
 export const postQueryRepository = {
     async findPosts(paginatorParams: PaginatorParams): Promise<PaginatorResponse<PostViewModel>> {

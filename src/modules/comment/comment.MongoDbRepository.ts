@@ -1,6 +1,6 @@
-import {CommentType} from "../domain/types/CommentType";
-import {commentsCollection} from "../db";
-import {CommentInputModel} from "../routes/inputModels/CommentInputModel";
+import {CommentType} from "../../domain/types/CommentType";
+import {commentsCollection} from "../../db";
+import {CommentInputModel} from "../../routes/inputModels/CommentInputModel";
 
 export const commentRepository = {
     async addComment(newComment: CommentType): Promise<CommentType> {

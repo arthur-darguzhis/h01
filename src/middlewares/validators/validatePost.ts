@@ -1,5 +1,5 @@
 import {body, query} from "express-validator";
-import {blogQueryRepository} from "../../queryRepository/blogQueryRepository";
+import {blogQueryRepository} from "../../modules/blog/blog.QueryRepository";
 import {sortDirections} from "../../routes/types/paginator/SortDirections";
 
 export const validatePost = {

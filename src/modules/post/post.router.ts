@@ -5,31 +5,31 @@ import {
     RequestWithParamsAndBody,
     RequestWithParamsAndQuery,
     RequestWithQuery
-} from "./types/RequestTypes";
-import {postQueryRepository} from "../queryRepository/postQueryRepository";
-import {PostInputModel} from "./inputModels/PostInputModel";
-import {checkErrorsInRequestDataMiddleware} from "../middlewares/checkErrorsInRequestDataMiddleware";
-import {APIErrorResultType} from "./types/apiError/APIErrorResultType";
-import {authGuardMiddleware} from "../middlewares/authGuardMiddleware";
-import {postsService} from "../domain/service/posts-service";
-import {postRepository} from "../repository/postMongoDbRepository";
-import {HTTP_STATUSES} from "./types/HttpStatuses";
-import {validatePost} from "../middlewares/validators/validatePost";
-import {validatePaginator} from "../middlewares/validators/validatePaginator";
-import {CommentInputModel} from "./inputModels/CommentInputModel";
-import {validateComment} from "../middlewares/validators/validateComment";
-import {jwtAuthGuardMiddleware} from "../middlewares/jwtAuthGuardMiddleware";
-import {commentsService} from "../domain/service/comments-service";
-import {commentQueryRepository} from "../queryRepository/commentQueryRepository";
-import {mapCommentToViewModel} from "../modules/comment/comment.mapper";
-import {mapPostToViewModel} from "../modules/post/post.mapper";
-import {PaginatorResponse} from "./types/paginator/PaginatorResponse";
-import {PostViewModel} from "../queryRepository/types/Post/PostViewModel";
-import {PaginatorParams} from "./types/paginator/PaginatorParams";
+} from "../../routes/types/RequestTypes";
+import {postQueryRepository} from "./post.QueryRepository";
+import {PostInputModel} from "../../routes/inputModels/PostInputModel";
+import {checkErrorsInRequestDataMiddleware} from "../../middlewares/checkErrorsInRequestDataMiddleware";
+import {APIErrorResultType} from "../../routes/types/apiError/APIErrorResultType";
+import {authGuardMiddleware} from "../../middlewares/authGuardMiddleware";
+import {postsService} from "../../domain/service/posts-service";
+import {postRepository} from "./post.MongoDbRepository";
+import {HTTP_STATUSES} from "../../routes/types/HttpStatuses";
+import {validatePost} from "../../middlewares/validators/validatePost";
+import {validatePaginator} from "../../middlewares/validators/validatePaginator";
+import {CommentInputModel} from "../../routes/inputModels/CommentInputModel";
+import {validateComment} from "../../middlewares/validators/validateComment";
+import {jwtAuthGuardMiddleware} from "../../middlewares/jwtAuthGuardMiddleware";
+import {commentsService} from "../../domain/service/comments-service";
+import {commentQueryRepository} from "../comment/comment.QueryRepository";
+import {mapCommentToViewModel} from "../comment/comment.mapper";
+import {mapPostToViewModel} from "./post.mapper";
+import {PaginatorResponse} from "../../routes/types/paginator/PaginatorResponse";
+import {PostViewModel} from "../../queryRepository/types/Post/PostViewModel";
+import {PaginatorParams} from "../../routes/types/paginator/PaginatorParams";
 
-export const postsRouter = Router({})
+export const postRouter = Router({})
 
-postsRouter.get('/',
+postRouter.get('/',
     validatePost.query.sortBy,
     validatePost.query.sortDirection,
     validatePaginator.pageNumber,
@@ -40,7 +40,7 @@ postsRouter.get('/',
         res.status(HTTP_STATUSES.OK_200).json(paginatedPostList)
     })
 
-postsRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res) => {
+postRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res) => {
     const post = await postQueryRepository.findPost(req.params.id)
     if (!post) {
         return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
@@ -48,7 +48,7 @@ postsRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res) => {
     res.status(HTTP_STATUSES.OK_200).json(post)
 })
 
-postsRouter.post('/',
+postRouter.post('/',
     authGuardMiddleware,
     validatePost.body.title,
     validatePost.body.shortDescription,
@@ -71,7 +71,7 @@ postsRouter.post('/',
         }
     })
 
-postsRouter.put('/:id',
+postRouter.put('/:id',
     authGuardMiddleware,
     validatePost.body.title,
     validatePost.body.shortDescription,
@@ -100,13 +100,13 @@ postsRouter.put('/:id',
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     })
 
-postsRouter.delete('/:id', authGuardMiddleware, async (req: RequestWithParams<{ id: string }>, res) => {
+postRouter.delete('/:id', authGuardMiddleware, async (req: RequestWithParams<{ id: string }>, res) => {
     await postsService.deletePost(req.params.id)
         ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
         : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
 })
 
-postsRouter.post('/:postId/comments',
+postRouter.post('/:postId/comments',
     jwtAuthGuardMiddleware,
     validateComment.body.content,
     checkErrorsInRequestDataMiddleware,
@@ -126,7 +126,7 @@ postsRouter.post('/:postId/comments',
         }
     })
 
-postsRouter.get('/:postId/comments',
+postRouter.get('/:postId/comments',
     validateComment.query.sortBy,
     validateComment.query.sortDirection,
     validatePaginator.pageSize,

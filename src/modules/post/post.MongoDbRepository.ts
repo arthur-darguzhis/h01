@@ -1,6 +1,6 @@
-import {postsCollection} from "../db";
-import {PostInputModel} from "../routes/inputModels/PostInputModel";
-import {PostType} from "../domain/types/PostType";
+import {postsCollection} from "../../db";
+import {PostInputModel} from "../../routes/inputModels/PostInputModel";
+import {PostType} from "../../domain/types/PostType";
 
 export const postRepository = {
     async addPost(newPost: PostType): Promise<PostType> {

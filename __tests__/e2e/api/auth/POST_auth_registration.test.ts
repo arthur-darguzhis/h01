@@ -2,7 +2,7 @@ import {UserInputModel} from "../../../../src/routes/inputModels/UserInputModel"
 import request from "supertest";
 import {app} from "../../../../src/server";
 import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
-import {userRepository} from "../../../../src/repository/userMongoDbRepository";
+import {userRepository} from "../../../../src/modules/user/user.MongoDbRepository";
 import {client} from "../../../../src/db";
 
 describe('POST => /auth/registration', () => {

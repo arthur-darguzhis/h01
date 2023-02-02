@@ -1,11 +1,11 @@
-import {UserViewModel} from "./types/User/UserViewModel";
-import {usersCollection} from "../db";
-import {UserType} from "../domain/types/UserType";
-import {UserFilterType} from "./types/User/UserFilterType";
-import {MeViewModel} from "./types/User/MeViewModel";
-import {mapUserToMeViewModel, mapUserToViewModel} from "../modules/user/user.mapper";
-import {PaginatorResponse} from "../routes/types/paginator/PaginatorResponse";
-import {UserPaginatorParams} from "../routes/types/paginator/UserPaginatorParams";
+import {UserViewModel} from "../../queryRepository/types/User/UserViewModel";
+import {usersCollection} from "../../db";
+import {UserType} from "../../domain/types/UserType";
+import {UserFilterType} from "../../queryRepository/types/User/UserFilterType";
+import {MeViewModel} from "../../queryRepository/types/User/MeViewModel";
+import {mapUserToMeViewModel, mapUserToViewModel} from "./user.mapper";
+import {PaginatorResponse} from "../../routes/types/paginator/PaginatorResponse";
+import {UserPaginatorParams} from "../../routes/types/paginator/UserPaginatorParams";
 
 export const userQueryRepository = {
     async findUser(id: string): Promise<UserViewModel | null> {

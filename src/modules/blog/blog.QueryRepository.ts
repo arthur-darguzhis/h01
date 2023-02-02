@@ -1,9 +1,9 @@
-import {BlogViewModel} from "./types/Blog/BlogViewModel";
-import {blogsCollection} from "../db";
-import {BlogFilterType} from "./types/Blog/BlogFilterType";
-import {mapBlogToViewModel} from "../modules/blog/blog.mapper";
-import {PaginatorResponse} from "../routes/types/paginator/PaginatorResponse";
-import {BlogPaginatorParams} from "../routes/types/paginator/BlogPaginatorParams";
+import {BlogViewModel} from "../../queryRepository/types/Blog/BlogViewModel";
+import {blogsCollection} from "../../db";
+import {BlogFilterType} from "../../queryRepository/types/Blog/BlogFilterType";
+import {mapBlogToViewModel} from "./blog.mapper";
+import {PaginatorResponse} from "../../routes/types/paginator/PaginatorResponse";
+import {BlogPaginatorParams} from "../../routes/types/paginator/BlogPaginatorParams";
 
 export const blogQueryRepository = {
 

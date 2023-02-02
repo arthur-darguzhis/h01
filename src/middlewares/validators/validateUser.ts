@@ -1,6 +1,6 @@
 import {body, query} from "express-validator";
 import {sortDirections} from "../../routes/types/paginator/SortDirections";
-import {userQueryRepository} from "../../queryRepository/userQueryRepository";
+import {userQueryRepository} from "../../modules/user/user.QueryRepository";
 
 export const validateUser = {
     body: {

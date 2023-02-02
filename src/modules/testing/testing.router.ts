@@ -1,9 +1,9 @@
 import {Router} from "express";
-import {HTTP_STATUSES} from "./types/HttpStatuses";
-import {postsService} from "../domain/service/posts-service";
-import {blogsService} from "../domain/service/blogs-service";
-import {usersService} from "../domain/service/users-service";
-import {commentsService} from "../domain/service/comments-service";
+import {HTTP_STATUSES} from "../../routes/types/HttpStatuses";
+import {postsService} from "../../domain/service/posts-service";
+import {blogsService} from "../../domain/service/blogs-service";
+import {usersService} from "../../domain/service/users-service";
+import {commentsService} from "../../domain/service/comments-service";
 
 export const testingRouter = Router({})
 

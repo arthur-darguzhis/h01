@@ -7,7 +7,7 @@ import {checkErrorsInRequestDataMiddleware} from "../middlewares/checkErrorsInRe
 import {validateLogin} from "../middlewares/validators/validateLogin";
 import {jwtService} from "../application/jwt-service";
 import {jwtAuthGuardMiddleware} from "../middlewares/jwtAuthGuardMiddleware";
-import {userQueryRepository} from "../queryRepository/userQueryRepository";
+import {userQueryRepository} from "../modules/user/user.QueryRepository";
 import {LoginSuccessViewModel} from "./types/apiError/LoginSuccessViewModel";
 import {UserInputModel} from "./inputModels/UserInputModel";
 import {EntityAlreadyExists} from "../domain/exceptions/EntityAlreadyExists";

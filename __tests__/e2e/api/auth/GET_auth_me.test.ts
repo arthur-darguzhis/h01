@@ -1,4 +1,4 @@
-import {userRepository} from "../../../../src/repository/userMongoDbRepository";
+import {userRepository} from "../../../../src/modules/user/user.MongoDbRepository";
 import {usersService} from "../../../../src/domain/service/users-service";
 import {LoginInputModel} from "../../../../src/routes/inputModels/LoginInputModel";
 import request from "supertest";

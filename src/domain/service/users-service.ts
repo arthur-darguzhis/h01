@@ -1,7 +1,7 @@
 import {UserInputModel} from "../../routes/inputModels/UserInputModel";
 import {UserType} from "../types/UserType";
 import {ObjectId} from "mongodb";
-import {userRepository} from "../../repository/userMongoDbRepository";
+import {userRepository} from "../../modules/user/user.MongoDbRepository";
 import bcrypt from 'bcrypt'
 import {EntityAlreadyExists} from "../exceptions/EntityAlreadyExists";
 import {v4 as uuidv4} from "uuid";

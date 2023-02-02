@@ -1,9 +1,9 @@
-import {commentsCollection} from "../db";
-import {CommentViewModel} from "./types/Comment/CommentViewModel";
-import {PostCommentFilterType} from "./types/PostComment/PostCommentFilterType";
-import {mapCommentToViewModel} from "../modules/comment/comment.mapper";
-import {PaginatorResponse} from "../routes/types/paginator/PaginatorResponse";
-import {PaginatorParams} from "../routes/types/paginator/PaginatorParams";
+import {commentsCollection} from "../../db";
+import {CommentViewModel} from "../../queryRepository/types/Comment/CommentViewModel";
+import {PostCommentFilterType} from "../../queryRepository/types/PostComment/PostCommentFilterType";
+import {mapCommentToViewModel} from "./comment.mapper";
+import {PaginatorResponse} from "../../routes/types/paginator/PaginatorResponse";
+import {PaginatorParams} from "../../routes/types/paginator/PaginatorParams";
 
 export const commentQueryRepository = {
     async findComment(commentId: string): Promise<CommentViewModel | null> {

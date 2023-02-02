@@ -1,7 +1,7 @@
-import {UserType} from "../domain/types/UserType";
-import {db} from "../db";
+import {UserType} from "../../domain/types/UserType";
+import {db} from "../../db";
 
-export const userRepository = {
+export const userInMemoryRepository = {
     isUserExists(login: string, password: string): boolean {
         const user = this.findUserByLogin(login);
         return !!(user && (user.password === btoa(password)));

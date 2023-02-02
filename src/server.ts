@@ -1,10 +1,10 @@
 import express from "express";
-import {blogsRouter} from "./routes/blogsRouter";
-import {postsRouter} from "./routes/postsRouter";
-import {usersRouter} from "./routes/usersRouter";
+import {blogRouter} from "./modules/blog/blog.router";
+import {postRouter} from "./modules/post/post.router";
+import {userRouter} from "./modules/user/user.router";
 import {authRouter} from "./routes/authRouter";
-import {commentsRouter} from "./routes/commentsRouter";
-import {testingRouter} from "./routes/testingRouter";
+import {commentRouter} from "./modules/comment/comment.router";
+import {testingRouter} from "./modules/testing/testing.router";
 import {settings} from "./settings";
 import {runDb} from "./db";
 import cookieParser from "cookie-parser";
@@ -12,11 +12,11 @@ export const app = express()
 
 app.use(express.json());
 app.use(cookieParser())
-app.use('/blogs', blogsRouter)
-app.use('/posts', postsRouter)
-app.use('/users', usersRouter)
+app.use('/blogs', blogRouter)
+app.use('/posts', postRouter)
+app.use('/users', userRouter)
 app.use('/auth', authRouter)
-app.use('/comments', commentsRouter)
+app.use('/comments', commentRouter)
 app.use('/testing', testingRouter)
 
 export const startApp = async () => {

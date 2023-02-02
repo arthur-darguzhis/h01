@@ -1,7 +1,7 @@
 import request from "supertest";
 import {app} from "../../../../src/server";
 import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
-import {blogRepository} from "../../../../src/repository/blogMongoDbRepository";
+import {blogRepository} from "../../../../src/modules/blog/blog.MongoDbRepository";
 import {BlogInputModel} from "../../../../src/routes/inputModels/BlogInputModel";
 import {client} from "../../../../src/db";
 

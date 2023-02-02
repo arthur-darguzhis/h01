@@ -1,18 +1,18 @@
 import {Router} from "express";
-import {RequestWithParams, RequestWithParamsAndBody} from "./types/RequestTypes";
-import {commentQueryRepository} from "../queryRepository/commentQueryRepository";
-import {HTTP_STATUSES} from "./types/HttpStatuses";
-import {CommentInputModel} from "./inputModels/CommentInputModel";
-import {commentsService} from "../domain/service/comments-service";
-import {jwtAuthGuardMiddleware} from "../middlewares/jwtAuthGuardMiddleware";
-import {validateComment} from "../middlewares/validators/validateComment";
-import {EntityNotFound} from "../domain/exceptions/EntityNotFound";
-import {Forbidden} from "../domain/exceptions/Forbidden";
-import {checkErrorsInRequestDataMiddleware} from "../middlewares/checkErrorsInRequestDataMiddleware";
+import {RequestWithParams, RequestWithParamsAndBody} from "../../routes/types/RequestTypes";
+import {commentQueryRepository} from "./comment.QueryRepository";
+import {HTTP_STATUSES} from "../../routes/types/HttpStatuses";
+import {CommentInputModel} from "../../routes/inputModels/CommentInputModel";
+import {commentsService} from "../../domain/service/comments-service";
+import {jwtAuthGuardMiddleware} from "../../middlewares/jwtAuthGuardMiddleware";
+import {validateComment} from "../../middlewares/validators/validateComment";
+import {EntityNotFound} from "../../domain/exceptions/EntityNotFound";
+import {Forbidden} from "../../domain/exceptions/Forbidden";
+import {checkErrorsInRequestDataMiddleware} from "../../middlewares/checkErrorsInRequestDataMiddleware";
 
-export const commentsRouter = Router({})
+export const commentRouter = Router({})
 
-commentsRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res) => {
+commentRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res) => {
     const comment = await commentQueryRepository.findComment(req.params.id)
     if (!comment) {
         return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
@@ -20,7 +20,7 @@ commentsRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res) =
     res.status(HTTP_STATUSES.OK_200).json(comment)
 })
 
-commentsRouter.put('/:id',
+commentRouter.put('/:id',
     jwtAuthGuardMiddleware,
     validateComment.body.content,
     checkErrorsInRequestDataMiddleware,
@@ -41,7 +41,7 @@ commentsRouter.put('/:id',
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     })
 
-commentsRouter.delete('/:id',
+commentRouter.delete('/:id',
     jwtAuthGuardMiddleware,
     async (req: RequestWithParams<{ id: string }>, res) => {
         try {

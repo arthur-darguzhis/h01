@@ -2,7 +2,7 @@ import {settings} from "../settings";
 import {UserType} from "../domain/types/UserType";
 import {MailIsNotSent} from "../domain/exceptions/MailIsNotSent";
 import {emailAdapter} from "../adapters/emailAdapter";
-import {userRepository} from "../repository/userMongoDbRepository";
+import {userRepository} from "../modules/user/user.MongoDbRepository";
 
 export const emailsManager = {
     async sendConfirmationLetter(user: UserType): Promise<true | never> {

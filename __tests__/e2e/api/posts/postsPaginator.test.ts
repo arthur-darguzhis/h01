@@ -1,10 +1,10 @@
 import request from "supertest";
 import {app} from "../../../../src/server";
 import {HTTP_STATUSES} from "../../../../src/routes/types/HttpStatuses";
-import {blogRepository} from "../../../../src/repository/blogMongoDbRepository";
+import {blogRepository} from "../../../../src/modules/blog/blog.MongoDbRepository";
 import {postsService} from "../../../../src/domain/service/posts-service";
 import {blogsService} from "../../../../src/domain/service/blogs-service";
-import {postRepository} from "../../../../src/repository/postMongoDbRepository";
+import {postRepository} from "../../../../src/modules/post/post.MongoDbRepository";
 import {client} from "../../../../src/db";
 
 describe('/blogs', () => {

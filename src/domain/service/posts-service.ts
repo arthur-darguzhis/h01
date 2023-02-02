@@ -1,5 +1,5 @@
-import {postRepository} from '../../repository/postMongoDbRepository'
-import {blogRepository} from '../../repository/blogMongoDbRepository'
+import {postRepository} from '../../modules/post/post.MongoDbRepository'
+import {blogRepository} from '../../modules/blog/blog.MongoDbRepository'
 import {PostInputModel} from "../../routes/inputModels/PostInputModel";
 import {BlogPostInputModel} from "../../routes/inputModels/BlogPostInputModel";
 import {ObjectId} from "mongodb";
