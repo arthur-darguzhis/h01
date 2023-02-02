@@ -3,15 +3,16 @@ import {UserType} from "../types/UserType";
 import {ObjectId} from "mongodb";
 import {userRepository} from "../../modules/user/user.MongoDbRepository";
 import bcrypt from 'bcrypt'
-import {EntityAlreadyExists} from "../exceptions/EntityAlreadyExists";
 import {v4 as uuidv4} from "uuid";
 import add from "date-fns/add"
 import {MailIsNotSent} from "../exceptions/MailIsNotSent";
 import {emailsManager} from "../../managers/emailsManager";
 import {UnprocessableEntity} from "../exceptions/UnprocessableEntity";
+import {emailConfirmationRepository} from "../../modules/emailConfirmation/emailConfirmation.MongoDbRepository";
+import {EmailConfirmationType} from "../../modules/emailConfirmation/types/EmailConfirmationType";
 
 export const usersService = {
-    async createUser(userInputModel: UserInputModel, isUserActive: boolean): Promise<UserType> {
+    async createUser(userInputModel: UserInputModel): Promise<UserType> {
         const passwordHash = await this._generatePasswordHash(userInputModel.password)
 
         const newUser: UserType = {
@@ -20,12 +21,7 @@ export const usersService = {
             password: passwordHash,
             email: userInputModel.email,
             createdAt: new Date().toISOString(),
-            isActive: isUserActive,
-            emailConfirmation: {
-                confirmationCode: isUserActive ? undefined : uuidv4(),
-                expirationDate: isUserActive ? undefined : add(new Date(), {hours: 10, minutes: 3}).getTime(),
-                isConfirmed: isUserActive,
-            }
+            isActive: true,
         }
 
         return await userRepository.addUser(newUser);
@@ -57,68 +53,54 @@ export const usersService = {
         return await bcrypt.hash(password, 10);
     },
 
-    async registerUser(userInputModel: UserInputModel): Promise<true | never> {
-        const isUserExists = await userRepository.isUserExists(userInputModel.email, userInputModel.login);
-        if (isUserExists) {
-            throw new EntityAlreadyExists('User with the same "email" or "login" is already exists')
-        }
-
-        const user: UserType = await this.createUser(userInputModel, false);
-        await emailsManager.sendConfirmationLetter(user)
-        // await userRepository.updateUser(user._id, {"emailConfirmation.sendingTime": new Date().getTime()})
-        return true;
-    },
-
     async confirmEmail(code: string): Promise<true | never> {
-        const user = await userRepository.getUserByConfirmationCode(code);
+        const emailConfirmation = await emailConfirmationRepository.getConfirmationByCode(code);
+        const user = await userRepository.getUser(emailConfirmation.userId);
 
-        if (user.isActive || user.emailConfirmation.isConfirmed) {
+        if (user.isActive || emailConfirmation.isConfirmed) {
             throw new UnprocessableEntity('The email is already confirmed')
         }
 
-        if (user.emailConfirmation.expirationDate && user.emailConfirmation.expirationDate < new Date().getTime()) {
+        if (emailConfirmation.expirationDate < new Date().getTime()) {
             throw new UnprocessableEntity('The confirmation code is expired');
         }
 
-        user.emailConfirmation = {
-            confirmationCode: undefined,
-            expirationDate: undefined,
-            sendingTime: undefined,
-            isConfirmed: true
-        };
-        const result = await userRepository.saveConfirmedUser(user._id, user.emailConfirmation)
-        if (!result) throw new UnprocessableEntity('User confirmation failed')
+        await this.activateUser(user._id);
+        await this.confirmEmailConfirmationCode(emailConfirmation._id)
+
+        //TODO возможно эта предупреждение нужно, но вообще хочется подумать стоит ли возвращать true | false или лучше кидать исключения?
+        //if (!result) throw new UnprocessableEntity('User confirmation failed')
         return true;
     },
 
     async resendConfirmEmail(email: string): Promise<true | never> {
         const user = await userRepository.getUserByEmail(email);
-        if (user.isActive || user.emailConfirmation.isConfirmed) {
+        const emailConfirmation = await emailConfirmationRepository.getConfirmationByUserId(user._id);
+        if (user.isActive || emailConfirmation.isConfirmed) {
             throw new UnprocessableEntity('The email is already confirmed')
         }
 
-        if (user.emailConfirmation.expirationDate
-            && user.emailConfirmation.expirationDate > new Date().getTime()
-            && user.emailConfirmation.sendingTime) {
-
-            const minutesLastResendWas = (new Date().getTime() - user.emailConfirmation.sendingTime) / 60
+        if (emailConfirmation.expirationDate > new Date().getTime()) {
+            const minutesLastResendWas = (new Date().getTime() - emailConfirmation.sendingTime) / (60 * 1000)
             if (Math.ceil(minutesLastResendWas) <= 15) {
                 const tryAfterMinutes = Math.ceil(15 - minutesLastResendWas);
                 throw new UnprocessableEntity(`Try to resend email in ${tryAfterMinutes} min`)
             }
         }
 
-        user.emailConfirmation = {
+        const newEmailConfirmation: EmailConfirmationType = {
+            _id: new ObjectId().toString(),
+            userId: user._id,
             confirmationCode: uuidv4(),
             expirationDate: add(new Date(), {hours: 10, minutes: 3}).getTime(),
             sendingTime: new Date().getTime(),
             isConfirmed: false,
         }
 
-        await userRepository.updateUser(user._id, {emailConfirmation: user.emailConfirmation});
+        await emailConfirmationRepository.addEmailConfirmation(newEmailConfirmation);
 
         try {
-            await emailsManager.sendConfirmationLetter(user)
+            await emailsManager.sendRegistrationConfirmationLetter(user, newEmailConfirmation)
         } catch (e) {
             if (e instanceof MailIsNotSent) {
                 await userRepository.deleteUser(user._id);
@@ -126,5 +108,13 @@ export const usersService = {
             }
         }
         return true;
+    },
+
+    async confirmEmailConfirmationCode(emailConfirmationId: string): Promise<boolean> {
+        return await emailConfirmationRepository.update(emailConfirmationId, {isConfirmed: true})
+    },
+
+    async activateUser(userId: string): Promise<boolean> {
+        return await userRepository.updateUser(userId, {isActive: true})
     }
 }

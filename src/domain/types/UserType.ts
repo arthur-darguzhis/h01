@@ -5,12 +5,4 @@ export type UserType = {
     email: string,
     createdAt: string
     isActive: boolean
-    emailConfirmation: UserEmailConfirmation
-}
-
-export type UserEmailConfirmation = {
-    confirmationCode?: string,
-    expirationDate?: number,
-    sendingTime?: number,
-    isConfirmed?: boolean,
 }

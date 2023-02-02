@@ -23,7 +23,7 @@ userRouter.post('/',
     validateUser.body.password,
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithBody<UserInputModel>, res) => {
-        const newUser: UserType = await usersService.createUser(req.body, true)
+        const newUser: UserType = await usersService.createUser(req.body)
         res.status(HTTP_STATUSES.CREATED_201).json(mapUserToViewModel(newUser))
     })
 

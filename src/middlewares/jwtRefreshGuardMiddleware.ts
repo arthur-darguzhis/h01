@@ -2,7 +2,7 @@ import {NextFunction, Request, Response} from "express";
 import {HTTP_STATUSES} from "../routes/types/HttpStatuses";
 import {jwtService} from "../application/jwt-service";
 import {usersService} from "../domain/service/users-service";
-import {refreshTokensBlackListRepository} from "../repository/refreshTokensBlackListRepository";
+import {refreshTokensBlackListRepository} from "../modules/auth/refreshTokensBlackListRepository";
 
 export const jwtRefreshGuardMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     if (!req.cookies || !req.cookies.refreshToken || req.cookies.refreshToken === '') {

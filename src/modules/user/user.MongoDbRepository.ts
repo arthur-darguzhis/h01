@@ -1,6 +1,7 @@
-import {UserEmailConfirmation, UserType} from "../../domain/types/UserType";
+import {UserType} from "../../domain/types/UserType";
 import {usersCollection} from "../../db";
 import {EntityNotFound} from "../../domain/exceptions/EntityNotFound";
+import {EmailConfirmationType} from "../emailConfirmation/types/EmailConfirmationType";
 
 export const userRepository = {
     async addUser(newUser: UserType): Promise<UserType> {
@@ -52,7 +53,7 @@ export const userRepository = {
         return user;
     },
 
-    async saveConfirmedUser(userId: string, emailConfirmation: UserEmailConfirmation): Promise<boolean> {
+    async saveConfirmedUser(userId: string, emailConfirmation: EmailConfirmationType): Promise<boolean> {
         const result = await usersCollection.updateOne({_id: userId}, {
             $set: {
                 isActive: true,

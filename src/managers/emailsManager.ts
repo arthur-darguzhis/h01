@@ -2,15 +2,15 @@ import {settings} from "../settings";
 import {UserType} from "../domain/types/UserType";
 import {MailIsNotSent} from "../domain/exceptions/MailIsNotSent";
 import {emailAdapter} from "../adapters/emailAdapter";
-import {userRepository} from "../modules/user/user.MongoDbRepository";
+import {EmailConfirmationType} from "../modules/emailConfirmation/types/EmailConfirmationType";
 
 export const emailsManager = {
-    async sendConfirmationLetter(user: UserType): Promise<true | never> {
-        if (!user.emailConfirmation!.confirmationCode || !user.email) {
+    async sendRegistrationConfirmationLetter(user: UserType, emailConfirmation: EmailConfirmationType): Promise<true | never> {
+        if (!emailConfirmation.confirmationCode || !user.email) {
             throw new MailIsNotSent('something wrong with confirmationCode or user email is empty');
         }
 
-        const confirmUrl = settings.APP_HOST + 'confirm-registration?code=' + user.emailConfirmation!.confirmationCode;
+        const confirmUrl = settings.APP_HOST + 'confirm-registration?code=' + emailConfirmation.confirmationCode;
 
         const preparedMail = {
             from: `"Artur Darguzhis" <${settings.GMAIL_APP_LOGIN}>`,
@@ -23,7 +23,6 @@ export const emailsManager = {
         };
 
         await emailAdapter.sendMail(preparedMail)
-        await userRepository.updateUser(user._id, {"emailConfirmation.sendingTime": new Date().getTime()})
         return true;
     }
 }

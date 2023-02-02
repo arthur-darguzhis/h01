@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import {UserType} from "../domain/types/UserType";
 import {settings} from "../settings";
-import {refreshTokensBlackListRepository} from "../repository/refreshTokensBlackListRepository";
+import {refreshTokensBlackListRepository} from "../modules/auth/refreshTokensBlackListRepository";
 import {JWT} from "./types/JWT";
 
 export const jwtService = {

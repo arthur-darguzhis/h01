@@ -5,6 +5,7 @@ import {MongoClient} from "mongodb";
 import {CommentType} from "./domain/types/CommentType";
 import {settings} from "./settings";
 import {JWT} from "./application/types/JWT";
+import {EmailConfirmationType} from "./modules/emailConfirmation/types/EmailConfirmationType";
 
 const mongoUri = settings.MONGO_URI;
 if (!mongoUri) {
@@ -20,6 +21,7 @@ export const blogsCollection = dbConnection.collection<BlogType>("blogs");
 export const postsCollection = dbConnection.collection<PostType>("posts");
 export const usersCollection = dbConnection.collection<UserType>("users");
 export const commentsCollection = dbConnection.collection<CommentType>("comments")
+export const emailConfirmationCollection = dbConnection.collection<EmailConfirmationType>("emailConfirmation")
 export const refreshTokenBlackListCollection = dbConnection.collection<JWT>("refreshTokenBlackList")
 
 //Расскажите почему эта функция не стрелочная и при чем здесь замыкание и переменная client? =)
@@ -47,11 +49,6 @@ export const db: { users: UserType[] } = {
             email: 'test@test.ts',
             isActive: true,
             createdAt: '',
-            emailConfirmation: {
-                confirmationCode: undefined,
-                expirationDate: undefined,
-                isConfirmed: undefined
-            }
         }
     ]
 }
