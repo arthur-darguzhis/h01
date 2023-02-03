@@ -39,7 +39,19 @@ describe('POST => /auth/registration-email-resending', () => {
     })
 
     it('should send email with new code if user exists but not confirmed yet; status 204', async () => {
+        const validRegistrationData: UserInputModel = {
+            login: 'infovoin.by',
+            password: '12345678',
+            email: "artur.dargujis@yandex.by"
+        }
 
+        const [user, emailConfirmation] = await authService.registerNewUser(validRegistrationData)
+
+        //act
+        await request(app)
+            .post('/auth/registration-email-resending')
+            .send({email: validRegistrationData.email})
+            .expect(HTTP_STATUSES.NO_CONTENT_204)
     })
 
     async function spoilConfirmationExpirationDate(emailConfirmation: EmailConfirmationType): Promise<boolean> {
