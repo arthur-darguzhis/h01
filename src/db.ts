@@ -27,12 +27,9 @@ export const refreshTokenBlackListCollection = dbConnection.collection<JWT>("ref
 //Расскажите почему эта функция не стрелочная и при чем здесь замыкание и переменная client? =)
 export async function runDb() {
     try {
-        //connect the client to the server
         await client.connect();
-        //Это тестовый пинг к базе данных hm, но здесь может быть что угодно
         await client.db('hm').command({ping: 1})
         console.log('Connected successfully to mongoServer');
-        //Почему в catch нет "e"? разве так можно?
     } catch (e) {
         console.log(e);
         //Ensure that the client will close when you finish/error
