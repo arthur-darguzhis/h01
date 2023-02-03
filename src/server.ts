@@ -1,4 +1,5 @@
-import express from "express";
+import 'express-async-errors';
+import express, {Request, Response, NextFunction} from "express";
 import {blogRouter} from "./modules/blog/blog.router";
 import {postRouter} from "./modules/post/post.router";
 import {userRouter} from "./modules/user/user.router";
@@ -8,6 +9,8 @@ import {settings} from "./settings";
 import {runDb} from "./db";
 import cookieParser from "cookie-parser";
 import {authRouter} from "./modules/auth/auth.router";
+import {errorHandler} from "./exceptions/ErrorHandler";
+
 export const app = express()
 
 app.use(express.json());
@@ -25,3 +28,12 @@ export const startApp = async () => {
         console.log(`Example app listening on port ${settings.PORT}`)
     })
 }
+
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+    console.log('Error encountered:', err.message || err);
+    next(err);
+});
+
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+    errorHandler.handleError(err, res);
+});
