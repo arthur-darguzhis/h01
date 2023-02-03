@@ -97,6 +97,7 @@ export const usersService = {
             isConfirmed: false,
         }
 
+        await emailConfirmationRepository.deleteEmailConfirmation(emailConfirmation._id);
         await emailConfirmationRepository.addEmailConfirmation(newEmailConfirmation);
 
         try {

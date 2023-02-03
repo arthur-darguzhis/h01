@@ -24,5 +24,10 @@ export const emailConfirmationRepository = {
     async addEmailConfirmation(emailConfirmation: EmailConfirmationType): Promise<EmailConfirmationType> {
         await emailConfirmationCollection.insertOne(emailConfirmation);
         return emailConfirmation;
+    },
+
+    async deleteEmailConfirmation(id: string): Promise<boolean> {
+        const result = await emailConfirmationCollection.deleteOne({_id: id})
+        return result.deletedCount === 1;
     }
 }
