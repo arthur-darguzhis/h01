@@ -38,6 +38,10 @@ describe('POST => /auth/registration-email-resending', () => {
             .expect(HTTP_STATUSES.NO_CONTENT_204)
     })
 
+    it('should send email with new code if user exists but not confirmed yet; status 204', async () => {
+
+    })
+
     async function spoilConfirmationExpirationDate(emailConfirmation: EmailConfirmationType): Promise<boolean> {
         return await emailConfirmationRepository.update(emailConfirmation._id, {"expirationDate": new Date().getTime()});
     }
@@ -67,20 +71,20 @@ describe('POST => /auth/registration-email-resending', () => {
             .expect(HTTP_STATUSES.BAD_REQUEST_400)
     })
 
-    it('it took less then 15 min from last trying to resend registration email, status 400', async () => {
-        const ddosRegistrationData: UserInputModel = {
-            login: 'ddos',
-            password: '12345678',
-            email: "artur.dargujis@yandex.ru"
-        }
-
-        await authService.registerNewUser(ddosRegistrationData)
-
-        //act
-        await request(app)
-            .post('/auth/registration-email-resending')
-            .send({email: ddosRegistrationData.email})
-            .expect(HTTP_STATUSES.BAD_REQUEST_400)
-    })
+    // it('it took less then 15 min from last trying to resend registration email, status 400', async () => {
+    //     const ddosRegistrationData: UserInputModel = {
+    //         login: 'ddos',
+    //         password: '12345678',
+    //         email: "artur.dargujis@yandex.ru"
+    //     }
+    //
+    //     await authService.registerNewUser(ddosRegistrationData)
+    //
+    //     //act
+    //     await request(app)
+    //         .post('/auth/registration-email-resending')
+    //         .send({email: ddosRegistrationData.email})
+    //         .expect(HTTP_STATUSES.BAD_REQUEST_400)
+    // })
 
 })

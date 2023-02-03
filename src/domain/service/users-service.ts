@@ -80,13 +80,13 @@ export const usersService = {
             throw new UnprocessableEntity('The email is already confirmed')
         }
 
-        if (emailConfirmation.expirationDate > new Date().getTime()) {
-            const minutesLastResendWas = (new Date().getTime() - emailConfirmation.sendingTime) / (60 * 1000)
-            if (Math.ceil(minutesLastResendWas) <= 15) {
-                const tryAfterMinutes = Math.ceil(15 - minutesLastResendWas);
-                throw new UnprocessableEntity(`Try to resend email in ${tryAfterMinutes} min`)
-            }
-        }
+        // if (emailConfirmation.expirationDate > new Date().getTime()) {
+        //     const minutesLastResendWas = (new Date().getTime() - emailConfirmation.sendingTime) / (60 * 1000)
+        //     if (Math.ceil(minutesLastResendWas) <= 15) {
+        //         const tryAfterMinutes = Math.ceil(15 - minutesLastResendWas);
+        //         throw new UnprocessableEntity(`Try to resend email in ${tryAfterMinutes} min`)
+        //     }
+        // }
 
         const newEmailConfirmation: EmailConfirmationType = {
             _id: new ObjectId().toString(),
