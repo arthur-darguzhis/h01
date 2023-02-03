@@ -60,6 +60,13 @@ describe('POST => /auth/registration-email-resending', () => {
             .expect(HTTP_STATUSES.BAD_REQUEST_400)
     })
 
+    it('should return error if user email doesnt exist; status 400', async () => {
+        await request(app)
+            .post('/auth/registration-email-resending')
+            .send({email: 'this_email_does_not_related_to_any_user@test.test'})
+            .expect(HTTP_STATUSES.BAD_REQUEST_400)
+    })
+
     it('it took less then 15 min from last trying to resend registration email, status 400', async () => {
         const ddosRegistrationData: UserInputModel = {
             login: 'ddos',

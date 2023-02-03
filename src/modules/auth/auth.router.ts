@@ -18,6 +18,7 @@ import {RegistrationConfirmationCodeModel} from "./types/RegistrationConfirmatio
 import {jwtRefreshGuardMiddleware} from "../../middlewares/jwtRefreshGuardMiddleware";
 import {UnprocessableEntity} from "../../domain/exceptions/UnprocessableEntity";
 import {authService} from "./auth.service";
+import {EntityNotFound} from "../../domain/exceptions/EntityNotFound";
 
 export const authRouter = Router({});
 
@@ -67,7 +68,7 @@ authRouter.post('/registration-email-resending',
         try {
             await usersService.resendConfirmEmail(req.body.email)
         } catch (err) {
-            if (err instanceof UnprocessableEntity) {
+            if (err instanceof UnprocessableEntity || err instanceof EntityNotFound) {
                 const apiErrorResult: APIErrorResultType = {
                     errorsMessages: [{
                         field: 'email',
