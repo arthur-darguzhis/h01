@@ -6,11 +6,11 @@ import {JWT} from "./types/JWT";
 
 export const jwtService = {
     createAuthJWT(user: UserType): string{
-        return jwt.sign({userId: user._id}, settings.JWT_AUTH_SECRET, {expiresIn: '10h'})
+        return jwt.sign({userId: user._id}, settings.JWT_AUTH_SECRET, {expiresIn: '10s'})
     },
 
     createRefreshJWT(user: UserType): string {
-        return jwt.sign({userId: user._id}, settings.JWT_REFRESH_SECRET, {expiresIn: '20h'})
+        return jwt.sign({userId: user._id}, settings.JWT_REFRESH_SECRET, {expiresIn: '20s'})
     },
 
     verifyAuthJWT(token: string) {
