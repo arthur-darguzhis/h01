@@ -7,12 +7,7 @@ import {settings} from "./settings";
 import {JWT} from "./application/types/JWT";
 import {EmailConfirmationType} from "./modules/emailConfirmation/types/EmailConfirmationType";
 
-const mongoUri = settings.MONGO_URI;
-if (!mongoUri) {
-    throw new Error('MongoDB URI is not found')
-}
-
-export const client: MongoClient = new MongoClient(mongoUri);
+export const client: MongoClient = new MongoClient(settings.MONGO_URI);
 const dbConnection = client.db();
 //Почему здесь при обращении к методу коллекции мы указываем тип? эта запись новая для меня) .collection<BlogType>("blogs")
 //уберите типизацию коллекции посмотрите на ошибку, объясните ее происхождение.
