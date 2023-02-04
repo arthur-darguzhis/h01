@@ -5,7 +5,6 @@ import {userRepository} from "../../modules/user/user.MongoDbRepository";
 import bcrypt from 'bcrypt'
 import {v4 as uuidv4} from "uuid";
 import add from "date-fns/add"
-import {MailIsNotSent} from "../exceptions/MailIsNotSent";
 import {emailsManager} from "../../managers/emailsManager";
 import {UnprocessableEntity} from "../exceptions/UnprocessableEntity";
 import {emailConfirmationRepository} from "../../modules/emailConfirmation/emailConfirmation.MongoDbRepository";
@@ -100,14 +99,8 @@ export const usersService = {
         await emailConfirmationRepository.deleteEmailConfirmation(emailConfirmation._id);
         await emailConfirmationRepository.addEmailConfirmation(newEmailConfirmation);
 
-        try {
-            await emailsManager.sendRegistrationConfirmationLetter(user, newEmailConfirmation)
-        } catch (e) {
-            if (e instanceof MailIsNotSent) {
-                await userRepository.deleteUser(user._id);
-                throw e;
-            }
-        }
+        emailsManager.sendRegistrationConfirmationLetter(user, newEmailConfirmation)
+
         return true;
     },
 

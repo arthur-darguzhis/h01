@@ -38,7 +38,7 @@ export const authService = {
 
         await userRepository.addUser(newUser);
         await emailConfirmationRepository.addEmailConfirmation(emailConfirmation)
-        await emailsManager.sendRegistrationConfirmationLetter(newUser, emailConfirmation)
+        emailsManager.sendRegistrationConfirmationLetter(newUser, emailConfirmation)
         return [newUser, emailConfirmation];
     },
 

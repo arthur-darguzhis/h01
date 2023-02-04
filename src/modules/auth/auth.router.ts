@@ -10,10 +10,8 @@ import {jwtAuthGuardMiddleware} from "../../middlewares/jwtAuthGuardMiddleware";
 import {userQueryRepository} from "../user/user.QueryRepository";
 import {LoginSuccessViewModel} from "../../routes/types/apiError/LoginSuccessViewModel";
 import {UserInputModel} from "../../routes/inputModels/UserInputModel";
-import {EntityAlreadyExists} from "../../domain/exceptions/EntityAlreadyExists";
 import {validateUser} from "../../middlewares/validators/validateUser";
 import {APIErrorResultType} from "../../routes/types/apiError/APIErrorResultType";
-import {MailIsNotSent} from "../../domain/exceptions/MailIsNotSent";
 import {RegistrationConfirmationCodeModel} from "./types/RegistrationConfirmationCodeModel";
 import {jwtRefreshGuardMiddleware} from "../../middlewares/jwtRefreshGuardMiddleware";
 import {UnprocessableEntity} from "../../domain/exceptions/UnprocessableEntity";
@@ -28,19 +26,7 @@ authRouter.post('/registration',
     validateUser.body.password,
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithBody<UserInputModel>, res) => {
-        try {
-            await authService.registerNewUser(req.body);
-        } catch (err) {
-            if (err instanceof EntityAlreadyExists || err instanceof MailIsNotSent) {
-                const apiErrorResult: APIErrorResultType = {
-                    errorsMessages: [{
-                        field: 'email',
-                        message: err.message
-                    }]
-                }
-                return res.status(HTTP_STATUSES.BAD_REQUEST_400).json(apiErrorResult)
-            }
-        }
+        await authService.registerNewUser(req.body);
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
     })
 

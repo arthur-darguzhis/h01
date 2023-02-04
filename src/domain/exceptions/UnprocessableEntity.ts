@@ -1,3 +1,5 @@
-export class UnprocessableEntity extends Error {
+import {AppError} from "../../exceptions/AppError";
+
+export class UnprocessableEntity extends AppError {
 
 }

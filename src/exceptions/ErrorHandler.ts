@@ -1,6 +1,8 @@
 import {AppError} from "./AppError";
 import {Response} from "express";
 import {HTTP_STATUSES} from "../routes/types/HttpStatuses";
+import {APIErrorResultType} from "../routes/types/apiError/APIErrorResultType";
+import {EntityAlreadyExists} from "../domain/exceptions/EntityAlreadyExists";
 
 class ErrorHandler {
     public handleError(error: Error | AppError, response?: Response): void {
@@ -20,13 +22,23 @@ class ErrorHandler {
     }
 
     private handleTrustedError(error: AppError, response: Response): void {
-        //Here should be switch case
-        response.status(501).json({ message: error.message });
+        let statusCode = HTTP_STATUSES.BAD_REQUEST_400
+        if (error instanceof EntityAlreadyExists) statusCode = HTTP_STATUSES.BAD_REQUEST_400
+
+        // const apiErrorResult: APIErrorResultType = {
+        //     errorsMessages: [{
+        //         field: 'email',
+        //         message: err.message
+        //     }]
+        // }
+        // return res.status(HTTP_STATUSES.BAD_REQUEST_400).json(apiErrorResult)
+
+        response.status(statusCode).json({message: error.message});
     }
 
     private handleUntrustedError(error: Error | AppError, response?: Response): void {
         if (response) {
-            response.status(HTTP_STATUSES.INTERNAL_SERVER_ERROR_500).json({ message: 'Internal server error' });
+            response.status(HTTP_STATUSES.INTERNAL_SERVER_ERROR_500).json({message: 'Internal server error'});
         }
 
         console.log('Application encountered an untrusted error.');
