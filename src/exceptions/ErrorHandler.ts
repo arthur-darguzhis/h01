@@ -20,12 +20,13 @@ class ErrorHandler {
     }
 
     private handleTrustedError(error: AppError, response: Response): void {
+        //Here should be switch case
         response.status(501).json({ message: error.message });
     }
 
     private handleUntrustedError(error: Error | AppError, response?: Response): void {
         if (response) {
-            response.status(500).json({ message: 'Internal server error' });
+            response.status(HTTP_STATUSES.INTERNAL_SERVER_ERROR_500).json({ message: 'Internal server error' });
         }
 
         console.log('Application encountered an untrusted error.');
