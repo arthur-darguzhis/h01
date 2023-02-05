@@ -1,22 +1,19 @@
 import {Request, Response, Router} from "express";
-import {RequestWithBody} from "../../routes/types/RequestTypes";
-import {usersService} from "../../domain/service/users-service";
-import {HTTP_STATUSES} from "../../routes/types/HttpStatuses";
-import {LoginInputModel} from "../../routes/inputModels/LoginInputModel";
-import {checkErrorsInRequestDataMiddleware} from "../../middlewares/checkErrorsInRequestDataMiddleware";
-import {validateLogin} from "../../middlewares/validators/validateLogin";
-import {jwtService} from "../../application/jwt-service";
-import {jwtAuthGuardMiddleware} from "../../middlewares/jwtAuthGuardMiddleware";
+import {RequestWithBody} from "../../common/presentationLayer/types/RequestTypes";
+import {usersService} from "../user/users-service";
+import {HTTP_STATUSES} from "../../common/presentationLayer/types/HttpStatuses";
+import {LoginInputModel} from "./types/LoginInputModel";
+import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/checkErrorsInRequestDataMiddleware";
+import {validateLogin} from "./middlewares/validateLogin";
+import {jwtService} from "../jwt/jwt-service";
+import {jwtAuthGuardMiddleware} from "./middlewares/jwtAuthGuardMiddleware";
 import {userQueryRepository} from "../user/user.QueryRepository";
-import {LoginSuccessViewModel} from "../../routes/types/apiError/LoginSuccessViewModel";
-import {UserInputModel} from "../../routes/inputModels/UserInputModel";
-import {validateUser} from "../../middlewares/validators/validateUser";
-import {APIErrorResultType} from "../../routes/types/apiError/APIErrorResultType";
+import {LoginSuccessViewModel} from "./types/LoginSuccessViewModel";
+import {UserInputModel} from "../user/types/UserInputModel";
+import {validateUser} from "../user/middlewares/validateUser";
 import {RegistrationConfirmationCodeModel} from "./types/RegistrationConfirmationCodeModel";
-import {jwtRefreshGuardMiddleware} from "../../middlewares/jwtRefreshGuardMiddleware";
-import {UnprocessableEntity} from "../../domain/exceptions/UnprocessableEntity";
+import {jwtRefreshGuardMiddleware} from "./middlewares/jwtRefreshGuardMiddleware";
 import {authService} from "./auth.service";
-import {EntityNotFound} from "../../domain/exceptions/EntityNotFound";
 
 export const authRouter = Router({});
 
@@ -31,19 +28,7 @@ authRouter.post('/registration',
     })
 
 authRouter.post('/registration-confirmation', async (req: RequestWithBody<RegistrationConfirmationCodeModel>, res) => {
-    try {
-        await usersService.confirmEmail(req.body.code);
-    } catch (err) {
-        if (err instanceof Error) {
-            const apiErrorResult: APIErrorResultType = {
-                errorsMessages: [{
-                    field: 'code',
-                    message: err.message
-                }]
-            }
-            return res.status(HTTP_STATUSES.BAD_REQUEST_400).json(apiErrorResult)
-        }
-    }
+    await usersService.confirmEmail(req.body.code);
     return res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 })
 
@@ -51,21 +36,7 @@ authRouter.post('/registration-email-resending',
     validateUser.body.email,
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithBody<{ email: string }>, res) => {
-        try {
-            await usersService.resendConfirmEmail(req.body.email)
-        } catch (err) {
-            if (err instanceof UnprocessableEntity || err instanceof EntityNotFound) {
-                const apiErrorResult: APIErrorResultType = {
-                    errorsMessages: [{
-                        field: 'email',
-                        message: err.message
-                    }]
-                }
-                return res.status(HTTP_STATUSES.BAD_REQUEST_400).json(apiErrorResult)
-            } else {
-
-            }
-        }
+        await usersService.resendConfirmEmail(req.body.email)
         return res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     })
 
@@ -73,7 +44,7 @@ authRouter.post('/login',
     validateLogin.body.loginOrEmail,
     validateLogin.body.password,
     checkErrorsInRequestDataMiddleware,
-    async (req: RequestWithBody<LoginInputModel>, res) => {
+    async (req: RequestWithBody<LoginInputModel>, res: Response<LoginSuccessViewModel>) => {
         const user = await usersService.checkCredentials(req.body.loginOrEmail, req.body.password)
         if (!user || !user.isActive) {
             return res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401);
@@ -81,35 +52,26 @@ authRouter.post('/login',
 
         const authToken = jwtService.createAuthJWT(user);
         const refreshToken = jwtService.createRefreshJWT(user)
-        const loginSuccessViewModel: LoginSuccessViewModel = {
-            "accessToken": authToken
-        }
 
         res.status(HTTP_STATUSES.OK_200)
             .cookie('refreshToken', refreshToken, {httpOnly: true, secure: true, maxAge: 20 * 1000})
-            .json(loginSuccessViewModel)
+            .json({"accessToken": authToken})
     })
 
-authRouter.post('/refresh-token', jwtRefreshGuardMiddleware, async (req, res) => {
-    await jwtService.addRefreshJWTtoBlackList(req.user!, req.cookies.refreshToken);
+authRouter.post('/refresh-token', jwtRefreshGuardMiddleware, async (req, res: Response<LoginSuccessViewModel>) => {
+    jwtService.addRefreshJWTtoBlackList(req.user!, req.cookies.refreshToken);
     const authToken = jwtService.createAuthJWT(req.user!);
     const refreshToken = jwtService.createRefreshJWT(req.user!)
-    const loginSuccessViewModel: LoginSuccessViewModel = {
-        "accessToken": authToken
-    }
+
     res.status(HTTP_STATUSES.OK_200)
-        .cookie('refreshToken', refreshToken, {
-            httpOnly: true,
-            secure: true,
-            maxAge: 20 * 1000
-        })
-        .json(loginSuccessViewModel)
+        .cookie('refreshToken', refreshToken, {httpOnly: true, secure: true, maxAge: 20 * 1000})
+        .json({"accessToken": authToken})
 })
 
 authRouter.post('/logout',
     jwtRefreshGuardMiddleware,
-    async (req: Request, res: Response) => {
-        await jwtService.addRefreshJWTtoBlackList(req.user!, req.cookies.refreshToken);
+    (req: Request, res: Response) => {
+        jwtService.addRefreshJWTtoBlackList(req.user!, req.cookies.refreshToken);
         res.clearCookie('refreshToken').sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     })
 

@@ -1,20 +1,24 @@
-import {PostViewModel} from "../../queryRepository/types/Post/PostViewModel";
-import {postsCollection} from "../../db";
-import {BlogPostFilterType} from "../../queryRepository/types/BlogPost/BlogPostFilterType";
+import {PostViewModel} from "./types/PostViewModel";
+import {dbConnection} from "../../db";
+import {BlogPostFilterType} from "./types/BlogPostFilterType";
 import {mapPostToViewModel} from "./post.mapper";
-import {PaginatorResponse} from "../../routes/types/paginator/PaginatorResponse";
-import {PaginatorParams} from "../../routes/types/paginator/PaginatorParams";
+import {PaginatorResponse} from "../auth/types/paginator/PaginatorResponse";
+import {PaginatorParams} from "../auth/types/paginator/PaginatorParams";
+import {blogRepository} from "../blog/blog.MongoDbRepository";
+import {EntityNotFound} from "../../common/exceptions/EntityNotFound";
+import {QueryMongoDbRepository} from "../../common/repositories/QueryMongoDbRepository";
+import {PostType} from "./types/PostType";
 
-export const postQueryRepository = {
+class PostQueryRepository extends QueryMongoDbRepository<PostType, PostViewModel>{
     async findPosts(paginatorParams: PaginatorParams): Promise<PaginatorResponse<PostViewModel>> {
         const {sortBy, sortDirection} = paginatorParams
         const pageNumber = +paginatorParams.pageNumber
         const pageSize = +paginatorParams.pageSize
 
         const direction = sortDirection === 'asc' ? 1 : -1;
-        const count = await postsCollection.countDocuments({});
+        const count = await this.collection.countDocuments({});
         const howManySkip = (pageNumber - 1) * pageSize;
-        const blogs = await postsCollection.find({}).sort(sortBy, direction).skip(howManySkip).limit(pageSize).toArray()
+        const blogs = await this.collection.find({}).sort(sortBy, direction).skip(howManySkip).limit(pageSize).toArray()
 
         return {
             "pagesCount": Math.ceil(count / pageSize),
@@ -23,26 +27,25 @@ export const postQueryRepository = {
             "totalCount": count,
             "items": blogs.map(mapPostToViewModel)
         }
-    },
-
-    async findPost(postId: string): Promise<PostViewModel | null> {
-        const post = await postsCollection.findOne({_id: postId});
-        return post ? mapPostToViewModel(post) : null
-    },
+    }
 
     async findPostsByBlogId(
-        id: string,
-        sortBy: string,
-        sortDirection: string,
-        pageNumber: number,
-        pageSize: number): Promise<PaginatorResponse<PostViewModel>> {
+        blogId: string,
+        paginatorParams: PaginatorParams): Promise<PaginatorResponse<PostViewModel>> {
+        const {sortBy, sortDirection} = paginatorParams;
+        const pageNumber = +paginatorParams.pageNumber
+        const pageSize = +paginatorParams.pageSize
+
+        if(!await blogRepository.isExists(blogId)){
+            throw new EntityNotFound(`Blog with ID: ${blogId} is not exists`)
+        }
 
         const direction = sortDirection === 'asc' ? 1 : -1;
 
-        let filter: BlogPostFilterType = {blogId: id}
-        let count = await postsCollection.countDocuments(filter);
+        let filter: BlogPostFilterType = {blogId: blogId}
+        let count = await this.collection.countDocuments(filter);
         const howManySkip = (pageNumber - 1) * pageSize;
-        const blogs = await postsCollection.find(filter).sort(sortBy, direction).skip(howManySkip).limit(pageSize).toArray()
+        const blogs = await this.collection.find(filter).sort(sortBy, direction).skip(howManySkip).limit(pageSize).toArray()
 
         return {
             "pagesCount": Math.ceil(count / pageSize),
@@ -51,6 +54,7 @@ export const postQueryRepository = {
             "totalCount": count,
             "items": blogs.map(mapPostToViewModel)
         }
-
     }
 }
+
+export const postQueryRepository = new PostQueryRepository(dbConnection, 'posts', mapPostToViewModel)

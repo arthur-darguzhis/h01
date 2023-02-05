@@ -1,15 +1,14 @@
-import {userRepository} from "../../../user/user.MongoDbRepository";
-import {usersService} from "../../../../domain/service/users-service";
-import {LoginInputModel} from "../../../../routes/inputModels/LoginInputModel";
+import {usersService} from "../../../user/users-service";
+import {LoginInputModel} from "../../types/LoginInputModel";
 import request from "supertest";
-import {HTTP_STATUSES} from "../../../../routes/types/HttpStatuses";
+import {HTTP_STATUSES} from "../../../../common/presentationLayer/types/HttpStatuses";
 import {app} from "../../../../server";
-import {client} from "../../../../db";
+import {client, dbConnection} from "../../../../db";
 
 describe('GET => /auth/me', () => {
     let token: string;
     beforeAll(async () => {
-        await userRepository.deleteAllUsers();
+        await dbConnection.dropDatabase();
         await usersService.createUser({
             "login": "user1",
             "password": "123456",
@@ -32,7 +31,7 @@ describe('GET => /auth/me', () => {
         await client.close();
     })
 
-    it('return info about login user, status 200', async () => {
+    it('Should return info about logged-in user, Status 200', async () => {
         const meResponse = await request(app)
             .get('/auth/me')
             .auth(token, {type: "bearer"})
@@ -46,7 +45,7 @@ describe('GET => /auth/me', () => {
         })
     })
 
-    it('request without JWT token, status 401', async () => {
+    it('Should return error if auth token is incorrect. Status 401', async () => {
         await request(app)
             .get('/auth/me')
             .auth('', {type: "bearer"})

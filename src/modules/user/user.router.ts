@@ -1,18 +1,18 @@
 import {Response, Router} from "express";
-import {RequestWithBody, RequestWithParams, RequestWithQuery} from "../../routes/types/RequestTypes";
-import {UserInputModel} from "../../routes/inputModels/UserInputModel";
-import {checkErrorsInRequestDataMiddleware} from "../../middlewares/checkErrorsInRequestDataMiddleware";
-import {authGuardMiddleware} from "../../middlewares/authGuardMiddleware";
-import {validateUser} from "../../middlewares/validators/validateUser";
-import {usersService} from "../../domain/service/users-service";
+import {RequestWithBody, RequestWithParams, RequestWithQuery} from "../../common/presentationLayer/types/RequestTypes";
+import {UserInputModel} from "./types/UserInputModel";
+import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/checkErrorsInRequestDataMiddleware";
+import {authGuardMiddleware} from "../auth/middlewares/authGuardMiddleware";
+import {validateUser} from "./middlewares/validateUser";
+import {usersService} from "./users-service";
 import {userQueryRepository} from "./user.QueryRepository";
-import {HTTP_STATUSES} from "../../routes/types/HttpStatuses";
-import {validatePaginator} from "../../middlewares/validators/validatePaginator";
-import {UserType} from "../../domain/types/UserType";
+import {HTTP_STATUSES} from "../../common/presentationLayer/types/HttpStatuses";
+import {validatePaginator} from "../../common/middlewares/validatePaginator";
+import {UserType} from "./types/UserType";
 import {mapUserToViewModel} from "./user.mapper";
-import {PaginatorResponse} from "../../routes/types/paginator/PaginatorResponse";
-import {UserViewModel} from "../../queryRepository/types/User/UserViewModel";
-import {UserPaginatorParams} from "../../routes/types/paginator/UserPaginatorParams";
+import {PaginatorResponse} from "../auth/types/paginator/PaginatorResponse";
+import {UserViewModel} from "./types/UserViewModel";
+import {UserPaginatorParams} from "./types/UserPaginatorParams";
 
 export const userRouter = Router({})
 

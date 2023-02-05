@@ -1,6 +1,6 @@
-import {UserType} from "../../domain/types/UserType";
-import {UserViewModel} from "../../queryRepository/types/User/UserViewModel";
-import {MeViewModel} from "../../queryRepository/types/User/MeViewModel";
+import {UserType} from "./types/UserType";
+import {UserViewModel} from "./types/UserViewModel";
+import {MeViewModel} from "./types/MeViewModel";
 
 export const mapUserToViewModel = (user: UserType): UserViewModel => {
     return {

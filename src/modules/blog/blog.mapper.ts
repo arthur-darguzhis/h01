@@ -1,5 +1,5 @@
-import {BlogType} from "../../domain/types/BlogType";
-import {BlogViewModel} from "../../queryRepository/types/Blog/BlogViewModel";
+import {BlogType} from "./types/BlogType";
+import {BlogViewModel} from "./types/BlogViewModel";
 
 export const mapBlogToViewModel = (blog: BlogType): BlogViewModel => {
     return {

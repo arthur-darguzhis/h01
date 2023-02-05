@@ -1,9 +1,8 @@
 import request from "supertest";
 import {app} from "../../../../server";
-import {HTTP_STATUSES} from "../../../../routes/types/HttpStatuses";
-import {userRepository} from "../../../user/user.MongoDbRepository";
+import {HTTP_STATUSES} from "../../../../common/presentationLayer/types/HttpStatuses";
 import {v4 as uuidv4} from "uuid";
-import {client} from "../../../../db";
+import {client, dbConnection} from "../../../../db";
 import {authService} from "../../auth.service";
 
 describe('POST => /auth/registration-confirmation', () => {
@@ -11,7 +10,7 @@ describe('POST => /auth/registration-confirmation', () => {
     const fakeConfirmationCode = uuidv4()
 
     beforeAll(async () => {
-        await userRepository.deleteAllUsers();
+        await dbConnection.dropDatabase();
         const [user, emailConfirmation] = await authService.registerNewUser({
             login: 'infovoin',
             password: '12345678',
@@ -24,14 +23,14 @@ describe('POST => /auth/registration-confirmation', () => {
         await client.close();
     })
 
-    it('Verify email, activate account, status 204', async () => {
+    it('It should verify email and activate account when confirmationCode is valid, Status 204', async () => {
         await request(app)
             .post('/auth/registration-confirmation')
             .send({code: realConfirmationCode})
             .expect(HTTP_STATUSES.NO_CONTENT_204)
     })
 
-    it('Confirmation code is incorrect, status 400', async () => {
+    it('It should return error if confirmation code is incorrect, Status 400', async () => {
         await request(app)
             .post('/auth/registration-confirmation')
             .send(fakeConfirmationCode)

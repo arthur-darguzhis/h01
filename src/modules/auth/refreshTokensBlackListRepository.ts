@@ -1,20 +1,16 @@
-import {refreshTokenBlackListCollection} from "../../db";
-import {JWT} from "../../application/types/JWT";
-import {ObjectId} from "mongodb";
-import {UserType} from "../../domain/types/UserType";
+import {dbConnection} from "../../db";
+import {jwtType} from "../jwt/types/JwtType";
+import {CommandMongoDbRepository} from "../../common/repositories/CommandMongoDbRepository";
 
-export const refreshTokensBlackListRepository = {
-    async isTokenInBlackList(userId: string, refreshToken: string): Promise<JWT | null> {
-        return await refreshTokenBlackListCollection.findOne({userId: userId, refreshToken: refreshToken})
-    },
+class RefreshTokensBlackListRepository extends CommandMongoDbRepository<jwtType, object>{
+    async isTokenInBlackList(userId: string, refreshToken: string): Promise<jwtType | null> {
+        return await this.collection.findOne({userId: userId, refreshToken: refreshToken})
+    }
 
-    async addTokenInBlackList(user: UserType, refreshToken: string): Promise<JWT> {
-        const jwt: JWT = {
-            _id: new ObjectId().toString(),
-            userId: user._id,
-            refreshToken: refreshToken
-        }
-        await refreshTokenBlackListCollection.insertOne(jwt)
+    async add(jwt: jwtType): Promise<jwtType> {
+        await this.collection.insertOne(jwt)
         return jwt
     }
 }
+
+export const refreshTokensBlackListRepository = new RefreshTokensBlackListRepository(dbConnection, 'refreshTokenBlackList')

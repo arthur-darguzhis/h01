@@ -1,22 +1,18 @@
-import {UserViewModel} from "../../queryRepository/types/User/UserViewModel";
-import {usersCollection} from "../../db";
-import {UserType} from "../../domain/types/UserType";
-import {UserFilterType} from "../../queryRepository/types/User/UserFilterType";
-import {MeViewModel} from "../../queryRepository/types/User/MeViewModel";
+import {UserViewModel} from "./types/UserViewModel";
+import {dbConnection} from "../../db";
+import {UserType} from "./types/UserType";
+import {UserFilterType} from "./types/UserFilterType";
+import {MeViewModel} from "./types/MeViewModel";
 import {mapUserToMeViewModel, mapUserToViewModel} from "./user.mapper";
-import {PaginatorResponse} from "../../routes/types/paginator/PaginatorResponse";
-import {UserPaginatorParams} from "../../routes/types/paginator/UserPaginatorParams";
+import {PaginatorResponse} from "../auth/types/paginator/PaginatorResponse";
+import {UserPaginatorParams} from "./types/UserPaginatorParams";
+import {QueryMongoDbRepository} from "../../common/repositories/QueryMongoDbRepository";
 
-export const userQueryRepository = {
-    async findUser(id: string): Promise<UserViewModel | null> {
-        const user = await usersCollection.findOne({_id: id})
-        return user ? mapUserToViewModel(user) : null
-    },
-
+class UserQueryRepository extends QueryMongoDbRepository<UserType, UserViewModel>{
     async findMe(id: string): Promise<MeViewModel | null> {
-        const user = await usersCollection.findOne({_id: id})
+        const user = await this.collection.findOne({_id: id})
         return user ? mapUserToMeViewModel(user) : null;
-    },
+    }
 
     async findUsers(userPaginatorParams: UserPaginatorParams): Promise<PaginatorResponse<UserViewModel>> {
         const {searchEmailTerm, searchLoginTerm, sortBy, sortDirection} = userPaginatorParams
@@ -36,9 +32,9 @@ export const userQueryRepository = {
 
         const direction = sortDirection === 'asc' ? 1 : -1;
 
-        const count = await usersCollection.countDocuments(filter)
+        const count = await this.collection.countDocuments(filter)
         const howManySkip = (pageNumber - 1) * pageSize;
-        const users = await usersCollection.find(filter).sort(sortBy, direction).skip(howManySkip).limit(pageSize).toArray()
+        const users = await this.collection.find(filter).sort(sortBy, direction).skip(howManySkip).limit(pageSize).toArray()
 
         return {
             "pagesCount": Math.ceil(count / pageSize),
@@ -47,12 +43,15 @@ export const userQueryRepository = {
             "totalCount": count,
             "items": users.map(mapUserToViewModel)
         }
-    },
+    }
+
     async findByLogin(login: string): Promise<UserType | null> {
-        return await usersCollection.findOne({login: login})
-    },
+        return await this.collection.findOne({login: login})
+    }
 
     async findByEmail(email: string): Promise<UserType | null> {
-        return await usersCollection.findOne({email: email})
+        return await this.collection.findOne({email: email})
     }
 }
+
+export const userQueryRepository = new UserQueryRepository(dbConnection, 'users', mapUserToViewModel)

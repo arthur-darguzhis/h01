@@ -1,5 +1,5 @@
-import {CommentType} from "../../domain/types/CommentType";
-import {CommentViewModel} from "../../queryRepository/types/Comment/CommentViewModel";
+import {CommentType} from "./types/CommentType";
+import {CommentViewModel} from "./types/CommentViewModel";
 
 export const mapCommentToViewModel = (comment: CommentType): CommentViewModel => {
     return {

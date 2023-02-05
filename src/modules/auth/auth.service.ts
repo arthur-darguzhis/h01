@@ -1,8 +1,8 @@
-import {UserInputModel} from "../../routes/inputModels/UserInputModel";
+import {UserInputModel} from "../user/types/UserInputModel";
 import {userRepository} from "../user/user.MongoDbRepository";
-import {EntityAlreadyExists} from "../../domain/exceptions/EntityAlreadyExists";
-import {UserType} from "../../domain/types/UserType";
-import {emailsManager} from "../../managers/emailsManager";
+import {EntityAlreadyExists} from "../../common/exceptions/EntityAlreadyExists";
+import {UserType} from "../user/types/UserType";
+import {emailsManager} from "../../common/managers/email/emailsManager";
 import {ObjectId} from "mongodb";
 import {v4 as uuidv4} from "uuid";
 import add from "date-fns/add";
@@ -12,7 +12,7 @@ import {emailConfirmationRepository} from "../emailConfirmation/emailConfirmatio
 
 export const authService = {
     async registerNewUser(userInputModel: UserInputModel): Promise<[user: UserType, emailConfirmation: EmailConfirmationType] | never> {
-        const isUserExists = await userRepository.isUserExists(userInputModel.email, userInputModel.login);
+        const isUserExists = await userRepository.isExistsWithSameEmailOrLogin(userInputModel.email, userInputModel.login);
         if (isUserExists) {
             throw new EntityAlreadyExists('User with the same "email" or "login" is already exists')
         }
@@ -36,9 +36,10 @@ export const authService = {
             isConfirmed: false,
         }
 
-        await userRepository.addUser(newUser);
-        await emailConfirmationRepository.addEmailConfirmation(emailConfirmation)
         emailsManager.sendRegistrationConfirmationLetter(newUser, emailConfirmation)
+        await userRepository.add(newUser);
+        await emailConfirmationRepository.add(emailConfirmation)
+
         return [newUser, emailConfirmation];
     },
 

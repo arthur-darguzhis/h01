@@ -1,33 +1,25 @@
-import {emailConfirmationCollection} from "../../db";
-import {EntityNotFound} from "../../domain/exceptions/EntityNotFound";
+import {dbConnection} from "../../db";
+import {EntityNotFound} from "../../common/exceptions/EntityNotFound";
 import {EmailConfirmationType} from "./types/EmailConfirmationType";
+import {CommandMongoDbRepository} from "../../common/repositories/CommandMongoDbRepository";
 
-export const emailConfirmationRepository = {
+class EmailConfirmationRepository extends CommandMongoDbRepository<EmailConfirmationType, object> {
 
-    async getConfirmationByCode(code: string): Promise<EmailConfirmationType | never> {
-        const emailConfirmation = await emailConfirmationCollection.findOne({confirmationCode: code})
-        if (emailConfirmation === null) throw new EntityNotFound(`Confirmation code ${code} is not exists`)
+    async findByConfirmationCode(code: string): Promise<EmailConfirmationType | null> {
+        return await this.collection.findOne({confirmationCode: code})
+    }
+
+    async getByConfirmationCode(code: string): Promise<EmailConfirmationType | never> {
+        const emailConfirmation = await this.collection.findOne({confirmationCode: code})
+        if (!emailConfirmation) throw new EntityNotFound(`Confirmation code: ${code} is not exists`)
         return emailConfirmation
-    },
+    }
 
-    async getConfirmationByUserId(userId: string): Promise<EmailConfirmationType | never> {
-        const emailConfirmation = await emailConfirmationCollection.findOne({userId: userId})
-        if (emailConfirmation === null) throw new EntityNotFound(`There is no confirmation code for userId: ${userId}`)
+    async getByUserId(userId: string): Promise<EmailConfirmationType | never> {
+        const emailConfirmation = await this.collection.findOne({userId: userId})
+        if (!emailConfirmation) throw new EntityNotFound(`There is no confirmation code for userId: ${userId}`)
         return emailConfirmation
-    },
-
-    async update(id: string, updateFilter: object): Promise<boolean> {
-        const result = await emailConfirmationCollection.updateOne({_id: id}, {$set: updateFilter})
-        return result.matchedCount === 1;
-    },
-
-    async addEmailConfirmation(emailConfirmation: EmailConfirmationType): Promise<EmailConfirmationType> {
-        await emailConfirmationCollection.insertOne(emailConfirmation);
-        return emailConfirmation;
-    },
-
-    async deleteEmailConfirmation(id: string): Promise<boolean> {
-        const result = await emailConfirmationCollection.deleteOne({_id: id})
-        return result.deletedCount === 1;
     }
 }
+
+export const emailConfirmationRepository = new EmailConfirmationRepository(dbConnection, 'emailConfirmation')

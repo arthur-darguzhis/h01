@@ -9,7 +9,7 @@ import {settings} from "./settings";
 import {runDb} from "./db";
 import cookieParser from "cookie-parser";
 import {authRouter} from "./modules/auth/auth.router";
-import {errorHandler} from "./exceptions/ErrorHandler";
+import {errorHandler} from "./common/managers/error/ErrorHandler";
 
 export const app = express()
 
@@ -30,7 +30,7 @@ export const startApp = async () => {
 }
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-    console.log('Error encountered:', err.message || err);
+    // console.log('Error encountered:', err.message || err);
     next(err);
 });
 

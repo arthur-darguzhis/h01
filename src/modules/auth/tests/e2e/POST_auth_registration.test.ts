@@ -1,13 +1,12 @@
-import {UserInputModel} from "../../../../routes/inputModels/UserInputModel";
+import {UserInputModel} from "../../../user/types/UserInputModel";
 import request from "supertest";
 import {app} from "../../../../server";
-import {HTTP_STATUSES} from "../../../../routes/types/HttpStatuses";
-import {userRepository} from "../../../user/user.MongoDbRepository";
-import {client} from "../../../../db";
+import {HTTP_STATUSES} from "../../../../common/presentationLayer/types/HttpStatuses";
+import {client, dbConnection} from "../../../../db";
 
 describe('POST => /auth/registration', () => {
     beforeAll(async () => {
-        await userRepository.deleteAllUsers();
+        await dbConnection.dropDatabase();
     })
 
     afterAll(async () => {
@@ -26,14 +25,14 @@ describe('POST => /auth/registration', () => {
         email: "test.test"
     }
 
-    it('Input data is accepted. Email with confirmation code will be send to passed email address, status 204', async () => {
+    it('Input data is accepted. Email with confirmation code will be send to passed email address. Status 204', async () => {
         await request(app)
             .post('/auth/registration')
             .send(validRegistrationData)
             .expect(HTTP_STATUSES.NO_CONTENT_204)
     })
 
-    it('"login", "password" and "email" are invalid, status 400', async () => {
+    it('"login", "password" and "email" are invalid, Status 400', async () => {
         const registrationResponse = await request(app)
             .post('/auth/registration')
             .send(invalidRegistrationData)
@@ -45,7 +44,7 @@ describe('POST => /auth/registration', () => {
         expect(registrationResponse.body.errorsMessages.length).toBe(3)
     })
 
-    it('User with the given email or login already exists, status 400', async () => {
+    it('User with the given email or login already exists, Status 400', async () => {
         await request(app)
             .post('/auth/registration')
             .send(validRegistrationData)

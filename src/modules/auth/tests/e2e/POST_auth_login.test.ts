@@ -1,14 +1,13 @@
-import {userRepository} from "../../../user/user.MongoDbRepository";
-import {usersService} from "../../../../domain/service/users-service";
+import {usersService} from "../../../user/users-service";
 import request from "supertest";
 import {app} from "../../../../server";
-import {HTTP_STATUSES} from "../../../../routes/types/HttpStatuses";
-import {LoginInputModel} from "../../../../routes/inputModels/LoginInputModel";
-import {client} from "../../../../db";
+import {HTTP_STATUSES} from "../../../../common/presentationLayer/types/HttpStatuses";
+import {LoginInputModel} from "../../types/LoginInputModel";
+import {client, dbConnection} from "../../../../db";
 
 describe('POST => /auth/login', () => {
     beforeAll(async () => {
-        await userRepository.deleteAllUsers();
+        await dbConnection.dropDatabase();
         await usersService.createUser({
             "login": "user1",
             "password": "123456",
@@ -32,7 +31,7 @@ describe('POST => /auth/login', () => {
 
     const emptyLoginAndPassword = {}
 
-    it('return JWT token, status 201 code', async () => {
+    it('return JWT token, Status 201', async () => {
         const token = await request(app)
             .post('/auth/login')
             .send(correctLoginAndPassword)
@@ -43,7 +42,7 @@ describe('POST => /auth/login', () => {
         })
     })
 
-    it('login and password are empty, status 400', async () => {
+    it('login and password are empty, Status 400', async () => {
         const validationResult = await request(app)
             .post('/auth/login')
             .send(emptyLoginAndPassword)
@@ -56,7 +55,7 @@ describe('POST => /auth/login', () => {
         expect(validationResult.body.errorsMessages.length).toBe(2)
     })
 
-    it('login or password is wrong, status 401', async () => {
+    it('login or password is wrong, Status 401', async () => {
         await request(app)
             .post('/auth/login')
             .send(incorrectLoginAndPassword)

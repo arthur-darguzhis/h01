@@ -5,27 +5,25 @@ import {
     RequestWithParamsAndBody,
     RequestWithParamsAndQuery,
     RequestWithQuery
-} from "../../routes/types/RequestTypes";
+} from "../../common/presentationLayer/types/RequestTypes";
 import {postQueryRepository} from "./post.QueryRepository";
-import {PostInputModel} from "../../routes/inputModels/PostInputModel";
-import {checkErrorsInRequestDataMiddleware} from "../../middlewares/checkErrorsInRequestDataMiddleware";
-import {APIErrorResultType} from "../../routes/types/apiError/APIErrorResultType";
-import {authGuardMiddleware} from "../../middlewares/authGuardMiddleware";
-import {postsService} from "../../domain/service/posts-service";
-import {postRepository} from "./post.MongoDbRepository";
-import {HTTP_STATUSES} from "../../routes/types/HttpStatuses";
-import {validatePost} from "../../middlewares/validators/validatePost";
-import {validatePaginator} from "../../middlewares/validators/validatePaginator";
-import {CommentInputModel} from "../../routes/inputModels/CommentInputModel";
-import {validateComment} from "../../middlewares/validators/validateComment";
-import {jwtAuthGuardMiddleware} from "../../middlewares/jwtAuthGuardMiddleware";
-import {commentsService} from "../../domain/service/comments-service";
+import {PostInputModel} from "./types/PostInputModel";
+import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/checkErrorsInRequestDataMiddleware";
+import {authGuardMiddleware} from "../auth/middlewares/authGuardMiddleware";
+import {postsService} from "./posts-service";
+import {HTTP_STATUSES} from "../../common/presentationLayer/types/HttpStatuses";
+import {validatePost} from "./middlewares/validatePost";
+import {validatePaginator} from "../../common/middlewares/validatePaginator";
+import {CommentInputModel} from "../comment/types/CommentInputModel";
+import {validateComment} from "../comment/middlewares/validateComment";
+import {jwtAuthGuardMiddleware} from "../auth/middlewares/jwtAuthGuardMiddleware";
+import {commentsService} from "../comment/comments-service";
 import {commentQueryRepository} from "../comment/comment.QueryRepository";
 import {mapCommentToViewModel} from "../comment/comment.mapper";
 import {mapPostToViewModel} from "./post.mapper";
-import {PaginatorResponse} from "../../routes/types/paginator/PaginatorResponse";
-import {PostViewModel} from "../../queryRepository/types/Post/PostViewModel";
-import {PaginatorParams} from "../../routes/types/paginator/PaginatorParams";
+import {PaginatorResponse} from "../auth/types/paginator/PaginatorResponse";
+import {PostViewModel} from "./types/PostViewModel";
+import {PaginatorParams} from "../auth/types/paginator/PaginatorParams";
 
 export const postRouter = Router({})
 
@@ -41,10 +39,7 @@ postRouter.get('/',
     })
 
 postRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res) => {
-    const post = await postQueryRepository.findPost(req.params.id)
-    if (!post) {
-        return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
-    }
+    const post = await postQueryRepository.get(req.params.id)
     res.status(HTTP_STATUSES.OK_200).json(post)
 })
 
@@ -56,19 +51,8 @@ postRouter.post('/',
     validatePost.body.blogId,
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithBody<PostInputModel>, res) => {
-        try {
-            const newPost = await postsService.createPost(req.body);
-            res.status(HTTP_STATUSES.CREATED_201).json(mapPostToViewModel(newPost));
-        } catch (e) {
-            const err = e as Error
-            const apiErrorResult: APIErrorResultType = {
-                errorsMessages: [{
-                    field: req.body.blogId,
-                    message: err.message
-                }]
-            }
-            return res.status(HTTP_STATUSES.BAD_REQUEST_400).json(apiErrorResult)
-        }
+        const newPost = await postsService.createPost(req.body);
+        res.status(HTTP_STATUSES.CREATED_201).json(mapPostToViewModel(newPost));
     })
 
 postRouter.put('/:id',
@@ -79,31 +63,13 @@ postRouter.put('/:id',
     validatePost.body.blogId,
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithParamsAndBody<{ id: string }, PostInputModel>, res) => {
-
-        const post = await postRepository.findPost(req.params.id);
-        if (!post) {
-            return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
-        }
-
-        try {
-            await postsService.updatePost(req.params.id, req.body)
-        } catch (e) {
-            const err = e as Error
-            const apiErrorResult: APIErrorResultType = {
-                errorsMessages: [{
-                    field: req.body.blogId,
-                    message: err.message
-                }]
-            }
-            return res.status(HTTP_STATUSES.BAD_REQUEST_400).json(apiErrorResult)
-        }
+        await postsService.updatePost(req.params.id, req.body)
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     })
 
 postRouter.delete('/:id', authGuardMiddleware, async (req: RequestWithParams<{ id: string }>, res) => {
     await postsService.deletePost(req.params.id)
-        ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
-        : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+    return res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 })
 
 postRouter.post('/:postId/comments',
@@ -111,19 +77,8 @@ postRouter.post('/:postId/comments',
     validateComment.body.content,
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithParamsAndBody<{ postId: string }, CommentInputModel>, res) => {
-        try {
-            const newComment = await commentsService.addComment(req.params.postId, req.body, req.user!);
-            return res.status(HTTP_STATUSES.CREATED_201).json(mapCommentToViewModel(newComment));
-        } catch (e) {
-            const err = e as Error
-            const apiErrorResult: APIErrorResultType = {
-                errorsMessages: [{
-                    field: req.params.postId,
-                    message: err.message
-                }]
-            }
-            return res.status(HTTP_STATUSES.NOT_FOUND_404).json(apiErrorResult)
-        }
+        const newComment = await commentsService.addComment(req.params.postId, req.body, req.user!);
+        return res.status(HTTP_STATUSES.CREATED_201).json(mapCommentToViewModel(newComment));
     })
 
 postRouter.get('/:postId/comments',
@@ -133,10 +88,6 @@ postRouter.get('/:postId/comments',
     validatePaginator.pageNumber,
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithParamsAndQuery<{ postId: string }, PaginatorParams>, res) => {
-        const post = await postQueryRepository.findPost(req.params.postId);
-        if (!post) {
-            return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
-        }
         const paginatedCommentsList = await commentQueryRepository.findCommentsByPostId(req.params.postId, req.query)
         res.status(HTTP_STATUSES.OK_200).json(paginatedCommentsList);
     })

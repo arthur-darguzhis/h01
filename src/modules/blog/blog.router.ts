@@ -4,26 +4,25 @@ import {
     RequestWithParams,
     RequestWithParamsAndBody,
     RequestWithParamsAndQuery, RequestWithQuery
-} from "../../routes/types/RequestTypes";
-import {BlogInputModel} from "../../routes/inputModels/BlogInputModel";
-import {checkErrorsInRequestDataMiddleware} from "../../middlewares/checkErrorsInRequestDataMiddleware";
-import {authGuardMiddleware} from "../../middlewares/authGuardMiddleware";
-import {blogsService} from "../../domain/service/blogs-service";
+} from "../../common/presentationLayer/types/RequestTypes";
+import {BlogInputModel} from "./types/BlogInputModel";
+import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/checkErrorsInRequestDataMiddleware";
+import {authGuardMiddleware} from "../auth/middlewares/authGuardMiddleware";
+import {blogsService} from "./blogs-service";
 import {blogQueryRepository} from "./blog.QueryRepository";
-import {HTTP_STATUSES} from "../../routes/types/HttpStatuses";
+import {HTTP_STATUSES} from "../../common/presentationLayer/types/HttpStatuses";
 import {postQueryRepository} from "../post/post.QueryRepository";
-import {validatePaginator} from "../../middlewares/validators/validatePaginator";
-import {validateBlog} from "../../middlewares/validators/validateBlog";
-import {validatePost} from "../../middlewares/validators/validatePost";
-import {postsService} from "../../domain/service/posts-service";
-import {APIErrorResultType} from "../../routes/types/apiError/APIErrorResultType";
-import {BlogPostInputModel} from "../../routes/inputModels/BlogPostInputModel";
-import {postRepository} from "../post/post.MongoDbRepository";
+import {validatePaginator} from "../../common/middlewares/validatePaginator";
+import {validateBlog} from "./middlewares/validateBlog";
+import {validatePost} from "../post/middlewares/validatePost";
+import {postsService} from "../post/posts-service";
+import {BlogPostInputModel} from "./types/BlogPostInputModel";
 import {mapPostToViewModel} from "../post/post.mapper";
 import {mapBlogToViewModel} from "./blog.mapper";
-import {PaginatorResponse} from "../../routes/types/paginator/PaginatorResponse";
-import {BlogViewModel} from "../../queryRepository/types/Blog/BlogViewModel";
-import {BlogPaginatorParams} from "../../routes/types/paginator/BlogPaginatorParams";
+import {PaginatorResponse} from "../auth/types/paginator/PaginatorResponse";
+import {BlogViewModel} from "./types/BlogViewModel";
+import {BlogPaginatorParams} from "./types/BlogPaginatorParams";
+import {PaginatorParams} from "../auth/types/paginator/PaginatorParams";
 
 export const blogRouter = Router({})
 
@@ -40,10 +39,7 @@ blogRouter.get('/',
     })
 
 blogRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res) => {
-    const blog = await blogQueryRepository.findBlog(req.params.id)
-    if (!blog) {
-        return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
-    }
+    const blog = await blogQueryRepository.get(req.params.id)
     res.status(HTTP_STATUSES.OK_200).json(blog)
 })
 
@@ -53,16 +49,8 @@ blogRouter.get('/:id/posts',
     validatePaginator.pageSize,
     validatePaginator.pageNumber,
     checkErrorsInRequestDataMiddleware,
-    async (req: RequestWithParamsAndQuery<{ id: string }, { sortBy: string, sortDirection: string, pageSize: string, pageNumber: string }>, res) => {
-
-        const blog = await blogQueryRepository.findBlog(req.params.id)
-        if (!blog) {
-            return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
-        }
-
-        const {sortBy, sortDirection, pageNumber, pageSize} = req.query
-        const paginatedPostList = await postQueryRepository.findPostsByBlogId(req.params.id, sortBy, sortDirection, +pageNumber, +pageSize);
-
+    async (req: RequestWithParamsAndQuery<{ id: string }, PaginatorParams>, res) => {
+        const paginatedPostList = await postQueryRepository.findPostsByBlogId(req.params.id, req.query);
         res.status(HTTP_STATUSES.OK_200).json(paginatedPostList)
     })
 
@@ -85,19 +73,8 @@ blogRouter.post('/:id/posts',
     validatePost.body.content,
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithParamsAndBody<{ id: string }, BlogPostInputModel>, res) => {
-        try {
-            const newPost = await postsService.createPostInBlog(req.params.id, req.body);
-            res.status(HTTP_STATUSES.CREATED_201).json(mapPostToViewModel(newPost));
-        } catch (e) {
-            const err = e as Error
-            const apiErrorResult: APIErrorResultType = {
-                errorsMessages: [{
-                    field: req.params.id,
-                    message: err.message
-                }]
-            }
-            return res.status(HTTP_STATUSES.NOT_FOUND_404).json(apiErrorResult)
-        }
+        const newPost = await postsService.createPostInBlog(req.params.id, req.body);
+        res.status(HTTP_STATUSES.CREATED_201).json(mapPostToViewModel(newPost));
     })
 
 blogRouter.put('/:id',
@@ -107,23 +84,11 @@ blogRouter.put('/:id',
     validateBlog.body.websiteUrl,
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithParamsAndBody<{ id: string }, BlogInputModel>, res) => {
-        const blog = await blogQueryRepository.findBlog(req.params.id);
-        if (!blog) {
-            return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
-        }
-
         await blogsService.updateBlog(req.params.id, req.body)
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     })
 
-blogRouter.delete('/:id',
-    authGuardMiddleware,
-    async (req: RequestWithParams<{ id: string }>, res) => {
-        const isBlogDeleted = await blogsService.deleteBlog(req.params.id)
-        if (!isBlogDeleted) {
-            return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
-        }
-
-        await postRepository.deleteBlogPosts(req.params.id);
-        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
-    })
+blogRouter.delete('/:id', authGuardMiddleware, async (req: RequestWithParams<{ id: string }>, res) => {
+    await blogsService.deleteBlog(req.params.id)
+    res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
+})

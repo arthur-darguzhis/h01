@@ -1,11 +1,10 @@
 import request from "supertest";
 import {app} from "../../../../server";
-import {HTTP_STATUSES} from "../../../../routes/types/HttpStatuses";
-import {userRepository} from "../../../user/user.MongoDbRepository";
-import {usersService} from "../../../../domain/service/users-service";
-import {UserType} from "../../../../domain/types/UserType";
-import {UserInputModel} from "../../../../routes/inputModels/UserInputModel";
-import {client} from "../../../../db";
+import {HTTP_STATUSES} from "../../../../common/presentationLayer/types/HttpStatuses";
+import {usersService} from "../../../user/users-service";
+import {UserType} from "../../../user/types/UserType";
+import {UserInputModel} from "../../../user/types/UserInputModel";
+import {client, dbConnection} from "../../../../db";
 import {authService} from "../../auth.service";
 import {emailConfirmationRepository} from "../../../emailConfirmation/emailConfirmation.MongoDbRepository";
 import {EmailConfirmationType} from "../../../emailConfirmation/types/EmailConfirmationType";
@@ -13,14 +12,14 @@ import {EmailConfirmationType} from "../../../emailConfirmation/types/EmailConfi
 describe('POST => /auth/registration-email-resending', () => {
 
     beforeAll(async () => {
-        await userRepository.deleteAllUsers();
+        await dbConnection.dropDatabase();
     })
 
     afterAll(async () => {
         await client.close();
     })
 
-    it('Input data is accepted. Email with confirmation code will be send to passed email address, status 204', async () => {
+    it('Should resend registration email to passed email address, Status 204', async () => {
         const validRegistrationData: UserInputModel = {
             login: 'infovoin',
             password: '12345678',
@@ -30,7 +29,6 @@ describe('POST => /auth/registration-email-resending', () => {
         const [user, emailConfirmation] = await authService.registerNewUser(validRegistrationData)
         await spoilConfirmationExpirationDate(emailConfirmation)
 
-
         //act
         await request(app)
             .post('/auth/registration-email-resending')
@@ -38,7 +36,7 @@ describe('POST => /auth/registration-email-resending', () => {
             .expect(HTTP_STATUSES.NO_CONTENT_204)
     })
 
-    it('should send email with new code if user exists but not confirmed yet; status 204', async () => {
+    it('Should resend registration email if user exists but not confirmed yet. Status 204', async () => {
         const validRegistrationData: UserInputModel = {
             login: 'infovoin.by',
             password: '12345678',
@@ -58,7 +56,7 @@ describe('POST => /auth/registration-email-resending', () => {
         return await emailConfirmationRepository.update(emailConfirmation._id, {"expirationDate": new Date().getTime()});
     }
 
-    it('email is already confirmed, status 400', async () => {
+    it('Shoult return error if email is already confirmed, Status 400', async () => {
 
         const mockRegistrationData: UserInputModel = {
             login: 'marlok',
@@ -67,7 +65,7 @@ describe('POST => /auth/registration-email-resending', () => {
         }
 
         const mockUser: UserType = await usersService.createUser(mockRegistrationData)
-        await userRepository.updateUser(mockUser._id, { isActive: true, "emailConfirmation.isConfirmed": true });
+        await usersService.activateUser(mockUser._id);
 
         //act
         await request(app)
@@ -76,7 +74,7 @@ describe('POST => /auth/registration-email-resending', () => {
             .expect(HTTP_STATUSES.BAD_REQUEST_400)
     })
 
-    it('should return error if user email doesnt exist; status 400', async () => {
+    it('Should return error if email doesnt exist; status 400', async () => {
         await request(app)
             .post('/auth/registration-email-resending')
             .send({email: 'this_email_does_not_related_to_any_user@test.test'})

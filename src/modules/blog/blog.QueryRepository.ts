@@ -1,11 +1,13 @@
-import {BlogViewModel} from "../../queryRepository/types/Blog/BlogViewModel";
-import {blogsCollection} from "../../db";
-import {BlogFilterType} from "../../queryRepository/types/Blog/BlogFilterType";
+import {BlogViewModel} from "./types/BlogViewModel";
+import {dbConnection} from "../../db";
+import {BlogFilterType} from "./types/BlogFilterType";
 import {mapBlogToViewModel} from "./blog.mapper";
-import {PaginatorResponse} from "../../routes/types/paginator/PaginatorResponse";
-import {BlogPaginatorParams} from "../../routes/types/paginator/BlogPaginatorParams";
+import {PaginatorResponse} from "../auth/types/paginator/PaginatorResponse";
+import {BlogPaginatorParams} from "./types/BlogPaginatorParams";
+import {QueryMongoDbRepository} from "../../common/repositories/QueryMongoDbRepository";
+import {BlogType} from "./types/BlogType";
 
-export const blogQueryRepository = {
+class BlogQueryRepository extends QueryMongoDbRepository<BlogType, BlogViewModel>{
 
     async findBlogs(blogPaginatorParams: BlogPaginatorParams): Promise<PaginatorResponse<BlogViewModel>> {
         const {searchNameTerm, sortBy, sortDirection} = blogPaginatorParams
@@ -19,9 +21,9 @@ export const blogQueryRepository = {
 
         const direction = sortDirection === 'asc' ? 1 : -1;
 
-        const count = await blogsCollection.countDocuments(filter);
+        const count = await this.collection.countDocuments(filter);
         const howManySkip = (pageNumber - 1) * pageSize;
-        const blogs = await blogsCollection.find(filter).sort(sortBy, direction).skip(howManySkip).limit(pageSize).toArray()
+        const blogs = await this.collection.find(filter).sort(sortBy, direction).skip(howManySkip).limit(pageSize).toArray()
 
         return {
             "pagesCount": Math.ceil(count / pageSize),
@@ -30,10 +32,7 @@ export const blogQueryRepository = {
             "totalCount": count,
             "items": blogs.map(mapBlogToViewModel)
         }
-    },
-
-    async findBlog(id: string): Promise<BlogViewModel | null> {
-        const blog = await blogsCollection.findOne({_id: id});
-        return blog ? mapBlogToViewModel(blog) : null;
-    },
+    }
 }
+
+export const blogQueryRepository = new BlogQueryRepository(dbConnection, 'blogs', mapBlogToViewModel)

@@ -1,15 +1,11 @@
-import {CommentType} from "../../domain/types/CommentType";
-import {commentsCollection} from "../../db";
-import {CommentInputModel} from "../../routes/inputModels/CommentInputModel";
+import {CommentType} from "./types/CommentType";
+import {dbConnection} from "../../db";
+import {CommentInputModel} from "./types/CommentInputModel";
+import {CommandMongoDbRepository} from "../../common/repositories/CommandMongoDbRepository";
 
-export const commentRepository = {
-    async addComment(newComment: CommentType): Promise<CommentType> {
-        await commentsCollection.insertOne(newComment);
-        return newComment
-    },
-
-    async updateComment(commentId: string, userId: string, commentInputModel: CommentInputModel): Promise<boolean> {
-        const result = await commentsCollection.updateOne({
+class CommentRepository extends CommandMongoDbRepository<CommentType, CommentInputModel> {
+    async updateUsersComment(commentId: string, userId: string, commentInputModel: CommentInputModel): Promise<boolean> {
+        const result = await this.collection.updateOne({
                 "_id": commentId,
                 "commentatorInfo.userId": userId
             },
@@ -17,21 +13,15 @@ export const commentRepository = {
         )
 
         return result.matchedCount === 1;
-    },
+    }
 
-    async deleteUserComment(commentId: string, userId: string): Promise<boolean> {
-        const result = await commentsCollection.deleteOne({
+    async deleteUsersComment(commentId: string, userId: string): Promise<boolean> {
+        const result = await this.collection.deleteOne({
             "_id": commentId,
             "commentatorInfo.userId": userId
         })
         return result.deletedCount === 1
-    },
-
-    async deleteAllComments(): Promise<void> {
-        await commentsCollection.deleteMany({})
-    },
-
-    async findComment(commentId: string): Promise<CommentType | null> {
-        return await commentsCollection.findOne({_id: commentId})
-    },
+    }
 }
+
+export const commentRepository = new CommentRepository(dbConnection, 'comments')
