@@ -30,15 +30,6 @@ class ErrorHandler {
         if (error instanceof EntityNotFound) statusCode = HTTP_STATUSES.NOT_FOUND_404
         if (error instanceof Forbidden) statusCode = HTTP_STATUSES.FORBIDDEN_403
 
-
-        // const apiErrorResult: APIErrorResultType = {
-        //     errorsMessages: [{
-        //         field: 'email',
-        //         message: err.message
-        //     }]
-        // }
-        // return res.status(HTTP_STATUSES.BAD_REQUEST_400).json(apiErrorResult)
-
         response.status(statusCode).json({message: error.message});
     }
 

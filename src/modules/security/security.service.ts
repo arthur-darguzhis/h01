@@ -2,6 +2,7 @@ import {usersActiveSessionsRepository} from "./security.usersActiveSessionsRepos
 import {UserActiveSessionType} from "./types/UserActiveSessionType";
 import {jwtService} from "../jwt/jwt-service";
 import {UserActiveSessionUpdateModelType} from "./types/UserActiveSessionUpdateModelType";
+import {Forbidden} from "../../common/exceptions/Forbidden";
 
 export const securityService = {
     async registerUserActiveSession(session: UserActiveSessionType) {
@@ -15,5 +16,20 @@ export const securityService = {
 
     async updateUserActiveSession(deviceId: string, userActiveSessionUpdateModel: UserActiveSessionUpdateModelType) {
         return await usersActiveSessionsRepository.updateByDeviceId(deviceId,userActiveSessionUpdateModel)
+    },
+
+    async removeAllUserSessions(userId: string) {
+        return await usersActiveSessionsRepository.deleteAllUsersSessions(userId)
+    },
+
+    async removeUserSessionsByDeviceId(userId: string, deviceId: string): Promise<true | never> {
+        const userActiveSession = await usersActiveSessionsRepository.getByDeviceId(deviceId);
+
+        if(userActiveSession.userId !== userId){
+            throw new Forbidden("Unable to delete session")
+        }
+
+        usersActiveSessionsRepository.deleteUserSessionByDeviceId(userId,deviceId)
+        return true;
     }
 }
