@@ -9,6 +9,7 @@ import add from "date-fns/add";
 import bcrypt from "bcrypt";
 import {EmailConfirmationType} from "../emailConfirmation/types/EmailConfirmationType";
 import {emailConfirmationRepository} from "../emailConfirmation/emailConfirmation.MongoDbRepository";
+import {securityService} from "../security/security.service";
 
 export const authService = {
     async registerNewUser(userInputModel: UserInputModel): Promise<[user: UserType, emailConfirmation: EmailConfirmationType] | never> {
@@ -46,4 +47,8 @@ export const authService = {
     async _generatePasswordHash(password: string): Promise<string> {
         return await bcrypt.hash(password, 10);
     },
+
+    async logoutUser(user: UserType, refreshToken: string) {
+        return await securityService.removeUserSession(refreshToken);
+    }
 }

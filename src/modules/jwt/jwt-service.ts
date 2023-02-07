@@ -5,6 +5,7 @@ import {refreshTokensBlackListRepository} from "../auth/refreshTokensBlackListRe
 import {jwtType} from "./types/JwtType";
 import {ObjectId} from "mongodb";
 import {InvalidValue} from "../../common/exceptions/InvalidValue";
+import {v4 as uuidv4} from "uuid";
 
 export const jwtService = {
     createAuthJWT(user: UserType): string {
@@ -12,7 +13,7 @@ export const jwtService = {
     },
 
     createRefreshJWT(user: UserType): string {
-        return jwt.sign({userId: user._id}, settings.JWT_REFRESH_SECRET, {expiresIn: '14d'})
+        return jwt.sign({userId: user._id, deviceId: uuidv4()}, settings.JWT_REFRESH_SECRET, {expiresIn: '14d'})
     },
 
     verifyAuthJWT(token: string) {
@@ -29,6 +30,10 @@ export const jwtService = {
         } catch (err) {
             throw new InvalidValue('refresh JWT is invalid');
         }
+    },
+
+    decodeRefreshJWT(token: string) {
+        return jwt.decode(token, {json: true})
     },
 
     getUserIdByAuthJWT(token: string) {

@@ -14,6 +14,9 @@ import {validateUser} from "../user/middlewares/validateUser";
 import {RegistrationConfirmationCodeModel} from "./types/RegistrationConfirmationCodeModel";
 import {jwtRefreshGuardMiddleware} from "./middlewares/jwtRefreshGuardMiddleware";
 import {authService} from "./auth.service";
+import {securityService} from "../security/security.service";
+import {UserActiveSessionType} from "../security/types/UserActiveSessionType";
+import {ObjectId} from "mongodb";
 
 export const authRouter = Router({});
 
@@ -52,6 +55,18 @@ authRouter.post('/login',
 
         const authToken = jwtService.createAuthJWT(user);
         const refreshToken = jwtService.createRefreshJWT(user)
+        const decodedRefreshToken = jwtService.decodeRefreshJWT(refreshToken);
+
+        const userActiveSession: UserActiveSessionType = {
+            _id: new ObjectId().toString(),
+            issuedAt: decodedRefreshToken?.iat,
+            expireAt: decodedRefreshToken?.exp,
+            deviceId: decodedRefreshToken?.deviceId,
+            IP: req.ip,
+            deviceName: req.headers["user-agent"] || '',
+            userId: user._id,
+        }
+        await securityService.registerUserActiveSession(userActiveSession)
 
         res.status(HTTP_STATUSES.OK_200)
             .cookie('refreshToken', refreshToken, {httpOnly: true, secure: true, maxAge: 20 * 1000})
@@ -71,7 +86,7 @@ authRouter.post('/refresh-token', jwtRefreshGuardMiddleware, async (req, res: Re
 authRouter.post('/logout',
     jwtRefreshGuardMiddleware,
     (req: Request, res: Response) => {
-        jwtService.addRefreshJWTtoBlackList(req.user!, req.cookies.refreshToken);
+        authService.logoutUser(req.user!, req.cookies.refreshToken)
         res.clearCookie('refreshToken').sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     })
 

@@ -10,6 +10,7 @@ import {runDb} from "./db";
 import cookieParser from "cookie-parser";
 import {authRouter} from "./modules/auth/auth.router";
 import {errorHandler} from "./common/managers/error/ErrorHandler";
+import {securityRouter} from "./modules/security/security.router";
 
 export const app = express()
 
@@ -20,6 +21,7 @@ app.use('/posts', postRouter)
 app.use('/users', userRouter)
 app.use('/auth', authRouter)
 app.use('/comments', commentRouter)
+app.use('/security', securityRouter)
 app.use('/testing', testingRouter)
 
 export const startApp = async () => {
