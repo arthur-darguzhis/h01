@@ -1,6 +1,5 @@
 import {Router} from "express";
 import {usersActiveSessionsQueryRepository} from "./security.usersActiveSessionsQueryRepository";
-import {jwtAuthGuardMiddleware} from "../auth/middlewares/jwtAuthGuardMiddleware";
 import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/checkErrorsInRequestDataMiddleware";
 import {HTTP_STATUSES} from "../../common/presentationLayer/types/HttpStatuses";
 import {securityService} from "./security.service";
@@ -10,7 +9,7 @@ import {jwtRefreshGuardMiddleware} from "../auth/middlewares/jwtRefreshGuardMidd
 export const securityRouter = Router({})
 
 securityRouter.get('/devices',
-    jwtAuthGuardMiddleware,
+    jwtRefreshGuardMiddleware,
     checkErrorsInRequestDataMiddleware,
     async (req, res) => {
         const allActiveUsersSessions = await usersActiveSessionsQueryRepository.findByUserId(req.user!._id)
