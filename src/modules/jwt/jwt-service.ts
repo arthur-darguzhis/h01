@@ -29,19 +29,7 @@ export const jwtService = {
         }
     },
 
-    decodeRefreshJWT(token: string) {
-        return jwt.decode(token, {json: true})
-    },
-
-    getDeviceIdFromRefreshToken(token: string){
-        const decodedToken = this.decodeRefreshJWT(token)
-        if(!decodedToken || !decodedToken.deviceId){
-            throw new InvalidValue('JWT token is invalid')
-        }
-        return decodedToken.deviceId;
-    },
-
-    getUserIdByAuthJWT(token: string) {
+    getUserIdFromAccessToken(token: string) {
         try {
             const result: any = jwt.verify(token, settings.JWT_AUTH_SECRET)
             return result.userId;
@@ -50,12 +38,17 @@ export const jwtService = {
         }
     },
 
-    getUserIdByRefreshJWT(token: string) {
-        try {
-            const result: any = jwt.verify(token, settings.JWT_REFRESH_SECRET)
-            return result.userId;
-        } catch (error) {
-            return null;
-        }
+    decodeRefreshJWT(token: string) {
+        return jwt.decode(token, {json: true})
+    },
+
+    getDeviceIdFromRefreshToken(token: string): string {
+        const decodedToken = this.decodeRefreshJWT(token)
+        return decodedToken?.deviceId;
+    },
+
+    getUserIdFromRefreshToken(token: string): string {
+        const decodedToken = this.decodeRefreshJWT(token)
+        return decodedToken?.userId;
     }
 }

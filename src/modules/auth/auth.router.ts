@@ -75,7 +75,6 @@ authRouter.post('/login',
     })
 
 authRouter.post('/refresh-token', jwtRefreshGuardMiddleware, async (req, res: Response<LoginSuccessViewModel>) => {
-    //refreshTokensBlackListRepository проверить что уже нет вызовов к этому репозиторию и удалить его
     const deviceId = jwtService.getDeviceIdFromRefreshToken(req.cookies.refreshToken);
 
     const user = req.user!
