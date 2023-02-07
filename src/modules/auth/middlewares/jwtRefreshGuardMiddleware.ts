@@ -15,7 +15,6 @@ export const jwtRefreshGuardMiddleware = async (req: Request, res: Response, nex
     }
 
     const userId = jwtService.getUserIdFromRefreshToken(req.cookies.refreshToken);
-
     req.user = await usersService.findUserById(userId)
     next();
 }

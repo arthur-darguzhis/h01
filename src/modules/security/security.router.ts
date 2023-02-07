@@ -5,6 +5,7 @@ import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/check
 import {HTTP_STATUSES} from "../../common/presentationLayer/types/HttpStatuses";
 import {securityService} from "./security.service";
 import {RequestWithParams} from "../../common/presentationLayer/types/RequestTypes";
+import {jwtRefreshGuardMiddleware} from "../auth/middlewares/jwtRefreshGuardMiddleware";
 
 export const securityRouter = Router({})
 
@@ -17,7 +18,7 @@ securityRouter.get('/devices',
     })
 
 securityRouter.delete('/devices',
-    jwtAuthGuardMiddleware,
+    jwtRefreshGuardMiddleware,
     checkErrorsInRequestDataMiddleware,
     async (req, res) => {
         await securityService.removeAllUserSessions(req.user!._id);
@@ -25,7 +26,7 @@ securityRouter.delete('/devices',
     })
 
 securityRouter.delete('/devices/:deviceId',
-    jwtAuthGuardMiddleware,
+    jwtRefreshGuardMiddleware,
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithParams<{ deviceId: string }>, res) => {
         await securityService.removeUserSessionsByDeviceId(req.user!._id, req.params.deviceId);
