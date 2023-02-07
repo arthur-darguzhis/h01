@@ -51,7 +51,7 @@ describe('POST => /auth/refresh-token', () => {
             "password": "123456"
         }
 
-        const responseWithToken = await request(app)
+        await request(app)
             .post('/auth/login')
             .send(logInputModel)
             .expect(HTTP_STATUSES.OK_200)

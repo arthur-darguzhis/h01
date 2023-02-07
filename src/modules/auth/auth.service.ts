@@ -48,7 +48,7 @@ export const authService = {
         return await bcrypt.hash(password, 10);
     },
 
-    async logoutUser(user: UserType, refreshToken: string) {
+    async removeUserSession(refreshToken: string) {
         return await securityService.removeUserSession(refreshToken);
     }
 }

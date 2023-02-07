@@ -1,4 +1,4 @@
-export type UserActiveSessionViewModel = {
+export type UserActiveSessionViewModelType = {
     ip: string
     title: string
     lastActiveDate: string

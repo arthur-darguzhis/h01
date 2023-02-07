@@ -17,6 +17,7 @@ import {authService} from "./auth.service";
 import {securityService} from "../security/security.service";
 import {UserActiveSessionType} from "../security/types/UserActiveSessionType";
 import {ObjectId} from "mongodb";
+import {UserActiveSessionUpdateModelType} from "../security/types/UserActiveSessionUpdateModelType";
 
 export const authRouter = Router({});
 
@@ -74,9 +75,22 @@ authRouter.post('/login',
     })
 
 authRouter.post('/refresh-token', jwtRefreshGuardMiddleware, async (req, res: Response<LoginSuccessViewModel>) => {
-    jwtService.addRefreshJWTtoBlackList(req.user!, req.cookies.refreshToken);
-    const authToken = jwtService.createAuthJWT(req.user!);
-    const refreshToken = jwtService.createRefreshJWT(req.user!)
+    //refreshTokensBlackListRepository проверить что уже нет вызовов к этому репозиторию и удалить его
+    const deviceId = jwtService.getDeviceIdFromRefreshToken(req.cookies.refreshToken);
+
+    const user = req.user!
+    const authToken = jwtService.createAuthJWT(user);
+    const refreshToken = jwtService.createRefreshJWT(user, deviceId)
+    const decodedRefreshToken = jwtService.decodeRefreshJWT(refreshToken);
+
+    const userActiveSessionUpdateModel: UserActiveSessionUpdateModelType = {
+        issuedAt: decodedRefreshToken?.iat,
+        expireAt: decodedRefreshToken?.exp,
+        IP: req.ip,
+        deviceName: req.headers["user-agent"] || '',
+    }
+
+    await securityService.updateUserActiveSession(deviceId, userActiveSessionUpdateModel)
 
     res.status(HTTP_STATUSES.OK_200)
         .cookie('refreshToken', refreshToken, {httpOnly: true, secure: true, maxAge: 20 * 1000})
@@ -86,7 +100,7 @@ authRouter.post('/refresh-token', jwtRefreshGuardMiddleware, async (req, res: Re
 authRouter.post('/logout',
     jwtRefreshGuardMiddleware,
     (req: Request, res: Response) => {
-        authService.logoutUser(req.user!, req.cookies.refreshToken)
+        authService.removeUserSession(req.cookies.refreshToken)
         res.clearCookie('refreshToken').sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     })
 

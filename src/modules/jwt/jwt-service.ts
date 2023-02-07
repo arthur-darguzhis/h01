@@ -1,9 +1,6 @@
 import jwt from 'jsonwebtoken';
 import {UserType} from "../user/types/UserType";
 import {settings} from "../../settings";
-import {refreshTokensBlackListRepository} from "../auth/refreshTokensBlackListRepository";
-import {jwtType} from "./types/JwtType";
-import {ObjectId} from "mongodb";
 import {InvalidValue} from "../../common/exceptions/InvalidValue";
 import {v4 as uuidv4} from "uuid";
 
@@ -12,8 +9,8 @@ export const jwtService = {
         return jwt.sign({userId: user._id}, settings.JWT_AUTH_SECRET, {expiresIn: '10m'})
     },
 
-    createRefreshJWT(user: UserType): string {
-        return jwt.sign({userId: user._id, deviceId: uuidv4()}, settings.JWT_REFRESH_SECRET, {expiresIn: '14d'})
+    createRefreshJWT(user: UserType, deviceId: string = uuidv4()): string {
+        return jwt.sign({userId: user._id, deviceId: deviceId}, settings.JWT_REFRESH_SECRET, {expiresIn: '14d'})
     },
 
     verifyAuthJWT(token: string) {
@@ -36,6 +33,14 @@ export const jwtService = {
         return jwt.decode(token, {json: true})
     },
 
+    getDeviceIdFromRefreshToken(token: string){
+        const decodedToken = this.decodeRefreshJWT(token)
+        if(!decodedToken || !decodedToken.deviceId){
+            throw new InvalidValue('JWT token is invalid')
+        }
+        return decodedToken.deviceId;
+    },
+
     getUserIdByAuthJWT(token: string) {
         try {
             const result: any = jwt.verify(token, settings.JWT_AUTH_SECRET)
@@ -52,14 +57,5 @@ export const jwtService = {
         } catch (error) {
             return null;
         }
-    },
-
-    async addRefreshJWTtoBlackList(user: UserType, refreshJWT: string) {
-        const jwt: jwtType = {
-            _id: new ObjectId().toString(),
-            userId: user._id,
-            refreshToken: refreshJWT
-        }
-        await refreshTokensBlackListRepository.add( jwt);
     }
 }
