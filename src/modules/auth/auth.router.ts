@@ -63,13 +63,13 @@ authRouter.post('/login',
         const authToken = jwtService.createAuthJWT(user);
         const refreshToken = jwtService.createRefreshJWT(user)
         const decodedRefreshToken = jwtService.decodeRefreshJWT(refreshToken);
-
+        const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
         const userActiveSession: UserActiveSessionType = {
             _id: new ObjectId().toString(),
             issuedAt: decodedRefreshToken?.iat,
             expireAt: decodedRefreshToken?.exp,
             deviceId: decodedRefreshToken?.deviceId,
-            IP: req.ip,
+            IP: ip as string,
             deviceName: req.headers["user-agent"] || '',
             userId: user._id,
         }
@@ -88,10 +88,12 @@ authRouter.post('/refresh-token', jwtRefreshGuardMiddleware, async (req, res: Re
     const refreshToken = jwtService.createRefreshJWT(user, deviceId)
     const decodedRefreshToken = jwtService.decodeRefreshJWT(refreshToken);
 
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+
     const userActiveSessionUpdateModel: UserActiveSessionUpdateModelType = {
         issuedAt: decodedRefreshToken?.iat,
         expireAt: decodedRefreshToken?.exp,
-        IP: req.ip,
+        IP: ip as string,
         deviceName: req.headers["user-agent"] || '',
     }
 
