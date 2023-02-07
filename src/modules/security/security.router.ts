@@ -5,6 +5,7 @@ import {HTTP_STATUSES} from "../../common/presentationLayer/types/HttpStatuses";
 import {securityService} from "./security.service";
 import {RequestWithParams} from "../../common/presentationLayer/types/RequestTypes";
 import {jwtRefreshGuardMiddleware} from "../auth/middlewares/jwtRefreshGuardMiddleware";
+import {jwtService} from "../jwt/jwt-service";
 
 export const securityRouter = Router({})
 
@@ -20,7 +21,8 @@ securityRouter.delete('/devices',
     jwtRefreshGuardMiddleware,
     checkErrorsInRequestDataMiddleware,
     async (req, res) => {
-        await securityService.removeAllUserSessions(req.user!._id);
+        const deviceId = jwtService.getDeviceIdFromRefreshToken(req.cookies.refreshToken);
+        await securityService.removeOtherDeviceSessions(req.user!._id, deviceId);
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     })
 

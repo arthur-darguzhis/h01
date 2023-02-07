@@ -18,8 +18,8 @@ export const securityService = {
         return await usersActiveSessionsRepository.updateByDeviceId(deviceId,userActiveSessionUpdateModel)
     },
 
-    async removeAllUserSessions(userId: string) {
-        return await usersActiveSessionsRepository.deleteAllUsersSessions(userId)
+    async removeOtherDeviceSessions(userId: string, deviceId: string) {
+        return await usersActiveSessionsRepository.removeOtherDeviceSessions(userId, deviceId)
     },
 
     async removeUserSessionsByDeviceId(userId: string, deviceId: string): Promise<true | never> {

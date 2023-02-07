@@ -22,8 +22,8 @@ class UsersActiveSessionsRepository extends CommandMongoDbRepository<UserActiveS
         return result.matchedCount === 1;
     }
 
-    async deleteAllUsersSessions(userId: string): Promise<void> {
-        await this.collection.deleteMany({userId: userId})
+    async removeOtherDeviceSessions(userId: string, deviceId: string): Promise<void> {
+        await this.collection.deleteMany({userId: userId, deviceId: {"$ne": deviceId }})
     }
 
     deleteUserSessionByDeviceId(userId: string, deviceId: string) {
