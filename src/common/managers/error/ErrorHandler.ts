@@ -5,6 +5,7 @@ import {EntityAlreadyExists} from "../../exceptions/EntityAlreadyExists";
 import {EntityNotFound} from "../../exceptions/EntityNotFound";
 import {Forbidden} from "../../exceptions/Forbidden";
 import {UnprocessableEntity} from "../../exceptions/UnprocessableEntity";
+import {TooManyRequest} from "../../exceptions/TooManyRequest";
 
 class ErrorHandler {
     public handleError(error: Error | AppError, response?: Response): void {
@@ -29,7 +30,7 @@ class ErrorHandler {
         if (error instanceof UnprocessableEntity) statusCode = HTTP_STATUSES.BAD_REQUEST_400
         if (error instanceof EntityNotFound) statusCode = HTTP_STATUSES.NOT_FOUND_404
         if (error instanceof Forbidden) statusCode = HTTP_STATUSES.FORBIDDEN_403
-
+        if (error instanceof TooManyRequest) statusCode = HTTP_STATUSES.TOO_MANY_REQUEST_429
         response.status(statusCode).json({message: error.message});
     }
 

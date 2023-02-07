@@ -52,6 +52,19 @@ describe('POST => /auth/registration-email-resending', () => {
             .expect(HTTP_STATUSES.NO_CONTENT_204)
     })
 
+    it('return Error Too Many Requests, Status 429', async () => {
+        for (let i = 0; i < 5; i++) {
+            await request(app)
+                .post('/auth/registration-email-resending')
+                .send({email: ''})
+        }
+
+        await request(app)
+            .post('/auth/registration-email-resending')
+            .send({email: ''})
+            .expect(HTTP_STATUSES.TOO_MANY_REQUEST_429)
+    })
+
     async function spoilConfirmationExpirationDate(emailConfirmation: EmailConfirmationType): Promise<boolean> {
         return await emailConfirmationRepository.update(emailConfirmation._id, {"expirationDate": new Date().getTime()});
     }

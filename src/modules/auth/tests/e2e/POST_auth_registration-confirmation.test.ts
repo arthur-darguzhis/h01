@@ -30,6 +30,19 @@ describe('POST => /auth/registration-confirmation', () => {
             .expect(HTTP_STATUSES.NO_CONTENT_204)
     })
 
+    it('return Error Too Many Requests, Status 429', async () => {
+        for (let i = 0; i < 5; i++) {
+            await request(app)
+                .post('/auth/registration-confirmation')
+                .send({code: realConfirmationCode})
+        }
+
+        await request(app)
+            .post('/auth/registration-confirmation')
+            .send({code: realConfirmationCode})
+            .expect(HTTP_STATUSES.TOO_MANY_REQUEST_429)
+    })
+
     it('It should return error if confirmation code is incorrect, Status 400', async () => {
         await request(app)
             .post('/auth/registration-confirmation')
