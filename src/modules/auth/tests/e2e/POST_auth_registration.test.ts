@@ -32,19 +32,6 @@ describe('POST => /auth/registration', () => {
             .expect(HTTP_STATUSES.NO_CONTENT_204)
     })
 
-    it('return Error Too Many Requests, Status 429', async () => {
-        for (let i = 0; i < 5; i++) {
-            await request(app)
-                .post('/auth/registration')
-                .send(validRegistrationData)
-        }
-
-        await request(app)
-            .post('/auth/registration')
-            .send(validRegistrationData)
-            .expect(HTTP_STATUSES.TOO_MANY_REQUEST_429)
-    })
-
     it('"login", "password" and "email" are invalid, Status 400', async () => {
         const registrationResponse = await request(app)
             .post('/auth/registration')
@@ -62,5 +49,18 @@ describe('POST => /auth/registration', () => {
             .post('/auth/registration')
             .send(validRegistrationData)
             .expect(HTTP_STATUSES.BAD_REQUEST_400)
+    })
+
+    it('return Error Too Many Requests, Status 429', async () => {
+        for (let i = 0; i < 5; i++) {
+            await request(app)
+                .post('/auth/registration')
+                .send(validRegistrationData)
+        }
+
+        await request(app)
+            .post('/auth/registration')
+            .send(validRegistrationData)
+            .expect(HTTP_STATUSES.TOO_MANY_REQUEST_429)
     })
 })

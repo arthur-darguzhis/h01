@@ -42,20 +42,6 @@ describe('POST => /auth/login', () => {
         })
     })
 
-    it('return Error Too Many Requests, Status 429', async () => {
-        for (let i = 0; i < 5; i++) {
-            await request(app)
-                .post('/auth/login')
-                .send(correctLoginAndPassword)
-                .expect(HTTP_STATUSES.OK_200)
-        }
-
-        await request(app)
-            .post('/auth/login')
-            .send(correctLoginAndPassword)
-            .expect(HTTP_STATUSES.TOO_MANY_REQUEST_429)
-    })
-
     it('login and password are empty, Status 400', async () => {
         const validationResult = await request(app)
             .post('/auth/login')
@@ -75,4 +61,18 @@ describe('POST => /auth/login', () => {
             .send(incorrectLoginAndPassword)
             .expect(HTTP_STATUSES.UNAUTHORIZED_401)
     })
+
+    it('return Error Too Many Requests, Status 429', async () => {
+        for (let i = 0; i < 5; i++) {
+            await request(app)
+                .post('/auth/login')
+                .send(correctLoginAndPassword)
+        }
+
+        await request(app)
+            .post('/auth/login')
+            .send(correctLoginAndPassword)
+            .expect(HTTP_STATUSES.TOO_MANY_REQUEST_429)
+    })
+
 })

@@ -18,7 +18,7 @@ import {securityService} from "../security/security.service";
 import {UserActiveSessionType} from "../security/types/UserActiveSessionType";
 import {ObjectId} from "mongodb";
 import {UserActiveSessionUpdateModelType} from "../security/types/UserActiveSessionUpdateModelType";
-import {checkRateLimiterMiddleware} from "../../common/middlewares/rateLimiterMiddleware";
+import {checkRateLimiterMiddleware, setRateLimiter} from "../../common/middlewares/rateLimiterMiddleware";
 
 export const authRouter = Router({});
 
@@ -34,14 +34,14 @@ authRouter.post('/registration',
     })
 
 authRouter.post('/registration-confirmation',
-    checkRateLimiterMiddleware,
+    setRateLimiter(5, 10),
     async (req: RequestWithBody<RegistrationConfirmationCodeModel>, res) => {
         await usersService.confirmEmail(req.body.code);
         return res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     })
 
 authRouter.post('/registration-email-resending',
-    checkRateLimiterMiddleware,
+    setRateLimiter(5, 10),
     validateUser.body.email,
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithBody<{ email: string }>, res) => {
@@ -50,7 +50,7 @@ authRouter.post('/registration-email-resending',
     })
 
 authRouter.post('/login',
-    checkRateLimiterMiddleware,
+    setRateLimiter(5, 10),
     validateLogin.body.loginOrEmail,
     validateLogin.body.password,
     checkErrorsInRequestDataMiddleware,
