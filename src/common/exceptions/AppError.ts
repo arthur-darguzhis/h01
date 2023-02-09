@@ -1,5 +1,5 @@
 export class AppError extends Error {
-    public readonly isOperational: boolean;
+    public isOperational: boolean;
 
     constructor(message: string, isOperational: boolean = true) {
         super(message);

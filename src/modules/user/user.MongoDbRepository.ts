@@ -33,6 +33,11 @@ class UserRepository extends CommandMongoDbRepository<UserType, object> {
         const result = await this.collection.updateOne({_id: userId}, {$set: {isActive: true}})
         return result.matchedCount === 1;
     }
+
+    async setNewPassword(userId: string, newPasswordHash: string) {
+        const result = await this.collection.updateOne({_id: userId}, {$set: {password: newPasswordHash}})
+        return result.matchedCount === 1;
+    }
 }
 
 export const userRepository = new UserRepository(dbConnection, 'users')

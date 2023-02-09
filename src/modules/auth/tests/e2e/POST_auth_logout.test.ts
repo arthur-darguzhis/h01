@@ -11,7 +11,7 @@ describe('POST => /auth/logout', () => {
         await usersService.createUser({
             "login": "user1",
             "password": "123456",
-            "email": "user1@gmail.com"
+            "email": "user1@test.test"
         })
     })
 

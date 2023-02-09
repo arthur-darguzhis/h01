@@ -19,6 +19,9 @@ import {UserActiveSessionType} from "../security/types/UserActiveSessionType";
 import {ObjectId} from "mongodb";
 import {UserActiveSessionUpdateModelType} from "../security/types/UserActiveSessionUpdateModelType";
 import {checkRateLimiterMiddleware, setRateLimiter} from "../../common/middlewares/rateLimiterMiddleware";
+import {NewPasswordRecoveryInputModel} from "./types/NewPasswordRecoveryInputModel";
+import {PasswordRecoveryInputModel} from "./types/PasswordRecoveryInputModel";
+import {body} from "express-validator";
 
 export const authRouter = Router({});
 
@@ -109,6 +112,24 @@ authRouter.post('/logout',
     (req: Request, res: Response) => {
         authService.removeUserSession(req.cookies.refreshToken)
         res.clearCookie('refreshToken').sendStatus(HTTP_STATUSES.NO_CONTENT_204)
+    })
+
+authRouter.post('/password-recovery',
+    setRateLimiter(5, 10),
+    validateUser.body.email,
+    checkErrorsInRequestDataMiddleware,
+    async (req: RequestWithBody<PasswordRecoveryInputModel>, res: Response) => {
+        authService.passwordRecovery(req.body)
+        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
+    })
+
+authRouter.post('/new-password',
+    setRateLimiter(5, 10),
+    body('newPassword').trim().isLength({min: 6, max: 20}),
+    checkErrorsInRequestDataMiddleware,
+    async (req: RequestWithBody<NewPasswordRecoveryInputModel>, res: Response) => {
+        await authService.setNewPassword(req.body)
+        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     })
 
 authRouter.get('/me', jwtAuthGuardMiddleware,

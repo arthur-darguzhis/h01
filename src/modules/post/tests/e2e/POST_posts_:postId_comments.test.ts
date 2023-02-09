@@ -37,7 +37,7 @@ describe('POST -> "/posts/:postId/comments"', () => {
         user = await usersService.createUser({
             "login": "user1",
             "password": "123456",
-            "email": "user1@gmail.com"
+            "email": "user1@test.test"
         })
 
         const logInputModel: LoginInputModel = {

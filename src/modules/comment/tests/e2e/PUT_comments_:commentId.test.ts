@@ -38,7 +38,7 @@ describe('PUT -> /comments/:commentId', () => {
         await usersService.createUser({
             "login": "user2",
             "password": "123456",
-            "email": "user2@gmail.com"
+            "email": "user2@test.test"
         })
 
         const logInputModelForSomeUser: LoginInputModel = {
@@ -62,7 +62,7 @@ describe('PUT -> /comments/:commentId', () => {
         await usersService.createUser({
             "login": "user1",
             "password": "123456",
-            "email": "user1@gmail.com"
+            "email": "user1@test.test"
         })
 
         const logInputModel: LoginInputModel = {

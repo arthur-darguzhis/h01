@@ -49,7 +49,7 @@ describe('POST -> "/users"', () => {
         const inputUserModel: UserInputModel = {
             "login": "user1",
             "password": "123456",
-            "email": "user1-test@gmail.com"
+            "email": "user1-test@test.test"
         }
         const newUser = await request(app)
             .post('/users')
@@ -60,7 +60,7 @@ describe('POST -> "/users"', () => {
         expect(newUser.body).toEqual({
             "id": expect.any(String),
             "login": "user1",
-            "email": "user1-test@gmail.com",
+            "email": "user1-test@test.test",
             "createdAt": expect.any(String)
         })
     })

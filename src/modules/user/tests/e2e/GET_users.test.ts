@@ -12,7 +12,7 @@ describe('GET -> "/users"', () => {
             await usersService.createUser({
                 "login": "user" + i,
                 "password": "123456" + i,
-                "email": "user" + i + "-test@gmail.com"
+                "email": "user" + i + "-test@test.test"
             })
         }
     });

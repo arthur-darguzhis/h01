@@ -10,6 +10,12 @@ import bcrypt from "bcrypt";
 import {EmailConfirmationType} from "../emailConfirmation/types/EmailConfirmationType";
 import {emailConfirmationRepository} from "../emailConfirmation/emailConfirmation.MongoDbRepository";
 import {securityService} from "../security/security.service";
+import {PasswordRecoveryInputModel} from "./types/PasswordRecoveryInputModel";
+import {EntityNotFound} from "../../common/exceptions/EntityNotFound";
+import {PasswordRecoveryType} from "../passwordRecovery/types/PasswordRecoveryType";
+import {NewPasswordRecoveryInputModel} from "./types/NewPasswordRecoveryInputModel";
+import {passwordRecoveryRepository} from "../passwordRecovery/passwordRecoveryRepository";
+import {UnprocessableEntity} from "../../common/exceptions/UnprocessableEntity";
 
 export const authService = {
     async registerNewUser(userInputModel: UserInputModel): Promise<[user: UserType, emailConfirmation: EmailConfirmationType] | never> {
@@ -50,5 +56,41 @@ export const authService = {
 
     async removeUserSession(refreshToken: string) {
         return await securityService.removeUserSession(refreshToken);
+    },
+
+    async passwordRecovery(passwordRecoveryInputModel: PasswordRecoveryInputModel): Promise<PasswordRecoveryType> {
+        let user;
+
+        try {
+            user = await userRepository.getUserByEmail(passwordRecoveryInputModel.email)
+        } catch (err) {
+            if (err instanceof EntityNotFound) err.isOperational = false;
+            throw err
+        }
+
+        const passwordRecovery: PasswordRecoveryType = {
+            _id: new ObjectId().toString(),
+            userId: user._id,
+            code: uuidv4(),
+            expirationDate: add(new Date(), {hours: 24}).getTime(),
+            sendingTime: new Date().getTime(),
+            isConfirmed: false,
+        }
+        emailsManager.sendPasswordRecoveryLetter(user, passwordRecovery)
+        await passwordRecoveryRepository.add(passwordRecovery);
+        return passwordRecovery
+    },
+
+    async setNewPassword(newPasswordRecoveryInputModel: NewPasswordRecoveryInputModel): Promise<PasswordRecoveryType> {
+        const {newPassword, recoveryCode,} = newPasswordRecoveryInputModel
+        const passwordRecovery = await passwordRecoveryRepository.getByCode(recoveryCode)
+
+        if (passwordRecovery.expirationDate < new Date().getTime()) {
+            throw new UnprocessableEntity('The password recovery code is expired');
+        }
+        const newPasswordHash = await this._generatePasswordHash(newPassword)
+        await userRepository.setNewPassword(passwordRecovery.userId, newPasswordHash)
+
+        return passwordRecovery;
     }
 }

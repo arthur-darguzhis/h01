@@ -2,6 +2,7 @@ import {settings} from "../../../settings";
 import {UserType} from "../../../modules/user/types/UserType";
 import {emailAdapter} from "../../adapters/emailAdapter";
 import {EmailConfirmationType} from "../../../modules/emailConfirmation/types/EmailConfirmationType";
+import {PasswordRecoveryType} from "../../../modules/passwordRecovery/types/PasswordRecoveryType";
 
 export const emailsManager = {
     sendRegistrationConfirmationLetter(user: UserType, emailConfirmation: EmailConfirmationType): void {
@@ -10,9 +11,22 @@ export const emailsManager = {
             from: `"Artur Darguzhis" <${settings.GMAIL_APP_LOGIN}>`,
             to: user.email,
             subject: 'Thank for your registration',
-            html: `<h1>Thank for your registration</h1>
-                   <p>To finish registration please follow the link below:
+            html: `<p>To finish registration please follow the link below:
                       <a href='${confirmUrl}'>complete registration</a>
+                   </p>`
+        };
+
+        emailAdapter.sendMail(preparedMail)
+    },
+
+    sendPasswordRecoveryLetter(user: UserType, passwordRecoveryCode: PasswordRecoveryType): void {
+        const confirmUrl = settings.APP_HOST + 'password-recovery?recoveryCode=' + passwordRecoveryCode.code;
+        const preparedMail = {
+            from: `"Artur Darguzhis" <${settings.GMAIL_APP_LOGIN}>`,
+            to: user.email,
+            subject: 'Password recovery',
+            html: `<p>To finish password recovery please follow the link below:
+                      <a href='${confirmUrl}'>recovery password</a>
                    </p>`
         };
 
