@@ -1,5 +1,5 @@
 import {body, query} from "express-validator";
-import {blogQueryRepository} from "../../blog/blog.QueryRepository";
+import {blogQueryRepository} from "../../blog/repository/blog.QueryRepository";
 import {sortDirections} from "../../auth/types/paginator/SortDirections";
 import {InvalidValue} from "../../../common/exceptions/InvalidValue";
 

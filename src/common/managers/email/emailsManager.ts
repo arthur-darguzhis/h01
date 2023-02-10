@@ -1,8 +1,8 @@
 import {settings} from "../../../settings";
 import {UserType} from "../../../modules/user/types/UserType";
 import {emailAdapter} from "../../adapters/emailAdapter";
-import {EmailConfirmationType} from "../../../modules/emailConfirmation/types/EmailConfirmationType";
-import {PasswordRecoveryType} from "../../../modules/passwordRecovery/types/PasswordRecoveryType";
+import {EmailConfirmationType} from "../../../modules/auth/emailConfirmation/types/EmailConfirmationType";
+import {PasswordRecoveryType} from "../../../modules/auth/passwordRecovery/types/PasswordRecoveryType";
 
 export const emailsManager = {
     sendRegistrationConfirmationLetter(user: UserType, emailConfirmation: EmailConfirmationType): void {

@@ -1,7 +1,7 @@
 export type UserActiveSessionType = {
     _id: string
-    issuedAt: number | undefined
-    expireAt: number | undefined
+    issuedAt: number
+    expireAt: number
     deviceId: string
     IP: string
     deviceName: string

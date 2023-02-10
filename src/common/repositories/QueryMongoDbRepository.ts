@@ -1,28 +1,27 @@
-import {Collection, Db, Document} from "mongodb";
+import {Document} from "mongodb";
 import {EntityNotFound} from "../exceptions/EntityNotFound";
+import mongoose from "mongoose";
 
 export class QueryMongoDbRepository<T extends Document, V> {
 
-    public collection: Collection<T>;
+    public model: mongoose.Model<T>;
     private mapEntityToViewModel: Function;
-    private readonly collectionName: string;
+    private readonly entityName: string;
 
-    constructor(dbConnection: Db, collectionName: string, mapper: Function) {
-        this.collection = dbConnection.collection<T>(collectionName);
+    constructor(model: mongoose.Model<T>, mapper: Function, entityName: string) {
+        this.model = model;
         this.mapEntityToViewModel = mapper;
-        this.collectionName = collectionName
+        this.entityName = entityName;
     }
 
     async find(id: string): Promise<V | null> {
-        // @ts-ignore
-        const entity = await this.collection.findOne({_id: id});
+        const entity = await this.model.findOne({_id: id});
         return entity ? this.mapEntityToViewModel(entity) : null
     }
 
     async get(id: string): Promise<V | never> {
-        // @ts-ignore
-        const entity = await this.collection.findOne({_id: id});
-        if (!entity) throw new EntityNotFound(`${this.collectionName} with ID: ${id} is not exists`)
+        const entity = await this.model.findOne({_id: id});
+        if (!entity) throw new EntityNotFound(`${this.entityName} with ID: ${id} is not exists`)
         return this.mapEntityToViewModel(entity)
     }
 }

@@ -1,6 +1,6 @@
-import {usersActiveSessionsRepository} from "./security.usersActiveSessionsRepository";
+import {usersActiveSessionsRepository} from "./repository/security.usersActiveSessionsRepository";
 import {UserActiveSessionType} from "./types/UserActiveSessionType";
-import {jwtService} from "../jwt/jwt-service";
+import {jwtService} from "../auth/jwt/jwt-service";
 import {UserActiveSessionUpdateModelType} from "./types/UserActiveSessionUpdateModelType";
 import {Forbidden} from "../../common/exceptions/Forbidden";
 
@@ -29,7 +29,7 @@ export const securityService = {
             throw new Forbidden("Unable to delete session")
         }
 
-        usersActiveSessionsRepository.deleteUserSessionByDeviceId(userId,deviceId)
+        await usersActiveSessionsRepository.deleteUserSessionByDeviceId(userId, deviceId)
         return true;
     }
 }

@@ -1,11 +1,11 @@
 import {Router} from "express";
-import {usersActiveSessionsQueryRepository} from "./security.usersActiveSessionsQueryRepository";
+import {usersActiveSessionsQueryRepository} from "./repository/security.usersActiveSessionsQueryRepository";
 import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/checkErrorsInRequestDataMiddleware";
 import {HTTP_STATUSES} from "../../common/presentationLayer/types/HttpStatuses";
 import {securityService} from "./security.service";
 import {RequestWithParams} from "../../common/presentationLayer/types/RequestTypes";
 import {jwtRefreshGuardMiddleware} from "../auth/middlewares/jwtRefreshGuardMiddleware";
-import {jwtService} from "../jwt/jwt-service";
+import {jwtService} from "../auth/jwt/jwt-service";
 
 export const securityRouter = Router({})
 

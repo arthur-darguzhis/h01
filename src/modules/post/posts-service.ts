@@ -1,5 +1,5 @@
-import {postRepository} from './post.MongoDbRepository'
-import {blogRepository} from '../blog/blog.MongoDbRepository'
+import {postRepository} from './repository/post.MongoDbRepository'
+import {blogRepository} from '../blog/repository/blog.MongoDbRepository'
 import {PostInputModel} from "./types/PostInputModel";
 import {BlogPostInputModel} from "../blog/types/BlogPostInputModel";
 import {ObjectId} from "mongodb";

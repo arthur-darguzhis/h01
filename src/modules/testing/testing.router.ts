@@ -1,11 +1,11 @@
 import {Router} from "express";
 import {HTTP_STATUSES} from "../../common/presentationLayer/types/HttpStatuses";
-import {dbConnection} from "../../db";
+import mongoose from "mongoose";
 
 export const testingRouter = Router({})
 
 testingRouter.delete('/all-data', async (req, res) => {
-    await dbConnection.dropDatabase();
+    await mongoose.connection.dropDatabase();
     res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 })
 

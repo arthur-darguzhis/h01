@@ -2,8 +2,8 @@ import {CommentType} from "./types/CommentType";
 import {ObjectId} from "mongodb";
 import {CommentInputModel} from "./types/CommentInputModel";
 import {UserType} from "../user/types/UserType";
-import {commentRepository} from "./comment.MongoDbRepository";
-import {postRepository} from "../post/post.MongoDbRepository";
+import {commentRepository} from "./repository/comment.MongoDbRepository";
+import {postRepository} from "../post/repository/post.MongoDbRepository";
 import {Forbidden} from "../../common/exceptions/Forbidden";
 
 export const commentsService = {

@@ -1,24 +1,22 @@
 import {UserType} from "./modules/user/types/UserType";
-import {MongoClient} from "mongodb";
 import {settings} from "./settings";
-
-export const client: MongoClient = new MongoClient(settings.MONGO_URI);
-export const dbConnection = client.db();
-//Почему здесь при обращении к методу коллекции мы указываем тип? эта запись новая для меня) .collection<BlogType>("blogs")
-//уберите типизацию коллекции посмотрите на ошибку, объясните ее происхождение.
-//marginnote3app://note/B299627A-D44B-44CA-B3CD-1E1714C7B949
-// export const blogsCollection = dbConnection.collection<BlogType>("blogs");
+import * as mongoose from "mongoose";
+import {errorHandler} from "./common/managers/error/ErrorHandler";
 
 //Расскажите почему эта функция не стрелочная и при чем здесь замыкание и переменная client? =)
 export async function runDb() {
     try {
-        await client.connect();
-        await client.db('hm').command({ping: 1})
+        mongoose.set('strictQuery', true); //Для чего эта настройка?
+        const mongooseConnection = await mongoose.connect(settings.MONGO_URI, {dbName: settings.MONGO_DB_NAME})
         console.log('Connected successfully to mongoServer');
+
+        mongooseConnection.connection.on('error', err => {
+            errorHandler.handleError(err);
+        });
     } catch (e) {
         console.log(e);
         //Ensure that the client will close when you finish/error
-        await client.close();
+        await mongoose.disconnect();
     }
 }
 

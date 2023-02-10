@@ -6,7 +6,7 @@ import {
     RequestWithParamsAndQuery,
     RequestWithQuery
 } from "../../common/presentationLayer/types/RequestTypes";
-import {postQueryRepository} from "./post.QueryRepository";
+import {postQueryRepository} from "./repository/post.QueryRepository";
 import {PostInputModel} from "./types/PostInputModel";
 import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/checkErrorsInRequestDataMiddleware";
 import {authGuardMiddleware} from "../auth/middlewares/authGuardMiddleware";
@@ -18,7 +18,7 @@ import {CommentInputModel} from "../comment/types/CommentInputModel";
 import {validateComment} from "../comment/middlewares/validateComment";
 import {jwtAuthGuardMiddleware} from "../auth/middlewares/jwtAuthGuardMiddleware";
 import {commentsService} from "../comment/comments-service";
-import {commentQueryRepository} from "../comment/comment.QueryRepository";
+import {commentQueryRepository} from "../comment/repository/comment.QueryRepository";
 import {mapCommentToViewModel} from "../comment/comment.mapper";
 import {mapPostToViewModel} from "./post.mapper";
 import {PaginatorResponse} from "../auth/types/paginator/PaginatorResponse";

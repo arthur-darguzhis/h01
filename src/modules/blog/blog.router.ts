@@ -3,15 +3,16 @@ import {
     RequestWithBody,
     RequestWithParams,
     RequestWithParamsAndBody,
-    RequestWithParamsAndQuery, RequestWithQuery
+    RequestWithParamsAndQuery,
+    RequestWithQuery
 } from "../../common/presentationLayer/types/RequestTypes";
 import {BlogInputModel} from "./types/BlogInputModel";
 import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/checkErrorsInRequestDataMiddleware";
 import {authGuardMiddleware} from "../auth/middlewares/authGuardMiddleware";
 import {blogsService} from "./blogs-service";
-import {blogQueryRepository} from "./blog.QueryRepository";
+import {blogQueryRepository} from "./repository/blog.QueryRepository";
 import {HTTP_STATUSES} from "../../common/presentationLayer/types/HttpStatuses";
-import {postQueryRepository} from "../post/post.QueryRepository";
+import {postQueryRepository} from "../post/repository/post.QueryRepository";
 import {validatePaginator} from "../../common/middlewares/validatePaginator";
 import {validateBlog} from "./middlewares/validateBlog";
 import {validatePost} from "../post/middlewares/validatePost";

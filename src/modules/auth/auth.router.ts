@@ -5,9 +5,9 @@ import {HTTP_STATUSES} from "../../common/presentationLayer/types/HttpStatuses";
 import {LoginInputModel} from "./types/LoginInputModel";
 import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/checkErrorsInRequestDataMiddleware";
 import {validateLogin} from "./middlewares/validateLogin";
-import {jwtService} from "../jwt/jwt-service";
+import {jwtService} from "./jwt/jwt-service";
 import {jwtAuthGuardMiddleware} from "./middlewares/jwtAuthGuardMiddleware";
-import {userQueryRepository} from "../user/user.QueryRepository";
+import {userQueryRepository} from "../user/repository/user.QueryRepository";
 import {LoginSuccessViewModel} from "./types/LoginSuccessViewModel";
 import {UserInputModel} from "../user/types/UserInputModel";
 import {validateUser} from "../user/middlewares/validateUser";
@@ -69,9 +69,9 @@ authRouter.post('/login',
         const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
         const userActiveSession: UserActiveSessionType = {
             _id: new ObjectId().toString(),
-            issuedAt: decodedRefreshToken?.iat,
-            expireAt: decodedRefreshToken?.exp,
-            deviceId: decodedRefreshToken?.deviceId,
+            issuedAt: decodedRefreshToken.iat!,
+            expireAt: decodedRefreshToken.exp!,
+            deviceId: decodedRefreshToken.deviceId,
             IP: ip as string,
             deviceName: req.headers["user-agent"] || '',
             userId: user._id,
@@ -119,13 +119,19 @@ authRouter.post('/password-recovery',
     validateUser.body.email,
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithBody<PasswordRecoveryInputModel>, res: Response) => {
-        authService.passwordRecovery(req.body)
+        try {
+            await authService.passwordRecovery(req.body)
+        } catch (err) {
+            console.log('silent exception for prevent user\'s email detection');
+        }
+
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     })
 
 authRouter.post('/new-password',
     setRateLimiter(5, 10),
     body('newPassword').trim().isLength({min: 6, max: 20}),
+    body('recoveryCode').trim().isLength({min: 15}),
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithBody<NewPasswordRecoveryInputModel>, res: Response) => {
         await authService.setNewPassword(req.body)

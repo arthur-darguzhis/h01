@@ -1,14 +1,14 @@
 import {UserInputModel} from "./types/UserInputModel";
 import {UserType} from "./types/UserType";
 import {ObjectId} from "mongodb";
-import {userRepository} from "./user.MongoDbRepository";
+import {userRepository} from "./repository/user.MongoDbRepository";
 import bcrypt from 'bcrypt'
 import {v4 as uuidv4} from "uuid";
 import add from "date-fns/add"
 import {emailsManager} from "../../common/managers/email/emailsManager";
 import {UnprocessableEntity} from "../../common/exceptions/UnprocessableEntity";
-import {emailConfirmationRepository} from "../emailConfirmation/emailConfirmation.MongoDbRepository";
-import {EmailConfirmationType} from "../emailConfirmation/types/EmailConfirmationType";
+import {emailConfirmationRepository} from "../auth/emailConfirmation/repository/emailConfirmation.MongoDbRepository";
+import {EmailConfirmationType} from "../auth/emailConfirmation/types/EmailConfirmationType";
 
 export const usersService = {
     async createUser(userInputModel: UserInputModel): Promise<UserType> {

@@ -5,7 +5,7 @@ import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/check
 import {authGuardMiddleware} from "../auth/middlewares/authGuardMiddleware";
 import {validateUser} from "./middlewares/validateUser";
 import {usersService} from "./users-service";
-import {userQueryRepository} from "./user.QueryRepository";
+import {userQueryRepository} from "./repository/user.QueryRepository";
 import {HTTP_STATUSES} from "../../common/presentationLayer/types/HttpStatuses";
 import {validatePaginator} from "../../common/middlewares/validatePaginator";
 import {UserType} from "./types/UserType";

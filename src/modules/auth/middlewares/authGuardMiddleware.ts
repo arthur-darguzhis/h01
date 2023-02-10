@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response} from "express";
 import {HTTP_STATUSES} from "../../../common/presentationLayer/types/HttpStatuses";
 import {atob} from "buffer";
-import {userInMemoryRepository} from "../../user/user.inMemoryRepository";
+import {userInMemoryRepository} from "../../user/repository/user.inMemoryRepository";
 
 export const authGuardMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const basicAuthValue = req.header("Authorization")

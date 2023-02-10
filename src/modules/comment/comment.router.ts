@@ -1,6 +1,6 @@
 import {Router} from "express";
 import {RequestWithParams, RequestWithParamsAndBody} from "../../common/presentationLayer/types/RequestTypes";
-import {commentQueryRepository} from "./comment.QueryRepository";
+import {commentQueryRepository} from "./repository/comment.QueryRepository";
 import {HTTP_STATUSES} from "../../common/presentationLayer/types/HttpStatuses";
 import {CommentInputModel} from "./types/CommentInputModel";
 import {commentsService} from "./comments-service";

@@ -1,5 +1,5 @@
 import {UserInputModel} from "../user/types/UserInputModel";
-import {userRepository} from "../user/user.MongoDbRepository";
+import {userRepository} from "../user/repository/user.MongoDbRepository";
 import {EntityAlreadyExists} from "../../common/exceptions/EntityAlreadyExists";
 import {UserType} from "../user/types/UserType";
 import {emailsManager} from "../../common/managers/email/emailsManager";
@@ -7,14 +7,13 @@ import {ObjectId} from "mongodb";
 import {v4 as uuidv4} from "uuid";
 import add from "date-fns/add";
 import bcrypt from "bcrypt";
-import {EmailConfirmationType} from "../emailConfirmation/types/EmailConfirmationType";
-import {emailConfirmationRepository} from "../emailConfirmation/emailConfirmation.MongoDbRepository";
+import {EmailConfirmationType} from "./emailConfirmation/types/EmailConfirmationType";
+import {emailConfirmationRepository} from "./emailConfirmation/repository/emailConfirmation.MongoDbRepository";
 import {securityService} from "../security/security.service";
 import {PasswordRecoveryInputModel} from "./types/PasswordRecoveryInputModel";
-import {EntityNotFound} from "../../common/exceptions/EntityNotFound";
-import {PasswordRecoveryType} from "../passwordRecovery/types/PasswordRecoveryType";
+import {PasswordRecoveryType} from "./passwordRecovery/types/PasswordRecoveryType";
 import {NewPasswordRecoveryInputModel} from "./types/NewPasswordRecoveryInputModel";
-import {passwordRecoveryRepository} from "../passwordRecovery/passwordRecoveryRepository";
+import {passwordRecoveryRepository} from "./passwordRecovery/passwordRecoveryRepository";
 import {UnprocessableEntity} from "../../common/exceptions/UnprocessableEntity";
 
 export const authService = {
@@ -58,15 +57,8 @@ export const authService = {
         return await securityService.removeUserSession(refreshToken);
     },
 
-    async passwordRecovery(passwordRecoveryInputModel: PasswordRecoveryInputModel): Promise<PasswordRecoveryType> {
-        let user;
-
-        try {
-            user = await userRepository.getUserByEmail(passwordRecoveryInputModel.email)
-        } catch (err) {
-            if (err instanceof EntityNotFound) err.isOperational = false;
-            throw err
-        }
+    async passwordRecovery(passwordRecoveryInputModel: PasswordRecoveryInputModel): Promise<PasswordRecoveryType | never> {
+        const user = await userRepository.getUserByEmail(passwordRecoveryInputModel.email)
 
         const passwordRecovery: PasswordRecoveryType = {
             _id: new ObjectId().toString(),
