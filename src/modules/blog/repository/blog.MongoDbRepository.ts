@@ -8,3 +8,4 @@ export class BlogRepository extends CommandMongoDbRepository<BlogType, BlogInput
 }
 
 export const blogRepository = new BlogRepository(BlogModel, 'Blog')
+//asdf
