@@ -31,3 +31,9 @@ commentRouter.delete('/:id',
         await commentsService.deleteUsersComment(req.params.id, req.user!._id)
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     })
+
+commentRouter.put('/:id/like-status',
+    jwtAuthGuardMiddleware,
+    async () => {
+
+    })
