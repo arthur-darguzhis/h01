@@ -9,6 +9,7 @@ import {
 } from "../../../src/modules/auth/emailConfirmation/repository/emailConfirmation.MongoDbRepository";
 import {EmailConfirmationType} from "../../../src/modules/auth/emailConfirmation/types/EmailConfirmationType";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
+import {RateLimiter} from "../../../src/common/middlewares/rateLimiterMiddleware";
 
 describe('POST => /auth/registration-email-resending', () => {
 
@@ -27,7 +28,7 @@ describe('POST => /auth/registration-email-resending', () => {
             email: "artur.dargujis@yandex.com"
         }
 
-        const [user, emailConfirmation] = await authService.registerNewUser(validRegistrationData)
+        const [_, emailConfirmation] = await authService.registerNewUser(validRegistrationData)
         await spoilConfirmationExpirationDate(emailConfirmation)
 
         //act
@@ -44,7 +45,7 @@ describe('POST => /auth/registration-email-resending', () => {
             email: "artur.dargujis@yandex.by"
         }
 
-        const [user, emailConfirmation] = await authService.registerNewUser(validRegistrationData)
+        await authService.registerNewUser(validRegistrationData)
 
         //act
         await request(app)
@@ -64,7 +65,7 @@ describe('POST => /auth/registration-email-resending', () => {
             email: "marlok@test.test"
         }
 
-        const [mockUser, emailConfirmation] = await authService.registerNewUser(mockRegistrationData)
+        const [mockUser, _] = await authService.registerNewUser(mockRegistrationData)
         await usersService.activateUser(mockUser._id);
 
         //act
@@ -81,17 +82,19 @@ describe('POST => /auth/registration-email-resending', () => {
             .expect(HTTP_STATUSES.BAD_REQUEST_400)
     })
 
-    // it('return Error Too Many Requests, Status 429', async () => {
-    //     for (let i = 0; i < 5; i++) {
-    //         await request(app)
-    //             .post('/auth/registration-email-resending')
-    //             .send({email: ''})
-    //     }
-    //
-    //     await request(app)
-    //         .post('/auth/registration-email-resending')
-    //         .send({email: ''})
-    //         .expect(HTTP_STATUSES.TOO_MANY_REQUEST_429)
-    // })
+    it('return Error Too Many Requests, Status 429', async () => {
+        for (let i = 0; i < 5; i++) {
+            await request(app)
+                .post('/auth/registration-email-resending')
+                .send({email: ''})
+        }
+
+        await request(app)
+            .post('/auth/registration-email-resending')
+            .send({email: ''})
+            .expect(HTTP_STATUSES.TOO_MANY_REQUEST_429)
+
+        RateLimiter.resetContainer()
+    })
 
 })

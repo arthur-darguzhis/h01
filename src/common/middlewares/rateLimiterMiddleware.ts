@@ -5,7 +5,7 @@ type rateLimiterContainer = {
     [key: string]: RateLimiter
 }
 
-class RateLimiter {
+export class RateLimiter {
     private static container: rateLimiterContainer = {};
     countOfRequestsFromIP;
     timePeriodInSec;
@@ -45,6 +45,10 @@ class RateLimiter {
         }
 
         this.map[ip][route].push(new Date().getTime());
+    }
+
+    public static resetContainer(): void {
+        RateLimiter.container = {};
     }
 }
 

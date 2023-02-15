@@ -3,6 +3,7 @@ import request from "supertest";
 import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
+import {RateLimiter} from "../../../src/common/middlewares/rateLimiterMiddleware";
 
 describe('POST => /auth/registration', () => {
     beforeAll(async () => {
@@ -51,16 +52,18 @@ describe('POST => /auth/registration', () => {
             .expect(HTTP_STATUSES.BAD_REQUEST_400)
     })
 
-    // it('return Error Too Many Requests, Status 429', async () => {
-    //     for (let i = 0; i < 5; i++) {
-    //         await request(app)
-    //             .post('/auth/registration')
-    //             .send(validRegistrationData)
-    //     }
-    //
-    //     await request(app)
-    //         .post('/auth/registration')
-    //         .send(validRegistrationData)
-    //         .expect(HTTP_STATUSES.TOO_MANY_REQUEST_429)
-    // })
+    it('return Error Too Many Requests, Status 429', async () => {
+        for (let i = 0; i < 5; i++) {
+            await request(app)
+                .post('/auth/registration')
+                .send(validRegistrationData)
+        }
+
+        await request(app)
+            .post('/auth/registration')
+            .send(validRegistrationData)
+            .expect(HTTP_STATUSES.TOO_MANY_REQUEST_429)
+
+        RateLimiter.resetContainer()
+    })
 })

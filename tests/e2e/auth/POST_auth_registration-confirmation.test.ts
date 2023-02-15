@@ -5,6 +5,7 @@ import {v4 as uuidv4} from "uuid";
 import {authService} from "../../../src/modules/auth/auth.service";
 
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
+import {RateLimiter} from "../../../src/common/middlewares/rateLimiterMiddleware";
 
 describe('POST => /auth/registration-confirmation', () => {
     let realConfirmationCode: string;
@@ -12,7 +13,7 @@ describe('POST => /auth/registration-confirmation', () => {
 
     beforeAll(async () => {
         await cleanDbBeforeTest()
-        const [user, emailConfirmation] = await authService.registerNewUser({
+        const [_, emailConfirmation] = await authService.registerNewUser({
             login: 'infovoin',
             password: '12345678',
             email: "artur.dargujis@yandex.com"
@@ -38,16 +39,18 @@ describe('POST => /auth/registration-confirmation', () => {
             .expect(HTTP_STATUSES.BAD_REQUEST_400)
     })
 
-    // it('return Error Too Many Requests, Status 429', async () => {
-    //     for (let i = 0; i < 5; i++) {
-    //         await request(app)
-    //             .post('/auth/registration-confirmation')
-    //             .send({code: realConfirmationCode})
-    //     }
-    //
-    //     await request(app)
-    //         .post('/auth/registration-confirmation')
-    //         .send({code: realConfirmationCode})
-    //         .expect(HTTP_STATUSES.TOO_MANY_REQUEST_429)
-    // })
+    it('return Error Too Many Requests, Status 429', async () => {
+        for (let i = 0; i < 5; i++) {
+            await request(app)
+                .post('/auth/registration-confirmation')
+                .send({code: realConfirmationCode})
+        }
+
+        await request(app)
+            .post('/auth/registration-confirmation')
+            .send({code: realConfirmationCode})
+            .expect(HTTP_STATUSES.TOO_MANY_REQUEST_429)
+
+        RateLimiter.resetContainer()
+    })
 })

@@ -3,7 +3,6 @@ import {settings} from "./settings";
 import * as mongoose from "mongoose";
 import {errorHandler} from "./common/managers/error/ErrorHandler";
 
-//Расскажите почему эта функция не стрелочная и при чем здесь замыкание и переменная client? =)
 export async function runDb() {
     try {
         mongoose.set('strictQuery', true); //Для чего эта настройка?

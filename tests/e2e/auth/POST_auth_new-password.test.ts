@@ -8,6 +8,7 @@ import {PasswordRecoveryInputModel} from "../../../src/modules/auth/types/Passwo
 import {v4 as uuidv4} from "uuid";
 import {passwordRecoveryRepository} from "../../../src/modules/auth/passwordRecovery/passwordRecoveryRepository";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
+import {RateLimiter} from "../../../src/common/middlewares/rateLimiterMiddleware";
 
 describe('POST => /auth/new-password', () => {
     beforeAll(async () => {
@@ -93,14 +94,16 @@ describe('POST => /auth/new-password', () => {
             .expect(HTTP_STATUSES.BAD_REQUEST_400)
     })
 
-    // it('Return status 429. If more than 5 attempts from one IP-address during 10 seconds', async () => {
-    //     for (let i = 0; i < 5; i++) {
-    //         await request(app)
-    //             .post('/auth/new-password')
-    //     }
-    //
-    //     await request(app)
-    //         .post('/auth/new-password')
-    //         .expect(HTTP_STATUSES.TOO_MANY_REQUEST_429)
-    // })
+    it('Return status 429. If more than 5 attempts from one IP-address during 10 seconds', async () => {
+        for (let i = 0; i < 5; i++) {
+            await request(app)
+                .post('/auth/new-password')
+        }
+
+        await request(app)
+            .post('/auth/new-password')
+            .expect(HTTP_STATUSES.TOO_MANY_REQUEST_429)
+
+        RateLimiter.resetContainer()
+    })
 })

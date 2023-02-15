@@ -3,16 +3,12 @@ import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
 import {authService} from "../../../src/modules/auth/auth.service";
+import {RateLimiter} from "../../../src/common/middlewares/rateLimiterMiddleware";
 
 describe('POST => /auth/password-recovery', () => {
     beforeAll(async () => {
         await cleanDbBeforeTest()
 
-        // await usersService.createUser({
-        //     "login": "user1",
-        //     "password": "123456",
-        //     "email": "artur.dargujis@yandex.com",
-        // });
         await authService.registerNewUser({
             "login": "user1",
             "password": "123456",
@@ -45,14 +41,16 @@ describe('POST => /auth/password-recovery', () => {
             .expect(HTTP_STATUSES.NO_CONTENT_204)
     })
 
-    // it('Return status 429. If more than 5 attempts from one IP-address during 10 seconds', async() => {
-    //     for (let i = 0; i < 5; i++) {
-    //         await request(app)
-    //             .post('/auth/password-recovery')
-    //     }
-    //
-    //     await request(app)
-    //         .post('/auth/password-recovery')
-    //         .expect(HTTP_STATUSES.TOO_MANY_REQUEST_429)
-    // })
+    it('Return status 429. If more than 5 attempts from one IP-address during 10 seconds', async () => {
+        for (let i = 0; i < 5; i++) {
+            await request(app)
+                .post('/auth/password-recovery')
+        }
+
+        await request(app)
+            .post('/auth/password-recovery')
+            .expect(HTTP_STATUSES.TOO_MANY_REQUEST_429)
+
+        RateLimiter.resetContainer()
+    })
 })

@@ -79,12 +79,11 @@ describe('PUT -> /comments/:commentId/like-status', () => {
             }).expect(HTTP_STATUSES.BAD_REQUEST_400)
     })
 
-
     it('Return status 404. When comment with specified id doesn\'t exists', async () => {
         await request(app).put('/comments/63d11d1562ede10be4f024ad/like-status')
             .auth(token, {type: "bearer"})
             .send({
-                "likeStatus": 'like'
+                "likeStatus": LIKE_STATUSES.LIKE
             }).expect(HTTP_STATUSES.NOT_FOUND_404)
     })
 
