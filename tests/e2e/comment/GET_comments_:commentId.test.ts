@@ -79,7 +79,12 @@ describe('GET -> /comments/:commentId', () => {
                     "userId": user._id,
                     "userLogin": "user1",
                 },
-                "createdAt": expect.any(String)
+                "createdAt": expect.any(String),
+                "likesInfo": {
+                    "likesCount": 0,
+                    "dislikesCount": 0,
+                    "myStatus": "None"
+                }
             }
         )
     })
