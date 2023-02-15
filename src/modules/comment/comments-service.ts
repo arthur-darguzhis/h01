@@ -5,6 +5,7 @@ import {UserType} from "../user/types/UserType";
 import {commentRepository} from "./repository/comment.MongoDbRepository";
 import {postRepository} from "../post/repository/post.MongoDbRepository";
 import {Forbidden} from "../../common/exceptions/Forbidden";
+import {LikeStatus} from "./types/LikeStatus";
 
 export const commentsService = {
     async addComment(postId: string, commentInputModel: CommentInputModel, currentUser: UserType): Promise<CommentType> {
@@ -41,4 +42,9 @@ export const commentsService = {
         }
         return await commentRepository.deleteUsersComment(commentId, userId)
     },
+
+    async processLikeStatus(commentId: string, likeStatus: LikeStatus): Promise<boolean | never> {
+        const comment = await commentRepository.get(commentId)
+        return true;
+    }
 }

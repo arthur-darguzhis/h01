@@ -7,6 +7,8 @@ import {commentsService} from "./comments-service";
 import {jwtAuthGuardMiddleware} from "../auth/middlewares/jwtAuthGuardMiddleware";
 import {validateComment} from "./middlewares/validateComment";
 import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/checkErrorsInRequestDataMiddleware";
+import {LikeInputModel} from "./types/LikeInputModel";
+import {validateLikeStatus} from "./middlewares/validateLikeStatus";
 
 export const commentRouter = Router({})
 
@@ -34,6 +36,9 @@ commentRouter.delete('/:id',
 
 commentRouter.put('/:id/like-status',
     jwtAuthGuardMiddleware,
-    async () => {
-
+    validateLikeStatus.body.likeStatus,
+    checkErrorsInRequestDataMiddleware,
+    async (req: RequestWithParamsAndBody<{ id: string }, LikeInputModel>, res) => {
+        await commentsService.processLikeStatus(req.params.id, req.body.likeStatus);
+        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     })
