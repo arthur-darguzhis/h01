@@ -22,6 +22,19 @@ class CommentRepository extends CommandMongoDbRepository<CommentType, CommentInp
         })
         return result.deletedCount === 1
     }
+
+    async updateLikesInfo(commentId: string, likesCount: number, dislikeCount: number): Promise<boolean> {
+        const result = await this.model.updateOne(
+            {"_id": commentId,},
+            {
+                $set: {
+                    "likesInfo.likesCount": likesCount,
+                    "likesInfo.dislikesCount": dislikeCount
+                }
+            }
+        )
+        return result.modifiedCount === 1;
+    }
 }
 
 export const commentRepository = new CommentRepository(CommentModel, 'Comment')
