@@ -5,7 +5,7 @@ import {UserType} from "../user/types/UserType";
 import {commentRepository} from "./repository/comment.MongoDbRepository";
 import {postRepository} from "../post/repository/post.MongoDbRepository";
 import {Forbidden} from "../../common/exceptions/Forbidden";
-import {LIKE_STATUSES, LikeStatus} from "./types/LikeStatus";
+import {LikeStatus} from "./types/LikeStatus";
 import {likesOfCommentsRepository} from "./repository/likesOfComments.MongoDbRepository";
 import {LikeOfCommentType} from "./types/LikeOfCommentType";
 
@@ -65,7 +65,7 @@ export const commentsService = {
         } else {
             const previousLikeStatus = userReaction.status
             if (previousLikeStatus === likeStatus) {
-                likeStatus = LIKE_STATUSES.NONE;
+                return true;
             }
             await likesOfCommentsRepository.updateLikeStatus(userReaction._id, likeStatus)
         }
