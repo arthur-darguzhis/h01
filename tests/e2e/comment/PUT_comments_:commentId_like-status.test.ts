@@ -116,6 +116,22 @@ describe('PUT -> /comments/:commentId/like-status', () => {
         )
     })
 
+    it('Return status 200. And pagination of created post with comments', async () => {
+        const postsCommentsPaginatorResponse = await request(app)
+            .get('/posts/' + post._id + '/comments')
+            .auth(token1, {type: "bearer"})
+            .expect(HTTP_STATUSES.OK_200)
+
+        expect(postsCommentsPaginatorResponse.body.items.length).toBe(1)
+        expect(postsCommentsPaginatorResponse.body).toEqual({
+            pagesCount: 1,
+            page: 1,
+            pageSize: 10,
+            totalCount: 1,
+            items: expect.any(Array),
+        });
+    })
+
     it('Return status 204. When the inputModel is correct and user make "dislike" operation', async () => {
         await request(app).put('/comments/' + commentId + '/like-status')
             .auth(token1, {type: "bearer"})

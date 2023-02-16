@@ -22,7 +22,7 @@ class LikesOfCommentsRepository extends CommandMongoDbRepository<LikeOfCommentTy
     }
 
     async getUserReactionOnCommentsBunch(commentsIdList: Array<string>, userId: string) {
-        return this.model.find({_id: {"$in": commentsIdList}, userId: userId}).lean();
+        return this.model.find({commentId: {"$in": commentsIdList}, userId: userId}).lean();
     }
 }
 

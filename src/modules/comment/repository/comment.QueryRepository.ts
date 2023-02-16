@@ -52,9 +52,6 @@ class CommentQueryRepository extends QueryMongoDbRepository<CommentType, Comment
                 commentIdAndReactionsList[likeData.commentId] = likeData.status;
             })
 
-            console.log('asdf')
-            console.log(commentIdAndReactionsList);
-
             items = comments.map((comment) => {
                 const likeStatus = commentIdAndReactionsList[comment._id] || LIKE_STATUSES.NONE;
                 const viewModel = mapCommentToViewModel(comment, likeStatus)
