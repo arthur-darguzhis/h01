@@ -2,7 +2,7 @@ import {Document} from "mongodb";
 import {EntityNotFound} from "../exceptions/EntityNotFound";
 import mongoose from "mongoose";
 
-export class CommandMongoDbRepository<T extends Document, U> {
+export class CommandMongoDbRepository<T extends Document, U extends object> {
 
     public readonly model: mongoose.Model<T>;
     private readonly entityName: string;
@@ -32,7 +32,7 @@ export class CommandMongoDbRepository<T extends Document, U> {
         return entity
     }
 
-    async update(id: string, updateFilter: object): Promise<boolean> {
+    async update(id: string, updateFilter: U): Promise<boolean> {
         const result = await this.model.updateOne({_id: id}, {$set: updateFilter})
         return result.modifiedCount === 1;
     }

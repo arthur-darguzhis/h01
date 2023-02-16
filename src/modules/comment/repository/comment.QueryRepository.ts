@@ -7,9 +7,27 @@ import {postQueryRepository} from "../../post/repository/post.QueryRepository";
 import {QueryMongoDbRepository} from "../../../common/repositories/QueryMongoDbRepository";
 import {CommentType} from "../types/CommentType";
 import {CommentModel} from "../model/CommentModel";
+import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
+import {likesOfCommentsRepository} from "./likesOfComments.MongoDbRepository";
+import {LIKE_STATUSES} from "../types/LikeStatus";
 
 class CommentQueryRepository extends QueryMongoDbRepository<CommentType, CommentViewModel> {
-    async findCommentsByPostId(postId: string, paginatorParams: PaginatorParams): Promise<PaginatorResponse<CommentViewModel>> {
+
+    async get(id: string, userId = null): Promise<CommentViewModel | never> {
+        const comment = await this.model.findOne({_id: id});
+        if (!comment) throw new EntityNotFound(`Comment with ID: ${id} is not exists`)
+
+        let myStatus = LIKE_STATUSES.NONE
+        if (userId) {
+            const myReaction = await likesOfCommentsRepository.findUserReactionOnTheComment(comment._id, userId)
+            if (myReaction) {
+                myStatus = myReaction.status
+            }
+        }
+        return mapCommentToViewModel(comment, myStatus)
+    }
+
+    async findCommentsByPostId(postId: string, paginatorParams: PaginatorParams, userId = null): Promise<PaginatorResponse<CommentViewModel>> {
         const post = await postQueryRepository.get(postId);
 
         const {sortBy, sortDirection} = paginatorParams
@@ -23,12 +41,34 @@ class CommentQueryRepository extends QueryMongoDbRepository<CommentType, Comment
         const howManySkip = (pageNumber - 1) * pageSize;
         const comments = await this.model.find(filter).sort({[sortBy]: direction}).skip(howManySkip).limit(pageSize).lean()
 
+
+        let items: CommentViewModel[];
+        if (userId) {
+            const commentsIdList: Array<string> = comments.map((comment) => comment._id);
+            const myReactiondOnComments = await likesOfCommentsRepository.getUserReactionOnCommentsBunch(commentsIdList, userId)
+
+            const commentIdAndReactionsList: any = []
+            myReactiondOnComments.forEach((likeData) => {
+                commentIdAndReactionsList[likeData.commentId] = likeData.status;
+            })
+
+            items = comments.map((comment) => {
+                const likeStatus = commentIdAndReactionsList[comment._id] || LIKE_STATUSES.NONE;
+                const viewModel = mapCommentToViewModel(comment, likeStatus)
+                return viewModel;
+            })
+        } else {
+            items = comments.map((comment) => {
+                return mapCommentToViewModel(comment)
+            })
+        }
+
         return {
             "pagesCount": Math.ceil(count / pageSize),
             "page": pageNumber,
             "pageSize": pageSize,
             "totalCount": count,
-            "items": comments.map(mapCommentToViewModel)
+            "items": items
         }
     }
 }
