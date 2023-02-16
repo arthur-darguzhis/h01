@@ -9,6 +9,7 @@ import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
 import {UserType} from "../../../src/modules/user/types/UserType";
+import {LIKE_STATUSES} from "../../../src/modules/comment/types/LikeStatus";
 
 describe('POST -> "/posts/:postId/comments"', () => {
     let blog: BlogType;
@@ -100,7 +101,12 @@ describe('POST -> "/posts/:postId/comments"', () => {
                 userId: user._id,
                 userLogin: 'user1'
             },
-            createdAt: expect.any(String)
+            createdAt: expect.any(String),
+            "likesInfo": {
+                "dislikesCount": 0,
+                "likesCount": 0,
+                "myStatus": LIKE_STATUSES.NONE,
+            },
         })
     })
 })

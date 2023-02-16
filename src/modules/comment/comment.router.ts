@@ -9,11 +9,17 @@ import {validateComment} from "./middlewares/validateComment";
 import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/checkErrorsInRequestDataMiddleware";
 import {LikeInputModel} from "./types/LikeInputModel";
 import {validateLikeStatus} from "./middlewares/validateLikeStatus";
+import {jwtService} from "../auth/jwt/jwt-service";
 
 export const commentRouter = Router({})
 
-commentRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res) => {
-    const comment = await commentQueryRepository.get(req.params.id)
+commentRouter.get('/:commentId', async (req: RequestWithParams<{ commentId: string }>, res) => {
+    let userId = null;
+    if (req.headers.authorization) {
+        const token = req.headers.authorization.split(' ')[1]
+        userId = jwtService.getUserIdFromAccessToken(token);
+    }
+    const comment = await commentQueryRepository.get(req.params.commentId, userId)
     res.status(HTTP_STATUSES.OK_200).json(comment)
 })
 
@@ -39,6 +45,6 @@ commentRouter.put('/:id/like-status',
     validateLikeStatus.body.likeStatus,
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithParamsAndBody<{ id: string }, LikeInputModel>, res) => {
-        await commentsService.processLikeStatus(req.params.id, req.body.likeStatus);
+        await commentsService.processLikeStatus(req.user!._id, req.params.id, req.body.likeStatus);
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     })

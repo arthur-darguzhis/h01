@@ -11,4 +11,4 @@ const userActiveSessionSchema = new mongoose.Schema<UserActiveSessionType>({
     userId: {type: String, required: true}
 })
 
-export const UserActiveSessionModel = mongoose.model('usersActiveSessions', userActiveSessionSchema)
+export const UserActiveSessionModel = mongoose.model('users_active_sessions', userActiveSessionSchema)

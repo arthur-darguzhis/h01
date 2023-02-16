@@ -9,6 +9,7 @@ import {CommentInputModel} from "../../../src/modules/comment/types/CommentInput
 import {BlogType} from "../../../src/modules/blog/types/BlogType";
 import {PostType} from "../../../src/modules/post/types/PostType";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
+import {LIKE_STATUSES} from "../../../src/modules/comment/types/LikeStatus";
 
 describe('PUT -> /comments/:commentId', () => {
     let blog: BlogType;
@@ -146,6 +147,11 @@ describe('PUT -> /comments/:commentId', () => {
                 "userLogin": "user1",
             },
             "createdAt": expect.any(String),
+            "likesInfo": {
+                "dislikesCount": 0,
+                "likesCount": 0,
+                "myStatus": LIKE_STATUSES.NONE,
+            },
         })
     })
 

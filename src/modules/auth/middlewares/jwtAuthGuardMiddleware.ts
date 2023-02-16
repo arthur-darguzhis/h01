@@ -12,7 +12,7 @@ export const jwtAuthGuardMiddleware = async (req: Request, res: Response, next: 
     const token = req.headers.authorization.split(' ')[1] //почему делим? из чего состоит строка?     "bearer asdf;lkjasdf;lkjasdf;lkj"
 
     try{
-        await jwtService.verifyAuthJWT(token)
+        jwtService.verifyAuthJWT(token)
     } catch (err) {
         return res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
     }

@@ -69,6 +69,7 @@ describe('GET -> "/posts/:postId/comments"', () => {
     it('Status 200', async () => {
         const postsCommentsPaginatorResponse = await request(app)
             .get('/posts/' + post._id + '/comments')
+            .auth(token, {type: "bearer"})
             .expect(HTTP_STATUSES.OK_200)
 
         expect(postsCommentsPaginatorResponse.body.items.length).toBe(10)

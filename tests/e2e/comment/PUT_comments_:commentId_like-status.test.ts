@@ -92,9 +92,10 @@ describe('PUT -> /comments/:commentId/like-status', () => {
             .auth(token, {type: "bearer"})
             .send({
                 "likeStatus": LIKE_STATUSES.LIKE
-            }).expect(HTTP_STATUSES.BAD_REQUEST_400);
+            }).expect(HTTP_STATUSES.NO_CONTENT_204);
 
         const commentsResponse = await request(app).get('/comments/' + commentId)
+            .auth(token, {type: "bearer"})
             .expect(HTTP_STATUSES.OK_200);
 
         expect(commentsResponse.body).toEqual(
@@ -120,9 +121,10 @@ describe('PUT -> /comments/:commentId/like-status', () => {
             .auth(token, {type: "bearer"})
             .send({
                 "likeStatus": LIKE_STATUSES.DISLIKE
-            }).expect(HTTP_STATUSES.BAD_REQUEST_400)
+            }).expect(HTTP_STATUSES.NO_CONTENT_204)
 
         const commentsResponse = await request(app).get('/comments/' + commentId)
+            .auth(token, {type: "bearer"})
             .expect(HTTP_STATUSES.OK_200);
 
         expect(commentsResponse.body).toEqual(
@@ -148,9 +150,10 @@ describe('PUT -> /comments/:commentId/like-status', () => {
             .auth(token, {type: "bearer"})
             .send({
                 "likeStatus": LIKE_STATUSES.NONE
-            }).expect(HTTP_STATUSES.BAD_REQUEST_400)
+            }).expect(HTTP_STATUSES.NO_CONTENT_204)
 
         const commentsResponse = await request(app).get('/comments/' + commentId)
+            .auth(token, {type: "bearer"})
             .expect(HTTP_STATUSES.OK_200);
 
         expect(commentsResponse.body).toEqual(

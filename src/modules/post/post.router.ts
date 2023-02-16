@@ -24,6 +24,7 @@ import {mapPostToViewModel} from "./post.mapper";
 import {PaginatorResponse} from "../auth/types/paginator/PaginatorResponse";
 import {PostViewModel} from "./types/PostViewModel";
 import {PaginatorParams} from "../auth/types/paginator/PaginatorParams";
+import {jwtService} from "../auth/jwt/jwt-service";
 
 export const postRouter = Router({})
 
@@ -88,6 +89,11 @@ postRouter.get('/:postId/comments',
     validatePaginator.pageNumber,
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithParamsAndQuery<{ postId: string }, PaginatorParams>, res) => {
-        const paginatedCommentsList = await commentQueryRepository.findCommentsByPostId(req.params.postId, req.query)
+        let userId = null;
+        if (req.headers.authorization) {
+            const token = req.headers.authorization.split(' ')[1]
+            userId = jwtService.getUserIdFromAccessToken(token);
+        }
+        const paginatedCommentsList = await commentQueryRepository.findCommentsByPostId(req.params.postId, req.query, userId)
         res.status(HTTP_STATUSES.OK_200).json(paginatedCommentsList);
     })
