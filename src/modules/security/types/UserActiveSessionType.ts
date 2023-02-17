@@ -14,13 +14,3 @@ export class UserActiveSession {
         this._id = new ObjectId().toString()
     }
 }
-
-// export type UserActiveSessionType = {
-//     _id: string
-//     issuedAt: number
-//     expireAt: number
-//     deviceId: string
-//     ip: string
-//     deviceName: string
-//     userId: string
-// }
