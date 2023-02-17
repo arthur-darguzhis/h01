@@ -5,7 +5,7 @@ import {LoginInputModel} from "../../../src/modules/auth/types/LoginInputModel";
 import request from "supertest";
 import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";
-import {UserType} from "../../../src/modules/user/types/UserType";
+import {User} from "../../../src/modules/user/types/UserType";
 import {BlogType} from "../../../src/modules/blog/types/BlogType";
 import {PostType} from "../../../src/modules/post/types/PostType";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
@@ -14,7 +14,7 @@ describe('GET -> /comments/:commentId', () => {
     let blog: BlogType;
     let post: PostType;
     let token: string;
-    let user: UserType;
+    let user: User;
     let commentId: string;
     beforeAll(async () => {
         await cleanDbBeforeTest()

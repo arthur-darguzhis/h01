@@ -1,7 +1,7 @@
 import {UserInputModel} from "../user/types/UserInputModel";
 import {userRepository} from "../user/repository/user.MongoDbRepository";
 import {EntityAlreadyExists} from "../../common/exceptions/EntityAlreadyExists";
-import {UserType} from "../user/types/UserType";
+import {User} from "../user/types/UserType";
 import {emailsManager} from "../../common/managers/email/emailsManager";
 import {ObjectId} from "mongodb";
 import {v4 as uuidv4} from "uuid";
@@ -17,21 +17,19 @@ import {passwordRecoveryRepository} from "./passwordRecovery/passwordRecoveryRep
 import {UnprocessableEntity} from "../../common/exceptions/UnprocessableEntity";
 
 export const authService = {
-    async registerNewUser(userInputModel: UserInputModel): Promise<[user: UserType, emailConfirmation: EmailConfirmationType] | never> {
+    async registerNewUser(userInputModel: UserInputModel): Promise<[user: User, emailConfirmation: EmailConfirmationType] | never> {
         const isUserExists = await userRepository.isExistsWithSameEmailOrLogin(userInputModel.email, userInputModel.login);
         if (isUserExists) {
             throw new EntityAlreadyExists('User with the same "email" or "login" is already exists')
         }
         const passwordHash = await this._generatePasswordHash(userInputModel.password)
 
-        const newUser: UserType = {
-            _id: new ObjectId().toString(),
-            login: userInputModel.login,
-            password: passwordHash,
-            email: userInputModel.email,
-            createdAt: new Date().toISOString(),
-            isActive: false,
-        }
+        const newUser: User = new User(
+            userInputModel.login,
+            passwordHash,
+            userInputModel.email,
+            false
+        )
 
         const emailConfirmation: EmailConfirmationType = {
             _id: new ObjectId().toString(),

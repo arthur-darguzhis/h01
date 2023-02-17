@@ -1,7 +1,7 @@
 import {CommentType} from "./types/CommentType";
 import {ObjectId} from "mongodb";
 import {CommentInputModel} from "./types/CommentInputModel";
-import {UserType} from "../user/types/UserType";
+import {User} from "../user/types/UserType";
 import {commentRepository} from "./repository/comment.MongoDbRepository";
 import {postRepository} from "../post/repository/post.MongoDbRepository";
 import {Forbidden} from "../../common/exceptions/Forbidden";
@@ -10,7 +10,7 @@ import {likesOfCommentsRepository} from "./repository/likesOfComments.MongoDbRep
 import {LikeOfCommentType} from "./types/LikeOfCommentType";
 
 export const commentsService = {
-    async addComment(postId: string, commentInputModel: CommentInputModel, currentUser: UserType): Promise<CommentType> {
+    async addComment(postId: string, commentInputModel: CommentInputModel, currentUser: User): Promise<CommentType> {
         const post = await postRepository.get(postId);
 
         const newComment: CommentType = {

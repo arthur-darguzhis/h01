@@ -1,4 +1,4 @@
-import {UserType} from "./modules/user/types/UserType";
+import {User} from "./modules/user/types/UserType";
 import {settings} from "./settings";
 import * as mongoose from "mongoose";
 import {errorHandler} from "./common/managers/error/ErrorHandler";
@@ -19,15 +19,13 @@ export async function runDb() {
     }
 }
 
-export const db: { users: UserType[] } = {
+export const db: { users: User[] } = {
     users: [
-        {
-            _id: '1009',
-            login: 'admin',
-            password: 'cXdlcnR5',
-            email: 'test@test.ts',
-            isActive: true,
-            createdAt: '',
-        }
+        new User(
+            'admin',
+            'cXdlcnR5',
+            'test@test.ts',
+            true
+        ),
     ]
 }

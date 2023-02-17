@@ -1,5 +1,5 @@
 import {UserInputModel} from "./types/UserInputModel";
-import {UserType} from "./types/UserType";
+import {User} from "./types/UserType";
 import {ObjectId} from "mongodb";
 import {userRepository} from "./repository/user.MongoDbRepository";
 import bcrypt from 'bcrypt'
@@ -11,22 +11,20 @@ import {emailConfirmationRepository} from "../auth/emailConfirmation/repository/
 import {EmailConfirmationType} from "../auth/emailConfirmation/types/EmailConfirmationType";
 
 export const usersService = {
-    async createUser(userInputModel: UserInputModel): Promise<UserType> {
+    async createUser(userInputModel: UserInputModel): Promise<User> {
         const passwordHash = await this._generatePasswordHash(userInputModel.password)
 
-        const newUser: UserType = {
-            _id: new ObjectId().toString(),
-            login: userInputModel.login,
-            password: passwordHash,
-            email: userInputModel.email,
-            createdAt: new Date().toISOString(),
-            isActive: true,
-        }
+        const newUser = new User(
+            userInputModel.login,
+            passwordHash,
+            userInputModel.email,
+            true,
+        )
 
         return await userRepository.add(newUser);
     },
 
-    async findUserById(id: string): Promise<UserType | null> {
+    async findUserById(id: string): Promise<User | null> {
         return userRepository.find(id);
     },
 
@@ -34,11 +32,12 @@ export const usersService = {
         return userRepository.delete(id)
     },
 
-    async checkCredentials(loginOrEmail: string, password: string): Promise<UserType | false> {
+    async checkCredentials(loginOrEmail: string, password: string): Promise<User | false> {
         const user = await userRepository.findByLoginOrEmail(loginOrEmail)
         if (!user) return false;
 
-        const areCredentialValid = await bcrypt.compare(password, user.password);
+        const areCredentialValid = await bcrypt.compare(password, user.passwordHash);
+        const areCredentialValid2 = await bcrypt.compare(user.passwordHash, password);
         if (!areCredentialValid) return false;
 
         return user;

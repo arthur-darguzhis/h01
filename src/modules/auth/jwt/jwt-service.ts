@@ -1,16 +1,16 @@
 import jwt, {JwtPayload} from 'jsonwebtoken';
-import {UserType} from "../../user/types/UserType";
+import {User} from "../../user/types/UserType";
 import {settings} from "../../../settings";
 import {InvalidValue} from "../../../common/exceptions/InvalidValue";
 import {v4 as uuidv4} from "uuid";
 import {UnprocessableEntity} from "../../../common/exceptions/UnprocessableEntity";
 
 export const jwtService = {
-    createAuthJWT(user: UserType): string {
+    createAuthJWT(user: User): string {
         return jwt.sign({userId: user._id}, settings.JWT_AUTH_SECRET, {expiresIn: '10m'})
     },
 
-    createRefreshJWT(user: UserType, deviceId: string = uuidv4()): string {
+    createRefreshJWT(user: User, deviceId: string = uuidv4()): string {
         return jwt.sign({userId: user._id, deviceId: deviceId}, settings.JWT_REFRESH_SECRET, {expiresIn: '14d'})
     },
 

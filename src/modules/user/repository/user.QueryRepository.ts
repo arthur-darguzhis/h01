@@ -1,5 +1,5 @@
 import {UserViewModel} from "../types/UserViewModel";
-import {UserType} from "../types/UserType";
+import {User} from "../types/UserType";
 import {UserFilterType} from "../types/UserFilterType";
 import {MeViewModel} from "../types/MeViewModel";
 import {mapUserToMeViewModel, mapUserToViewModel} from "../user.mapper";
@@ -8,7 +8,7 @@ import {UserPaginatorParams} from "../types/UserPaginatorParams";
 import {QueryMongoDbRepository} from "../../../common/repositories/QueryMongoDbRepository";
 import {UserModel} from "../model/UserModel";
 
-class UserQueryRepository extends QueryMongoDbRepository<UserType, UserViewModel> {
+class UserQueryRepository extends QueryMongoDbRepository<User, UserViewModel> {
     async findMe(id: string): Promise<MeViewModel | null> {
         const user = await this.model.findOne({_id: id})
         return user ? mapUserToMeViewModel(user) : null;
@@ -45,11 +45,11 @@ class UserQueryRepository extends QueryMongoDbRepository<UserType, UserViewModel
         }
     }
 
-    async findByLogin(login: string): Promise<UserType | null> {
+    async findByLogin(login: string): Promise<User | null> {
         return this.model.findOne({login: login})
     }
 
-    async findByEmail(email: string): Promise<UserType | null> {
+    async findByEmail(email: string): Promise<User | null> {
         return this.model.findOne({email: email})
     }
 }

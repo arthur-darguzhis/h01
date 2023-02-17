@@ -1,16 +1,16 @@
-import {UserType} from "../types/UserType";
+import {User} from "../types/UserType";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 import {CommandMongoDbRepository} from "../../../common/repositories/CommandMongoDbRepository";
 import {UserModel} from "../model/UserModel";
 
-class UserRepository extends CommandMongoDbRepository<UserType, object> {
-    async findByLoginOrEmail(loginOrEmail: string): Promise<UserType | null> {
-        return await this.model.findOne({
+class UserRepository extends CommandMongoDbRepository<User, object> {
+    async findByLoginOrEmail(loginOrEmail: string): Promise<User | null> {
+        return this.model.findOne({
             $or: [
                 {login: loginOrEmail},
                 {email: loginOrEmail}
             ]
-        })
+        });
     }
 
     async isExistsWithSameEmailOrLogin(email: string, login: string): Promise<boolean> {
@@ -23,7 +23,7 @@ class UserRepository extends CommandMongoDbRepository<UserType, object> {
         return !!user;
     }
 
-    async getUserByEmail(email: string): Promise<UserType | never> {
+    async getUserByEmail(email: string): Promise<User | never> {
         const user = await this.model.findOne({email: email})
         if (!user) throw new EntityNotFound(`User with email: ${email} is not exists`)
         return user
@@ -35,7 +35,7 @@ class UserRepository extends CommandMongoDbRepository<UserType, object> {
     }
 
     async setNewPassword(userId: string, newPasswordHash: string) {
-        const result = await this.model.updateOne({_id: userId}, {$set: {password: newPasswordHash}})
+        const result = await this.model.updateOne({_id: userId}, {$set: {passwordHash: newPasswordHash}})
         return result.modifiedCount === 1;
     }
 }
