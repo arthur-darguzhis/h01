@@ -1,18 +1,18 @@
-import {PasswordRecoveryType} from "./types/PasswordRecoveryType";
+import {PasswordRecovery} from "./types/PasswordRecoveryType";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 import {PasswordRecoveryModel} from "./model/PasswordRecoveryModel";
 
 class PasswordRecoveryRepository {
-    async add(passwordRecovery: PasswordRecoveryType): Promise<PasswordRecoveryType> {
+    async add(passwordRecovery: PasswordRecovery): Promise<PasswordRecovery> {
         await PasswordRecoveryModel.create(passwordRecovery)
         return passwordRecovery
     }
 
-    async find(id: string): Promise<PasswordRecoveryType | null> {
+    async find(id: string): Promise<PasswordRecovery | null> {
         return PasswordRecoveryModel.findOne({_id: id});
     }
 
-    async get(id: string): Promise<PasswordRecoveryType | never> {
+    async get(id: string): Promise<PasswordRecovery | never> {
         const passwordRecovery = await PasswordRecoveryModel.findOne({_id: id});
         if (!passwordRecovery) throw new EntityNotFound(`Password Recovery Code with ID: ${id} is not exists`);
         return passwordRecovery
@@ -28,7 +28,7 @@ class PasswordRecoveryRepository {
         return result.deletedCount === 1;
     }
 
-    async getByCode(code: string): Promise<PasswordRecoveryType | never> {
+    async getByCode(code: string): Promise<PasswordRecovery | never> {
         const passwordRecovery = await PasswordRecoveryModel.findOne({code: code})
         if (!passwordRecovery) throw new EntityNotFound("it's not a password recovery");
         return passwordRecovery;

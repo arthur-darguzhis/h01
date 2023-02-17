@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import {PasswordRecoveryType} from "../types/PasswordRecoveryType";
+import {PasswordRecovery} from "../types/PasswordRecoveryType";
 
-const passwordRecoverySchema = new mongoose.Schema<PasswordRecoveryType>({
+const passwordRecoverySchema = new mongoose.Schema<PasswordRecovery>({
     _id: String,
     userId: String,
     code: String,

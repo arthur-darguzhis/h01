@@ -11,7 +11,7 @@ import {EmailConfirmationType} from "./emailConfirmation/types/EmailConfirmation
 import {emailConfirmationRepository} from "./emailConfirmation/repository/emailConfirmation.MongoDbRepository";
 import {securityService} from "../security/securityService";
 import {PasswordRecoveryInputModel} from "./types/PasswordRecoveryInputModel";
-import {PasswordRecoveryType} from "./passwordRecovery/types/PasswordRecoveryType";
+import {PasswordRecovery} from "./passwordRecovery/types/PasswordRecoveryType";
 import {NewPasswordRecoveryInputModel} from "./types/NewPasswordRecoveryInputModel";
 import {passwordRecoveryRepository} from "./passwordRecovery/passwordRecoveryRepository";
 import {UnprocessableEntity} from "../../common/exceptions/UnprocessableEntity";
@@ -55,23 +55,16 @@ class AuthService {
         return securityService.removeUserSession(refreshToken);
     }
 
-    async passwordRecovery(passwordRecoveryInputModel: PasswordRecoveryInputModel): Promise<PasswordRecoveryType | never> {
+    async passwordRecovery(passwordRecoveryInputModel: PasswordRecoveryInputModel): Promise<PasswordRecovery | never> {
         const user = await userRepository.getUserByEmail(passwordRecoveryInputModel.email)
 
-        const passwordRecovery: PasswordRecoveryType = {
-            _id: new ObjectId().toString(),
-            userId: user._id,
-            code: uuidv4(),
-            expirationDate: add(new Date(), {hours: 24}).getTime(),
-            sendingTime: new Date().getTime(),
-            isConfirmed: false,
-        }
+        const passwordRecovery = new PasswordRecovery(user._id)
         emailsManager.sendPasswordRecoveryLetter(user, passwordRecovery)
         await passwordRecoveryRepository.add(passwordRecovery);
         return passwordRecovery
     }
 
-    async setNewPassword(newPasswordRecoveryInputModel: NewPasswordRecoveryInputModel): Promise<PasswordRecoveryType> {
+    async setNewPassword(newPasswordRecoveryInputModel: NewPasswordRecoveryInputModel): Promise<PasswordRecovery> {
         const {newPassword, recoveryCode,} = newPasswordRecoveryInputModel
         const passwordRecovery = await passwordRecoveryRepository.getByCode(recoveryCode)
 

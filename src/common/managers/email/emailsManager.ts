@@ -2,7 +2,7 @@ import {settings} from "../../../settings";
 import {User} from "../../../modules/user/types/UserType";
 import {emailAdapter} from "../../adapters/emailAdapter";
 import {EmailConfirmationType} from "../../../modules/auth/emailConfirmation/types/EmailConfirmationType";
-import {PasswordRecoveryType} from "../../../modules/auth/passwordRecovery/types/PasswordRecoveryType";
+import {PasswordRecovery} from "../../../modules/auth/passwordRecovery/types/PasswordRecoveryType";
 
 export const emailsManager = {
     sendRegistrationConfirmationLetter(user: User, emailConfirmation: EmailConfirmationType): void {
@@ -19,7 +19,7 @@ export const emailsManager = {
         emailAdapter.sendMail(preparedMail)
     },
 
-    sendPasswordRecoveryLetter(user: User, passwordRecoveryCode: PasswordRecoveryType): void {
+    sendPasswordRecoveryLetter(user: User, passwordRecoveryCode: PasswordRecovery): void {
         const confirmUrl = settings.APP_HOST + 'password-recovery?recoveryCode=' + passwordRecoveryCode.code;
         const preparedMail = {
             from: `"Artur Darguzhis" <${settings.GMAIL_APP_LOGIN}>`,
