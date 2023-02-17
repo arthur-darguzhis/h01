@@ -14,9 +14,9 @@ class LikesOfCommentsRepository {
     }
 
     async get(id: string): Promise<LikeOfCommentType | never> {
-        const entity = await LikeOfCommentModel.findOne({_id: id});
-        if (!entity) throw new EntityNotFound(`Like for comment with ID: ${id} is not exists`);
-        return entity
+        const likeOfComment = await LikeOfCommentModel.findOne({_id: id});
+        if (!likeOfComment) throw new EntityNotFound(`Like for comment with ID: ${id} is not exists`);
+        return likeOfComment
     }
 
     async update(id: string, updateFilter: { status: string }): Promise<boolean> {

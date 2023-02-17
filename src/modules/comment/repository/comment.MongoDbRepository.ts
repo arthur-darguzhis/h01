@@ -14,9 +14,9 @@ class CommentRepository {
     }
 
     async get(id: string): Promise<CommentType | never> {
-        const entity = await CommentModel.findOne({_id: id});
-        if (!entity) throw new EntityNotFound(`Comment with ID: ${id} is not exists`);
-        return entity
+        const comment = await CommentModel.findOne({_id: id});
+        if (!comment) throw new EntityNotFound(`Comment with ID: ${id} is not exists`);
+        return comment
     }
 
     async update(id: string, updateFilter: CommentInputModel): Promise<boolean> {

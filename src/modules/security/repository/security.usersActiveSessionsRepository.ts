@@ -15,9 +15,9 @@ class UsersActiveSessionsRepository {
     }
 
     async get(id: string): Promise<UserActiveSession | never> {
-        const entity = await UserActiveSessionModel.findOne({_id: id});
-        if (!entity) throw new EntityNotFound(`User Active Session with ID: ${id} is not exists`);
-        return entity
+        const userActiveSession = await UserActiveSessionModel.findOne({_id: id});
+        if (!userActiveSession) throw new EntityNotFound(`User Active Session with ID: ${id} is not exists`);
+        return userActiveSession
     }
 
     async update(id: string, updateFilter: object): Promise<boolean> {

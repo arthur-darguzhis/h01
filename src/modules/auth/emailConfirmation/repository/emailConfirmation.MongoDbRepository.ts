@@ -13,9 +13,9 @@ class EmailConfirmationRepository {
     }
 
     async get(id: string): Promise<EmailConfirmationType | never> {
-        const entity = await EmailConfirmationModel.findOne({_id: id});
-        if (!entity) throw new EntityNotFound(`Email confirmation with ID: ${id} is not exists`);
-        return entity
+        const emailConfirmation = await EmailConfirmationModel.findOne({_id: id});
+        if (!emailConfirmation) throw new EntityNotFound(`Email confirmation with ID: ${id} is not exists`);
+        return emailConfirmation
     }
 
     async update(id: string, updateFilter: object): Promise<boolean> {

@@ -4,14 +4,14 @@ import {BlogModel} from "../model/BlogModel";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 
 export class BlogRepository {
-    async add(newEntity: BlogType): Promise<BlogType> {
-        await BlogModel.create(newEntity)
-        return newEntity
+    async add(blog: BlogType): Promise<BlogType> {
+        await BlogModel.create(blog)
+        return blog
     }
 
     async isExists(id: string): Promise<boolean> {
-        const entity = await BlogModel.findOne({_id: id})
-        return !!entity;
+        const blog = await BlogModel.findOne({_id: id})
+        return !!blog;
     }
 
     async find(id: string): Promise<BlogType | null> {
@@ -19,9 +19,9 @@ export class BlogRepository {
     }
 
     async get(id: string): Promise<BlogType | never> {
-        const entity = await BlogModel.findOne({_id: id});
-        if (!entity) throw new EntityNotFound(`Blog with ID: ${id} is not exists`);
-        return entity
+        const blog = await BlogModel.findOne({_id: id});
+        if (!blog) throw new EntityNotFound(`Blog with ID: ${id} is not exists`);
+        return blog
     }
 
     async update(id: string, updateFilter: BlogInputModel): Promise<boolean> {

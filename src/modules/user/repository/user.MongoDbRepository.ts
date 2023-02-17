@@ -13,9 +13,9 @@ class UserRepository {
     }
 
     async get(id: string): Promise<User | never> {
-        const entity = await UserModel.findOne({_id: id});
-        if (!entity) throw new EntityNotFound(`User with ID: ${id} is not exists`);
-        return entity
+        const user = await UserModel.findOne({_id: id});
+        if (!user) throw new EntityNotFound(`User with ID: ${id} is not exists`);
+        return user
     }
 
     async update(id: string, updateFilter: object): Promise<boolean> {

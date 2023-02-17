@@ -14,9 +14,9 @@ class PostRepository {
     }
 
     async get(id: string): Promise<Post | never> {
-        const entity = await PostModel.findOne({_id: id});
-        if (!entity) throw new EntityNotFound(`Post with ID: ${id} is not exists`);
-        return entity
+        const post = await PostModel.findOne({_id: id});
+        if (!post) throw new EntityNotFound(`Post with ID: ${id} is not exists`);
+        return post
     }
 
     async update(id: string, updateFilter: PostInputModel): Promise<boolean> {

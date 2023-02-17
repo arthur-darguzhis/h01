@@ -13,9 +13,9 @@ class PasswordRecoveryRepository {
     }
 
     async get(id: string): Promise<PasswordRecoveryType | never> {
-        const entity = await PasswordRecoveryModel.findOne({_id: id});
-        if (!entity) throw new EntityNotFound(`Password Recovery Code with ID: ${id} is not exists`);
-        return entity
+        const passwordRecovery = await PasswordRecoveryModel.findOne({_id: id});
+        if (!passwordRecovery) throw new EntityNotFound(`Password Recovery Code with ID: ${id} is not exists`);
+        return passwordRecovery
     }
 
     async update(id: string, updateFilter: object): Promise<boolean> {
