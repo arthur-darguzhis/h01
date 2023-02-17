@@ -3,15 +3,9 @@ import {EmailConfirmationType} from "../types/EmailConfirmationType";
 import {EmailConfirmationModel} from "../model/EmailConfirmationModel";
 
 class EmailConfirmationRepository {
-
     async add(emailConfirmation: EmailConfirmationType): Promise<EmailConfirmationType> {
         await EmailConfirmationModel.create(emailConfirmation)
         return emailConfirmation
-    }
-
-    async isExists(id: string): Promise<boolean> {
-        const entity = await EmailConfirmationModel.findOne({_id: id})
-        return !!entity;
     }
 
     async find(id: string): Promise<EmailConfirmationType | null> {
@@ -36,12 +30,6 @@ class EmailConfirmationRepository {
 
     async findByConfirmationCode(code: string): Promise<EmailConfirmationType | null> {
         return EmailConfirmationModel.findOne({confirmationCode: code})
-    }
-
-    async getByConfirmationCode(code: string): Promise<EmailConfirmationType | never> {
-        const emailConfirmation = await EmailConfirmationModel.findOne({confirmationCode: code})
-        if (!emailConfirmation) throw new EntityNotFound(`Confirmation code: ${code} is not exists`)
-        return emailConfirmation
     }
 
     async getByUserId(userId: string): Promise<EmailConfirmationType | never> {
