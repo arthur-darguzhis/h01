@@ -3,11 +3,8 @@ import {userRepository} from "../user/repository/user.MongoDbRepository";
 import {EntityAlreadyExists} from "../../common/exceptions/EntityAlreadyExists";
 import {User} from "../user/types/UserType";
 import {emailsManager} from "../../common/managers/email/emailsManager";
-import {ObjectId} from "mongodb";
-import {v4 as uuidv4} from "uuid";
-import add from "date-fns/add";
 import bcrypt from "bcrypt";
-import {EmailConfirmationType} from "./emailConfirmation/types/EmailConfirmationType";
+import {EmailConfirmation} from "./emailConfirmation/types/EmailConfirmation";
 import {emailConfirmationRepository} from "./emailConfirmation/repository/emailConfirmation.MongoDbRepository";
 import {securityService} from "../security/securityService";
 import {PasswordRecoveryInputModel} from "./types/PasswordRecoveryInputModel";
@@ -17,7 +14,7 @@ import {passwordRecoveryRepository} from "./passwordRecovery/passwordRecoveryRep
 import {UnprocessableEntity} from "../../common/exceptions/UnprocessableEntity";
 
 class AuthService {
-    async registerNewUser(userInputModel: UserInputModel): Promise<[user: User, emailConfirmation: EmailConfirmationType] | never> {
+    async registerNewUser(userInputModel: UserInputModel): Promise<[user: User, emailConfirmation: EmailConfirmation] | never> {
         const isUserExists = await userRepository.isExistsWithSameEmailOrLogin(userInputModel.email, userInputModel.login);
         if (isUserExists) {
             throw new EntityAlreadyExists('User with the same "email" or "login" is already exists')
@@ -31,14 +28,7 @@ class AuthService {
             false
         )
 
-        const emailConfirmation: EmailConfirmationType = {
-            _id: new ObjectId().toString(),
-            userId: newUser._id,
-            confirmationCode: uuidv4(),
-            expirationDate: add(new Date(), {hours: 10, minutes: 3}).getTime(),
-            sendingTime: new Date().getTime(),
-            isConfirmed: false,
-        }
+        const emailConfirmation = new EmailConfirmation(newUser._id)
 
         emailsManager.sendRegistrationConfirmationLetter(newUser, emailConfirmation)
         await userRepository.add(newUser);

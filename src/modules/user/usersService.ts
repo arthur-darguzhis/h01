@@ -1,14 +1,11 @@
 import {UserInputModel} from "./types/UserInputModel";
 import {User} from "./types/UserType";
-import {ObjectId} from "mongodb";
 import {userRepository} from "./repository/user.MongoDbRepository";
 import bcrypt from 'bcrypt'
-import {v4 as uuidv4} from "uuid";
-import add from "date-fns/add"
 import {emailsManager} from "../../common/managers/email/emailsManager";
 import {UnprocessableEntity} from "../../common/exceptions/UnprocessableEntity";
 import {emailConfirmationRepository} from "../auth/emailConfirmation/repository/emailConfirmation.MongoDbRepository";
-import {EmailConfirmationType} from "../auth/emailConfirmation/types/EmailConfirmationType";
+import {EmailConfirmation} from "../auth/emailConfirmation/types/EmailConfirmation";
 
 class UsersService {
     async createUser(userInputModel: UserInputModel): Promise<User> {
@@ -80,14 +77,7 @@ class UsersService {
             throw new UnprocessableEntity('The email is already confirmed')
         }
 
-        const newEmailConfirmation: EmailConfirmationType = {
-            _id: new ObjectId().toString(),
-            userId: user._id,
-            confirmationCode: uuidv4(),
-            expirationDate: add(new Date(), {hours: 10, minutes: 3}).getTime(),
-            sendingTime: new Date().getTime(),
-            isConfirmed: false,
-        }
+        const newEmailConfirmation = new EmailConfirmation(user._id)
 
         await emailConfirmationRepository.delete(emailConfirmation._id);
         await emailConfirmationRepository.add(newEmailConfirmation);

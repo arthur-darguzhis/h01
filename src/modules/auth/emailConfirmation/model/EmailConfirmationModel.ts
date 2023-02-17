@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import {EmailConfirmationType} from "../types/EmailConfirmationType";
+import {EmailConfirmation} from "../types/EmailConfirmation";
 
-const emailConfirmationSchema = new mongoose.Schema<EmailConfirmationType>({
+const emailConfirmationSchema = new mongoose.Schema<EmailConfirmation>({
     _id: String,
     userId: String,
     confirmationCode: String,

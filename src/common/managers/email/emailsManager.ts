@@ -1,12 +1,12 @@
 import {settings} from "../../../settings";
 import {User} from "../../../modules/user/types/UserType";
 import {emailAdapter} from "../../adapters/emailAdapter";
-import {EmailConfirmationType} from "../../../modules/auth/emailConfirmation/types/EmailConfirmationType";
+import {EmailConfirmation} from "../../../modules/auth/emailConfirmation/types/EmailConfirmation";
 import {PasswordRecovery} from "../../../modules/auth/passwordRecovery/types/PasswordRecoveryType";
 import {EmailDto} from "./types/EmailDto";
 
 export const emailsManager = {
-    sendRegistrationConfirmationLetter(user: User, emailConfirmation: EmailConfirmationType): void {
+    sendRegistrationConfirmationLetter(user: User, emailConfirmation: EmailConfirmation): void {
         const confirmUrl = settings.APP_HOST + 'confirm-registration?code=' + emailConfirmation.confirmationCode;
         const preparedMail = new EmailDto(
             `"Artur Darguzhis" <${settings.GMAIL_APP_LOGIN}>`,

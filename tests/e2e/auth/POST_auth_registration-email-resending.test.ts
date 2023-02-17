@@ -7,7 +7,7 @@ import {authService} from "../../../src/modules/auth/authService";
 import {
     emailConfirmationRepository
 } from "../../../src/modules/auth/emailConfirmation/repository/emailConfirmation.MongoDbRepository";
-import {EmailConfirmationType} from "../../../src/modules/auth/emailConfirmation/types/EmailConfirmationType";
+import {EmailConfirmation} from "../../../src/modules/auth/emailConfirmation/types/EmailConfirmation";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
 import {RateLimiter} from "../../../src/common/middlewares/rateLimiterMiddleware";
 
@@ -54,7 +54,7 @@ describe('POST => /auth/registration-email-resending', () => {
             .expect(HTTP_STATUSES.NO_CONTENT_204)
     })
 
-    async function spoilConfirmationExpirationDate(emailConfirmation: EmailConfirmationType): Promise<boolean> {
+    async function spoilConfirmationExpirationDate(emailConfirmation: EmailConfirmation): Promise<boolean> {
         return await emailConfirmationRepository.update(emailConfirmation._id, {"expirationDate": new Date().getTime()});
     }
 

@@ -1,18 +1,18 @@
 import {EntityNotFound} from "../../../../common/exceptions/EntityNotFound";
-import {EmailConfirmationType} from "../types/EmailConfirmationType";
+import {EmailConfirmation} from "../types/EmailConfirmation";
 import {EmailConfirmationModel} from "../model/EmailConfirmationModel";
 
 class EmailConfirmationRepository {
-    async add(emailConfirmation: EmailConfirmationType): Promise<EmailConfirmationType> {
+    async add(emailConfirmation: EmailConfirmation): Promise<EmailConfirmation> {
         await EmailConfirmationModel.create(emailConfirmation)
         return emailConfirmation
     }
 
-    async find(id: string): Promise<EmailConfirmationType | null> {
+    async find(id: string): Promise<EmailConfirmation | null> {
         return EmailConfirmationModel.findOne({_id: id});
     }
 
-    async get(id: string): Promise<EmailConfirmationType | never> {
+    async get(id: string): Promise<EmailConfirmation | never> {
         const emailConfirmation = await EmailConfirmationModel.findOne({_id: id});
         if (!emailConfirmation) throw new EntityNotFound(`Email confirmation with ID: ${id} is not exists`);
         return emailConfirmation
@@ -28,11 +28,11 @@ class EmailConfirmationRepository {
         return result.deletedCount === 1;
     }
 
-    async findByConfirmationCode(code: string): Promise<EmailConfirmationType | null> {
+    async findByConfirmationCode(code: string): Promise<EmailConfirmation | null> {
         return EmailConfirmationModel.findOne({confirmationCode: code})
     }
 
-    async getByUserId(userId: string): Promise<EmailConfirmationType | never> {
+    async getByUserId(userId: string): Promise<EmailConfirmation | never> {
         const emailConfirmation = await EmailConfirmationModel.findOne({userId: userId})
         if (!emailConfirmation) throw new EntityNotFound(`There is no confirmation code for userId: ${userId}`)
         return emailConfirmation
