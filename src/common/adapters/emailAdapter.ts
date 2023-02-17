@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 import {settings} from "../../settings";
-import {EmailFormType} from "../managers/email/types/EmailFormType";
+import {EmailDto} from "../managers/email/types/EmailDto";
 
 const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
 });
 
 export const emailAdapter = {
-    sendMail(preparedMail: EmailFormType) {
+    sendMail(preparedMail: EmailDto) {
         transporter.sendMail(preparedMail);
     }
 }
