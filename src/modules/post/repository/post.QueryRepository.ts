@@ -1,5 +1,4 @@
 import {PostViewModel} from "../types/PostViewModel";
-import {BlogPostFilterType} from "../types/BlogPostFilterType";
 import {mapPostToViewModel} from "../post.mapper";
 import {PaginatorResponse} from "../../auth/types/paginator/PaginatorResponse";
 import {PaginatorParams} from "../../auth/types/paginator/PaginatorParams";
@@ -52,7 +51,7 @@ class PostQueryRepository {
 
         const direction = sortDirection === 'asc' ? 1 : -1;
 
-        let filter: BlogPostFilterType = {blogId: blogId}
+        let filter = {blogId: blogId}
         let count = await PostModel.countDocuments(filter);
         const howManySkip = (pageNumber - 1) * pageSize;
         const blogs = await PostModel.find(filter).sort({[sortBy]: direction}).skip(howManySkip).limit(pageSize).lean()

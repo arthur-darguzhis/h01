@@ -1,5 +1,4 @@
 import {BlogViewModel} from "../types/BlogViewModel";
-import {BlogFilterType} from "../types/BlogFilterType";
 import {mapBlogToViewModel} from "../blog.mapper";
 import {PaginatorResponse} from "../../auth/types/paginator/PaginatorResponse";
 import {BlogPaginatorParams} from "../types/BlogPaginatorParams";
@@ -23,7 +22,7 @@ class BlogQueryRepository {
         const pageSize = +blogPaginatorParams.pageSize
         const pageNumber = +blogPaginatorParams.pageNumber
 
-        const filter: BlogFilterType = {};
+        const filter: { name?: { '$regex': string, '$options': 'i' } } = {};
         if (searchNameTerm) {
             filter.name = {'$regex': searchNameTerm, '$options': 'i'};
         }

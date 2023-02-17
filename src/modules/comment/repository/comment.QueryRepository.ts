@@ -1,5 +1,4 @@
 import {CommentViewModel} from "../types/CommentViewModel";
-import {PostCommentFilterType} from "../types/PostCommentFilterType";
 import {mapCommentToViewModel} from "../comment.mapper";
 import {PaginatorResponse} from "../../auth/types/paginator/PaginatorResponse";
 import {PaginatorParams} from "../../auth/types/paginator/PaginatorParams";
@@ -39,7 +38,7 @@ class CommentQueryRepository {
 
         const direction = sortDirection === 'asc' ? 1 : -1;
 
-        let filter: PostCommentFilterType = {postId: post.id}
+        let filter = {postId: post.id}
         let count = await CommentModel.countDocuments(filter);
         const howManySkip = (pageNumber - 1) * pageSize;
         const comments = await CommentModel.find(filter).sort({[sortBy]: direction}).skip(howManySkip).limit(pageSize).lean()

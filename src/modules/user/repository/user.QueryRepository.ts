@@ -1,5 +1,4 @@
 import {UserViewModel} from "../types/UserViewModel";
-import {UserFilterType} from "../types/UserFilterType";
 import {MeViewModel} from "../types/MeViewModel";
 import {mapUserToMeViewModel, mapUserToViewModel} from "../user.mapper";
 import {PaginatorResponse} from "../../auth/types/paginator/PaginatorResponse";
@@ -28,7 +27,7 @@ class UserQueryRepository {
         const {searchEmailTerm, searchLoginTerm, sortBy, sortDirection} = userPaginatorParams
         const pageSize = +userPaginatorParams.pageSize
         const pageNumber = +userPaginatorParams.pageNumber
-        const filter: UserFilterType = {};
+        const filter: { "$or"?: Object[] } = {};
 
         if (searchLoginTerm) {
             const loginFilter = {"login": {'$regex': searchLoginTerm, '$options': 'i'}}
