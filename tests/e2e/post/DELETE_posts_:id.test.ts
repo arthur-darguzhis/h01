@@ -4,8 +4,8 @@ import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpSta
 import {Post} from "../../../src/modules/post/types/PostType";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
 import {BlogType} from "../../../src/modules/blog/types/BlogType";
-import {blogsService} from "../../../src/modules/blog/blogs-service";
-import {postsService} from "../../../src/modules/post/posts-service";
+import {blogsService} from "../../../src/modules/blog/blogsService";
+import {postsService} from "../../../src/modules/post/postsService";
 
 describe('DELETE -> "/posts/:id"', () => {
     let blog: BlogType;

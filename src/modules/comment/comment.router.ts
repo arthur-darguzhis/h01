@@ -3,13 +3,13 @@ import {RequestWithParams, RequestWithParamsAndBody} from "../../common/presenta
 import {commentQueryRepository} from "./repository/comment.QueryRepository";
 import {HTTP_STATUSES} from "../../common/presentationLayer/types/HttpStatuses";
 import {CommentInputModel} from "./types/CommentInputModel";
-import {commentsService} from "./comments-service";
+import {commentsService} from "./commentsService";
 import {jwtAuthGuardMiddleware} from "../auth/middlewares/jwtAuthGuardMiddleware";
 import {validateComment} from "./middlewares/validateComment";
 import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/checkErrorsInRequestDataMiddleware";
 import {LikeInputModel} from "./types/LikeInputModel";
 import {validateLikeStatus} from "./middlewares/validateLikeStatus";
-import {jwtService} from "../auth/jwt/jwt-service";
+import {jwtService} from "../auth/jwt/jwtService";
 
 export const commentRouter = Router({})
 

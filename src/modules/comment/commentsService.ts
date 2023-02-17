@@ -9,7 +9,7 @@ import {LikeStatus} from "./types/LikeStatus";
 import {likesOfCommentsRepository} from "./repository/likesOfComments.MongoDbRepository";
 import {LikeOfCommentType} from "./types/LikeOfCommentType";
 
-export const commentsService = {
+class CommentsService {
     async addComment(postId: string, commentInputModel: CommentInputModel, currentUser: User): Promise<CommentType> {
         const post = await postRepository.get(postId);
 
@@ -29,7 +29,7 @@ export const commentsService = {
         }
 
         return await commentRepository.add(newComment);
-    },
+    }
 
     async updateUsersComment(commentId: string, userId: string, commentInputModel: CommentInputModel): Promise<boolean | never> {
         const comment = await commentRepository.get(commentId)
@@ -38,7 +38,7 @@ export const commentsService = {
             throw new Forbidden("You can update only your comments")
         }
         return await commentRepository.updateUsersComment(commentId, userId, commentInputModel)
-    },
+    }
 
     async deleteUsersComment(commentId: string, userId: string): Promise<boolean | never> {
         const comment = await commentRepository.get(commentId)
@@ -47,7 +47,7 @@ export const commentsService = {
             throw new Forbidden("You can delete only your comments")
         }
         return await commentRepository.deleteUsersComment(commentId, userId)
-    },
+    }
 
     async processLikeStatus(userId: string, commentId: string, likeStatus: LikeStatus): Promise<boolean | never> {
         const comment = await commentRepository.get(commentId)
@@ -71,11 +71,13 @@ export const commentsService = {
         }
         await this.updateLikesAndDislikesCountInComment(comment._id)
         return true;
-    },
+    }
 
     async updateLikesAndDislikesCountInComment(commentId: string) {
         const likesCount = await likesOfCommentsRepository.calculateCountOfLikes(commentId);
         const dislikesCount = await likesOfCommentsRepository.calculateCountOfDislikes(commentId);
         await commentRepository.updateLikesInfo(commentId, likesCount, dislikesCount)
-    },
+    }
 }
+
+export const commentsService = new CommentsService()

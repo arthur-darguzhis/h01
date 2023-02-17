@@ -2,9 +2,9 @@ import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/commo
 import {BlogType} from "../../../src/modules/blog/types/BlogType";
 import {Post} from "../../../src/modules/post/types/PostType";
 import {User} from "../../../src/modules/user/types/UserType";
-import {blogsService} from "../../../src/modules/blog/blogs-service";
-import {postsService} from "../../../src/modules/post/posts-service";
-import {usersService} from "../../../src/modules/user/users-service";
+import {blogsService} from "../../../src/modules/blog/blogsService";
+import {postsService} from "../../../src/modules/post/postsService";
+import {usersService} from "../../../src/modules/user/usersService";
 import {LoginInputModel} from "../../../src/modules/auth/types/LoginInputModel";
 import request from "supertest";
 import {app} from "../../../src/server";

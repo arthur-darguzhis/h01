@@ -1,5 +1,5 @@
 import {BlogType} from "../../../src/modules/blog/types/BlogType";
-import {blogsService} from "../../../src/modules/blog/blogs-service";
+import {blogsService} from "../../../src/modules/blog/blogsService";
 import {BlogInputModel} from "../../../src/modules/blog/types/BlogInputModel";
 import request from "supertest";
 import {app} from "../../../src/server";

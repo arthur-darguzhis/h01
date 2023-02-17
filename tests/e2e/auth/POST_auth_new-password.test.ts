@@ -1,9 +1,9 @@
-import {usersService} from "../../../src/modules/user/users-service";
+import {usersService} from "../../../src/modules/user/usersService";
 import request from "supertest";
 import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";
 import {NewPasswordRecoveryInputModel} from "../../../src/modules/auth/types/NewPasswordRecoveryInputModel";
-import {authService} from "../../../src/modules/auth/auth.service";
+import {authService} from "../../../src/modules/auth/authService";
 import {PasswordRecoveryInputModel} from "../../../src/modules/auth/types/PasswordRecoveryInputModel";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
 

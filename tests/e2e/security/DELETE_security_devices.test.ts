@@ -1,5 +1,5 @@
 import request from "supertest";
-import {usersService} from "../../../src/modules/user/users-service";
+import {usersService} from "../../../src/modules/user/usersService";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
 import {LoginInputModel} from "../../../src/modules/auth/types/LoginInputModel";
 import {app} from "../../../src/server";

@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response} from "express";
 import {HTTP_STATUSES} from "../../../common/presentationLayer/types/HttpStatuses";
-import {jwtService} from "../jwt/jwt-service";
-import {usersService} from "../../user/users-service";
+import {jwtService} from "../jwt/jwtService";
+import {usersService} from "../../user/usersService";
 
 export const jwtRefreshGuardMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     if (!req.cookies || !req.cookies.refreshToken || req.cookies.refreshToken === '') {

@@ -16,7 +16,7 @@ import {NewPasswordRecoveryInputModel} from "./types/NewPasswordRecoveryInputMod
 import {passwordRecoveryRepository} from "./passwordRecovery/passwordRecoveryRepository";
 import {UnprocessableEntity} from "../../common/exceptions/UnprocessableEntity";
 
-export const authService = {
+class AuthService {
     async registerNewUser(userInputModel: UserInputModel): Promise<[user: User, emailConfirmation: EmailConfirmationType] | never> {
         const isUserExists = await userRepository.isExistsWithSameEmailOrLogin(userInputModel.email, userInputModel.login);
         if (isUserExists) {
@@ -45,15 +45,15 @@ export const authService = {
         await emailConfirmationRepository.add(emailConfirmation)
 
         return [newUser, emailConfirmation];
-    },
+    }
 
     async _generatePasswordHash(password: string): Promise<string> {
         return await bcrypt.hash(password, 10);
-    },
+    }
 
     async removeUserSession(refreshToken: string) {
         return securityService.removeUserSession(refreshToken);
-    },
+    }
 
     async passwordRecovery(passwordRecoveryInputModel: PasswordRecoveryInputModel): Promise<PasswordRecoveryType | never> {
         const user = await userRepository.getUserByEmail(passwordRecoveryInputModel.email)
@@ -69,7 +69,7 @@ export const authService = {
         emailsManager.sendPasswordRecoveryLetter(user, passwordRecovery)
         await passwordRecoveryRepository.add(passwordRecovery);
         return passwordRecovery
-    },
+    }
 
     async setNewPassword(newPasswordRecoveryInputModel: NewPasswordRecoveryInputModel): Promise<PasswordRecoveryType> {
         const {newPassword, recoveryCode,} = newPasswordRecoveryInputModel
@@ -84,3 +84,5 @@ export const authService = {
         return passwordRecovery;
     }
 }
+
+export const authService = new AuthService();

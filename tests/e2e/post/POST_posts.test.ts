@@ -1,4 +1,4 @@
-import {blogsService} from "../../../src/modules/blog/blogs-service";
+import {blogsService} from "../../../src/modules/blog/blogsService";
 import {BlogType} from "../../../src/modules/blog/types/BlogType";
 import request from "supertest";
 import {app} from "../../../src/server";

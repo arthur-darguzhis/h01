@@ -10,7 +10,7 @@ import {UnprocessableEntity} from "../../common/exceptions/UnprocessableEntity";
 import {emailConfirmationRepository} from "../auth/emailConfirmation/repository/emailConfirmation.MongoDbRepository";
 import {EmailConfirmationType} from "../auth/emailConfirmation/types/EmailConfirmationType";
 
-export const usersService = {
+class UsersService {
     async createUser(userInputModel: UserInputModel): Promise<User> {
         const passwordHash = await this._generatePasswordHash(userInputModel.password)
 
@@ -22,30 +22,29 @@ export const usersService = {
         )
 
         return await userRepository.add(newUser);
-    },
+    }
 
     async findUserById(id: string): Promise<User | null> {
         return userRepository.find(id);
-    },
+    }
 
     async deleteUser(id: string): Promise<boolean> {
         return userRepository.delete(id)
-    },
+    }
 
     async checkCredentials(loginOrEmail: string, password: string): Promise<User | false> {
         const user = await userRepository.findByLoginOrEmail(loginOrEmail)
         if (!user) return false;
 
         const areCredentialValid = await bcrypt.compare(password, user.passwordHash);
-        const areCredentialValid2 = await bcrypt.compare(user.passwordHash, password);
         if (!areCredentialValid) return false;
 
         return user;
-    },
+    }
 
     async _generatePasswordHash(password: string): Promise<string> {
         return await bcrypt.hash(password, 10);
-    },
+    }
 
     async confirmEmail(code: string): Promise<true | never> {
         const emailConfirmation = await emailConfirmationRepository.findByConfirmationCode(code);
@@ -69,7 +68,7 @@ export const usersService = {
         //TODO возможно эта предупреждение нужно, но вообще хочется подумать стоит ли возвращать true | false или лучше кидать исключения?
         //if (!result) throw new UnprocessableEntity('User confirmation failed')
         return true;
-    },
+    }
 
     async resendConfirmEmail(email: string): Promise<true | never> {
         const user = await userRepository.findByLoginOrEmail(email);
@@ -80,14 +79,6 @@ export const usersService = {
         if (user.isActive || emailConfirmation.isConfirmed) {
             throw new UnprocessableEntity('The email is already confirmed')
         }
-
-        // if (emailConfirmation.expirationDate > new Date().getTime()) {
-        //     const minutesLastResendWas = (new Date().getTime() - emailConfirmation.sendingTime) / (60 * 1000)
-        //     if (Math.ceil(minutesLastResendWas) <= 15) {
-        //         const tryAfterMinutes = Math.ceil(15 - minutesLastResendWas);
-        //         throw new UnprocessableEntity(`Try to resend email in ${tryAfterMinutes} min`)
-        //     }
-        // }
 
         const newEmailConfirmation: EmailConfirmationType = {
             _id: new ObjectId().toString(),
@@ -104,13 +95,15 @@ export const usersService = {
         emailsManager.sendRegistrationConfirmationLetter(user, newEmailConfirmation)
 
         return true;
-    },
+    }
 
     async confirmEmailConfirmationCode(emailConfirmationId: string): Promise<boolean> {
         return await emailConfirmationRepository.update(emailConfirmationId, {isConfirmed: true})
-    },
+    }
 
     async activateUser(userId: string): Promise<boolean> {
         return await userRepository.activeUser(userId)
     }
 }
+
+export const usersService = new UsersService()

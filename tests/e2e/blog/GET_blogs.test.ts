@@ -1,7 +1,7 @@
 import request from "supertest";
 import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";
-import {blogsService} from "../../../src/modules/blog/blogs-service";
+import {blogsService} from "../../../src/modules/blog/blogsService";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
 
 describe('GET -> "/blogs"', () => {

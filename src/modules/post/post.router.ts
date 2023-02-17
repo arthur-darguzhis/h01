@@ -10,21 +10,21 @@ import {postQueryRepository} from "./repository/post.QueryRepository";
 import {PostInputModel} from "./types/PostInputModel";
 import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/checkErrorsInRequestDataMiddleware";
 import {authGuardMiddleware} from "../auth/middlewares/authGuardMiddleware";
-import {postsService} from "./posts-service";
+import {postsService} from "./postsService";
 import {HTTP_STATUSES} from "../../common/presentationLayer/types/HttpStatuses";
 import {validatePost} from "./middlewares/validatePost";
 import {validatePaginator} from "../../common/middlewares/validatePaginator";
 import {CommentInputModel} from "../comment/types/CommentInputModel";
 import {validateComment} from "../comment/middlewares/validateComment";
 import {jwtAuthGuardMiddleware} from "../auth/middlewares/jwtAuthGuardMiddleware";
-import {commentsService} from "../comment/comments-service";
+import {commentsService} from "../comment/commentsService";
 import {commentQueryRepository} from "../comment/repository/comment.QueryRepository";
 import {mapCommentToViewModel} from "../comment/comment.mapper";
 import {mapPostToViewModel} from "./post.mapper";
 import {PaginatorResponse} from "../auth/types/paginator/PaginatorResponse";
 import {PostViewModel} from "./types/PostViewModel";
 import {PaginatorParams} from "../auth/types/paginator/PaginatorParams";
-import {jwtService} from "../auth/jwt/jwt-service";
+import {jwtService} from "../auth/jwt/jwtService";
 
 export const postRouter = Router({})
 

@@ -2,7 +2,7 @@ import request from "supertest";
 import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
-import {authService} from "../../../src/modules/auth/auth.service";
+import {authService} from "../../../src/modules/auth/authService";
 import {RateLimiter} from "../../../src/common/middlewares/rateLimiterMiddleware";
 
 describe('POST => /auth/password-recovery', () => {

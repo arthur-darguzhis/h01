@@ -5,7 +5,7 @@ import {BlogPostInputModel} from "../blog/types/BlogPostInputModel";
 import {ObjectId} from "mongodb";
 import {Post} from "./types/PostType";
 
-export const postsService = {
+class PostsService {
     async createPost(postInputModel: PostInputModel): Promise<Post> {
         const blog = await blogRepository.get(postInputModel.blogId);
 
@@ -20,7 +20,7 @@ export const postsService = {
         }
 
         return await postRepository.add(newPost);
-    },
+    }
 
     async createPostInBlog(blogId: string, body: BlogPostInputModel): Promise<Post | never> {
         const blog = await blogRepository.get(blogId);
@@ -36,7 +36,7 @@ export const postsService = {
         }
 
         return await postRepository.add(newPost)
-    },
+    }
 
     async updatePost(id: string, postInputModel: PostInputModel): Promise<boolean | never> {
         const post = await postRepository.get(id);
@@ -50,10 +50,12 @@ export const postsService = {
             blogName: blog.name
         }
         return postRepository.update(id, updatedPost)
-    },
+    }
 
     async deletePost(id: string): Promise<boolean> {
         const post = await postRepository.get(id)
         return await postRepository.delete(post._id);
-    },
+    }
 }
+
+export const postsService = new PostsService()

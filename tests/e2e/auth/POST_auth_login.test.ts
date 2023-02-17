@@ -1,4 +1,4 @@
-import {usersService} from "../../../src/modules/user/users-service";
+import {usersService} from "../../../src/modules/user/usersService";
 import request from "supertest";
 import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";

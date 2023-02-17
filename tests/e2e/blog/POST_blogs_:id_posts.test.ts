@@ -1,5 +1,5 @@
 import {BlogType} from "../../../src/modules/blog/types/BlogType";
-import {blogsService} from "../../../src/modules/blog/blogs-service";
+import {blogsService} from "../../../src/modules/blog/blogsService";
 import request from "supertest";
 import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";

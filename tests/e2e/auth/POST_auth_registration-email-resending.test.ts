@@ -1,9 +1,9 @@
 import request from "supertest";
 import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";
-import {usersService} from "../../../src/modules/user/users-service";
+import {usersService} from "../../../src/modules/user/usersService";
 import {UserInputModel} from "../../../src/modules/user/types/UserInputModel";
-import {authService} from "../../../src/modules/auth/auth.service";
+import {authService} from "../../../src/modules/auth/authService";
 import {
     emailConfirmationRepository
 } from "../../../src/modules/auth/emailConfirmation/repository/emailConfirmation.MongoDbRepository";

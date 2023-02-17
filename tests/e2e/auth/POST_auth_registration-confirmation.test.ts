@@ -2,7 +2,7 @@ import request from "supertest";
 import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";
 import {v4 as uuidv4} from "uuid";
-import {authService} from "../../../src/modules/auth/auth.service";
+import {authService} from "../../../src/modules/auth/authService";
 
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
 import {RateLimiter} from "../../../src/common/middlewares/rateLimiterMiddleware";
