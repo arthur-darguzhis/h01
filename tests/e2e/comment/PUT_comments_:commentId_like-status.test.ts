@@ -1,5 +1,5 @@
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
-import {BlogType} from "../../../src/modules/blog/types/BlogType";
+import {Blog} from "../../../src/modules/blog/types/BlogType";
 import {Post} from "../../../src/modules/post/types/PostType";
 import {User} from "../../../src/modules/user/types/UserType";
 import {blogsService} from "../../../src/modules/blog/blogsService";
@@ -12,7 +12,7 @@ import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpSta
 import {LIKE_STATUSES} from "../../../src/modules/comment/types/LikeStatus";
 
 describe('PUT -> /comments/:commentId/like-status', () => {
-    let blog: BlogType;
+    let blog: Blog;
     let post: Post
     let token1: string;
     let user1: User;

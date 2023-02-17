@@ -1,7 +1,7 @@
-import {BlogType} from "./types/BlogType";
+import {Blog} from "./types/BlogType";
 import {BlogViewModel} from "./types/BlogViewModel";
 
-export const mapBlogToViewModel = (blog: BlogType): BlogViewModel => {
+export const mapBlogToViewModel = (blog: Blog): BlogViewModel => {
     return {
         id: blog._id,
         name: blog.name,

@@ -1,4 +1,4 @@
-import {BlogType} from "../../../src/modules/blog/types/BlogType";
+import {Blog} from "../../../src/modules/blog/types/BlogType";
 import {blogsService} from "../../../src/modules/blog/blogsService";
 import request from "supertest";
 import {app} from "../../../src/server";
@@ -6,7 +6,7 @@ import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpSta
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
 
 describe('DELETE -> "/blogs/:id"', () => {
-    let blog: BlogType;
+    let blog: Blog
 
     beforeAll(async () => {
         await cleanDbBeforeTest()

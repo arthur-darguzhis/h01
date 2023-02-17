@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import {BlogType} from "../types/BlogType";
+import {Blog} from "../types/BlogType";
 
-const blogSchema = new mongoose.Schema<BlogType>({
+const blogSchema = new mongoose.Schema<Blog>({
     _id: {type: String, required: true},
     name: {type: String, required: true, min: 1, max: 15},
     description: {type: String, required: true, min: 1, max: 500},

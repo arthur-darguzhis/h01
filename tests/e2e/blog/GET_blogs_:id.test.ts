@@ -1,12 +1,12 @@
 import {blogsService} from "../../../src/modules/blog/blogsService";
-import {BlogType} from "../../../src/modules/blog/types/BlogType";
+import {Blog} from "../../../src/modules/blog/types/BlogType";
 import request from "supertest";
 import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
 
 describe('GET -> "/blogs/:id"', () => {
-    let blog: BlogType;
+    let blog: Blog;
     beforeAll(async () => {
         await cleanDbBeforeTest()
 

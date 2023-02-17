@@ -6,12 +6,12 @@ import request from "supertest";
 import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";
 import {User} from "../../../src/modules/user/types/UserType";
-import {BlogType} from "../../../src/modules/blog/types/BlogType";
+import {Blog} from "../../../src/modules/blog/types/BlogType";
 import {Post} from "../../../src/modules/post/types/PostType";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
 
 describe('GET -> /comments/:commentId', () => {
-    let blog: BlogType;
+    let blog: Blog;
     let post: Post;
     let token: string;
     let user: User;

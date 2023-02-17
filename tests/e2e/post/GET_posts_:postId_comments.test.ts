@@ -1,4 +1,4 @@
-import {BlogType} from "../../../src/modules/blog/types/BlogType";
+import {Blog} from "../../../src/modules/blog/types/BlogType";
 import {Post} from "../../../src/modules/post/types/PostType";
 import {blogsService} from "../../../src/modules/blog/blogsService";
 import {postsService} from "../../../src/modules/post/postsService";
@@ -10,7 +10,7 @@ import {usersService} from "../../../src/modules/user/usersService";
 import {LoginInputModel} from "../../../src/modules/auth/types/LoginInputModel";
 
 describe('GET -> "/posts/:postId/comments"', () => {
-    let blog: BlogType;
+    let blog: Blog;
     let post: Post
     let token: string;
 

@@ -1,4 +1,4 @@
-import {BlogType} from "../../../src/modules/blog/types/BlogType";
+import {Blog} from "../../../src/modules/blog/types/BlogType";
 import {blogsService} from "../../../src/modules/blog/blogsService";
 import {BlogInputModel} from "../../../src/modules/blog/types/BlogInputModel";
 import request from "supertest";
@@ -7,7 +7,7 @@ import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpSta
 import {cleanDbBeforeTest} from "../../../src/common/testing/cleanDbBeforeTest";
 
 describe('PUT -> "/blogs/:id"', () => {
-    let blog: BlogType;
+    let blog: Blog;
     const updateBlogInputModel: BlogInputModel = {
         name: 'second blog',
         description: 'the second blog description',

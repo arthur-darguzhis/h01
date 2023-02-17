@@ -1,5 +1,5 @@
 import {blogsService} from "../../../src/modules/blog/blogsService";
-import {BlogType} from "../../../src/modules/blog/types/BlogType";
+import {Blog} from "../../../src/modules/blog/types/BlogType";
 import request from "supertest";
 import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";
@@ -7,7 +7,7 @@ import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/commo
 import {PostInputModel} from "../../../src/modules/post/types/PostInputModel";
 
 describe('POST -> "/posts"', () => {
-    let blog: BlogType;
+    let blog: Blog;
     let postInputModel: PostInputModel
     beforeAll(async () => {
         await cleanDbBeforeTest()

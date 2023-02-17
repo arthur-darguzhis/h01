@@ -1,6 +1,6 @@
 import {blogsService} from "../../../src/modules/blog/blogsService";
 import {postsService} from "../../../src/modules/post/postsService";
-import {BlogType} from "../../../src/modules/blog/types/BlogType";
+import {Blog} from "../../../src/modules/blog/types/BlogType";
 import {Post} from "../../../src/modules/post/types/PostType";
 import request from "supertest";
 import {app} from "../../../src/server";
@@ -9,7 +9,7 @@ import {PostInputModel} from "../../../src/modules/post/types/PostInputModel";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
 
 describe('PUT -> "/posts/:id"', () => {
-    let blog: BlogType;
+    let blog: Blog;
     let post: Post;
     beforeAll(async () => {
         await cleanDbBeforeTest()

@@ -6,13 +6,13 @@ import request from "supertest";
 import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";
 import {CommentInputModel} from "../../../src/modules/comment/types/CommentInputModel";
-import {BlogType} from "../../../src/modules/blog/types/BlogType";
+import {Blog} from "../../../src/modules/blog/types/BlogType";
 import {Post} from "../../../src/modules/post/types/PostType";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
 import {LIKE_STATUSES} from "../../../src/modules/comment/types/LikeStatus";
 
 describe('PUT -> /comments/:commentId', () => {
-    let blog: BlogType;
+    let blog: Blog;
     let post: Post;
     let token: string;
     let commentId: string;

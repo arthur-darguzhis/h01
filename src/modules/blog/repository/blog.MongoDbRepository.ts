@@ -1,10 +1,10 @@
 import {BlogInputModel} from "../types/BlogInputModel";
-import {BlogType} from "../types/BlogType";
+import {Blog} from "../types/BlogType";
 import {BlogModel} from "../model/BlogModel";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 
 export class BlogRepository {
-    async add(blog: BlogType): Promise<BlogType> {
+    async add(blog: Blog): Promise<Blog> {
         await BlogModel.create(blog)
         return blog
     }
@@ -14,11 +14,11 @@ export class BlogRepository {
         return !!blog;
     }
 
-    async find(id: string): Promise<BlogType | null> {
+    async find(id: string): Promise<Blog | null> {
         return BlogModel.findOne({_id: id});
     }
 
-    async get(id: string): Promise<BlogType | never> {
+    async get(id: string): Promise<Blog | never> {
         const blog = await BlogModel.findOne({_id: id});
         if (!blog) throw new EntityNotFound(`Blog with ID: ${id} is not exists`);
         return blog
