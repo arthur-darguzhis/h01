@@ -6,10 +6,10 @@ import {PaginatorParams} from "../../auth/types/paginator/PaginatorParams";
 import {blogRepository} from "../../blog/repository/blog.MongoDbRepository";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 import {QueryMongoDbRepository} from "../../../common/repositories/QueryMongoDbRepository";
-import {PostType} from "../types/PostType";
+import {Post} from "../types/PostType";
 import {PostModel} from "../types/PostModel";
 
-class PostQueryRepository extends QueryMongoDbRepository<PostType, PostViewModel> {
+class PostQueryRepository extends QueryMongoDbRepository<Post, PostViewModel> {
     async findPosts(paginatorParams: PaginatorParams): Promise<PaginatorResponse<PostViewModel>> {
         const {sortBy, sortDirection} = paginatorParams
         const pageNumber = +paginatorParams.pageNumber

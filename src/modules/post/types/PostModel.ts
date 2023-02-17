@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import {PostType} from "./PostType";
+import {Post} from "./PostType";
 
-const postSchema = new mongoose.Schema<PostType>({
+const postSchema = new mongoose.Schema<Post>({
     _id: {type: String, required: true},
     title: {type: String, required: true, min: 1, max: 30},
     shortDescription: {type: String, required: true, min: 1, max: 100},

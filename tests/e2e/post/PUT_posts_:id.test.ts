@@ -1,7 +1,7 @@
 import {blogsService} from "../../../src/modules/blog/blogs-service";
 import {postsService} from "../../../src/modules/post/posts-service";
 import {BlogType} from "../../../src/modules/blog/types/BlogType";
-import {PostType} from "../../../src/modules/post/types/PostType";
+import {Post} from "../../../src/modules/post/types/PostType";
 import request from "supertest";
 import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";
@@ -10,7 +10,7 @@ import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/commo
 
 describe('PUT -> "/posts/:id"', () => {
     let blog: BlogType;
-    let post: PostType;
+    let post: Post;
     beforeAll(async () => {
         await cleanDbBeforeTest()
 

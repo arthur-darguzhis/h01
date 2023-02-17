@@ -3,10 +3,10 @@ import {blogRepository} from '../blog/repository/blog.MongoDbRepository'
 import {PostInputModel} from "./types/PostInputModel";
 import {BlogPostInputModel} from "../blog/types/BlogPostInputModel";
 import {ObjectId} from "mongodb";
-import {PostType} from "./types/PostType";
+import {Post} from "./types/PostType";
 
 export const postsService = {
-    async createPost(postInputModel: PostInputModel): Promise<PostType> {
+    async createPost(postInputModel: PostInputModel): Promise<Post> {
         const blog = await blogRepository.get(postInputModel.blogId);
 
         const newPost = {
@@ -22,7 +22,7 @@ export const postsService = {
         return await postRepository.add(newPost);
     },
 
-    async createPostInBlog(blogId: string, body: BlogPostInputModel): Promise<PostType | never> {
+    async createPostInBlog(blogId: string, body: BlogPostInputModel): Promise<Post | never> {
         const blog = await blogRepository.get(blogId);
 
         const newPost = {

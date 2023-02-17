@@ -1,7 +1,7 @@
 import {blogsService} from "../../../src/modules/blog/blogs-service";
 import {postsService} from "../../../src/modules/post/posts-service";
 import {BlogType} from "../../../src/modules/blog/types/BlogType";
-import {PostType} from "../../../src/modules/post/types/PostType";
+import {Post} from "../../../src/modules/post/types/PostType";
 import {usersService} from "../../../src/modules/user/users-service";
 import {LoginInputModel} from "../../../src/modules/auth/types/LoginInputModel";
 import request from "supertest";
@@ -13,7 +13,7 @@ import {LIKE_STATUSES} from "../../../src/modules/comment/types/LikeStatus";
 
 describe('POST -> "/posts/:postId/comments"', () => {
     let blog: BlogType;
-    let post: PostType
+    let post: Post
     let token: string;
     let user: User;
 

@@ -1,5 +1,5 @@
 import {BlogType} from "../../../src/modules/blog/types/BlogType";
-import {PostType} from "../../../src/modules/post/types/PostType";
+import {Post} from "../../../src/modules/post/types/PostType";
 import {blogsService} from "../../../src/modules/blog/blogs-service";
 import {postsService} from "../../../src/modules/post/posts-service";
 import request from "supertest";
@@ -11,7 +11,7 @@ import {LoginInputModel} from "../../../src/modules/auth/types/LoginInputModel";
 
 describe('GET -> "/posts/:postId/comments"', () => {
     let blog: BlogType;
-    let post: PostType
+    let post: Post
     let token: string;
 
     beforeAll(async () => {

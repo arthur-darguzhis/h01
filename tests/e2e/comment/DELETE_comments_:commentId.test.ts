@@ -6,12 +6,12 @@ import request from "supertest";
 import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";
 import {BlogType} from "../../../src/modules/blog/types/BlogType";
-import {PostType} from "../../../src/modules/post/types/PostType";
+import {Post} from "../../../src/modules/post/types/PostType";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
 
 describe('DELETE -> /comments/:commentId', () => {
     let blog: BlogType;
-    let post: PostType;
+    let post: Post;
     let token: string;
     let commentId: string;
     let someUserToken: string;

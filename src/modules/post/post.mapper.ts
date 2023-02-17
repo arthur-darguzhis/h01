@@ -1,7 +1,7 @@
-import {PostType} from "./types/PostType";
+import {Post} from "./types/PostType";
 import {PostViewModel} from "./types/PostViewModel";
 
-export const mapPostToViewModel = (post: PostType): PostViewModel => {
+export const mapPostToViewModel = (post: Post): PostViewModel => {
     return {
         id: post._id,
         title: post.title,

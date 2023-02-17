@@ -1,7 +1,7 @@
 import request from "supertest";
 import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";
-import {PostType} from "../../../src/modules/post/types/PostType";
+import {Post} from "../../../src/modules/post/types/PostType";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
 import {BlogType} from "../../../src/modules/blog/types/BlogType";
 import {blogsService} from "../../../src/modules/blog/blogs-service";
@@ -9,7 +9,7 @@ import {postsService} from "../../../src/modules/post/posts-service";
 
 describe('DELETE -> "/posts/:id"', () => {
     let blog: BlogType;
-    let post: PostType
+    let post: Post
     beforeAll(async () => {
         await cleanDbBeforeTest()
 

@@ -7,12 +7,12 @@ import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";
 import {User} from "../../../src/modules/user/types/UserType";
 import {BlogType} from "../../../src/modules/blog/types/BlogType";
-import {PostType} from "../../../src/modules/post/types/PostType";
+import {Post} from "../../../src/modules/post/types/PostType";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
 
 describe('GET -> /comments/:commentId', () => {
     let blog: BlogType;
-    let post: PostType;
+    let post: Post;
     let token: string;
     let user: User;
     let commentId: string;
