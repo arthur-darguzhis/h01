@@ -1,12 +1,12 @@
 import {CommandMongoDbRepository} from "../../../common/repositories/CommandMongoDbRepository";
-import {UserActiveSessionType} from "../types/UserActiveSessionType";
+import {UserActiveSession} from "../types/UserActiveSessionType";
 import {UserActiveSessionUpdateModelType} from "../types/UserActiveSessionUpdateModelType";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 import {UserActiveSessionModel} from "../model/UserActiveSessionModel";
 
-class UsersActiveSessionsRepository extends CommandMongoDbRepository<UserActiveSessionType, object> {
+class UsersActiveSessionsRepository extends CommandMongoDbRepository<UserActiveSession, object> {
 
-    async getByDeviceId(deviceId: string): Promise<UserActiveSessionType> {
+    async getByDeviceId(deviceId: string): Promise<UserActiveSession> {
         const userActiveSession = await this.model.findOne({deviceId: deviceId})
         if (!userActiveSession) throw new EntityNotFound(`There is not session for deviceId: ${deviceId}`)
         return userActiveSession

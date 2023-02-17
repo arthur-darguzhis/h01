@@ -15,8 +15,7 @@ import {RegistrationConfirmationCodeModel} from "./types/RegistrationConfirmatio
 import {jwtRefreshGuardMiddleware} from "./middlewares/jwtRefreshGuardMiddleware";
 import {authService} from "./auth.service";
 import {securityService} from "../security/security.service";
-import {UserActiveSessionType} from "../security/types/UserActiveSessionType";
-import {ObjectId} from "mongodb";
+import {UserActiveSession} from "../security/types/UserActiveSessionType";
 import {UserActiveSessionUpdateModelType} from "../security/types/UserActiveSessionUpdateModelType";
 import {checkRateLimiterMiddleware, setRateLimiter} from "../../common/middlewares/rateLimiterMiddleware";
 import {NewPasswordRecoveryInputModel} from "./types/NewPasswordRecoveryInputModel";
@@ -67,15 +66,14 @@ authRouter.post('/login',
         const refreshToken = jwtService.createRefreshJWT(user)
         const decodedRefreshToken = jwtService.decodeRefreshJWT(refreshToken);
         const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
-        const userActiveSession: UserActiveSessionType = {
-            _id: new ObjectId().toString(),
-            issuedAt: decodedRefreshToken.iat!,
-            expireAt: decodedRefreshToken.exp!,
-            deviceId: decodedRefreshToken.deviceId,
-            IP: ip as string,
-            deviceName: req.headers["user-agent"] || '',
-            userId: user._id,
-        }
+        const userActiveSession = new UserActiveSession(
+            decodedRefreshToken.iat!,
+            decodedRefreshToken.exp!,
+            decodedRefreshToken.deviceId,
+            ip as string,
+            req.headers["user-agent"] || '',
+            user._id,
+        )
         await securityService.registerUserActiveSession(userActiveSession)
 
         res.status(HTTP_STATUSES.OK_200)
@@ -96,7 +94,7 @@ authRouter.post('/refresh-token', jwtRefreshGuardMiddleware, async (req, res: Re
     const userActiveSessionUpdateModel: UserActiveSessionUpdateModelType = {
         issuedAt: decodedRefreshToken?.iat,
         expireAt: decodedRefreshToken?.exp,
-        IP: ip as string,
+        ip: ip as string,
         deviceName: req.headers["user-agent"] || '',
     }
 

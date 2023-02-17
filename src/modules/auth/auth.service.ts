@@ -52,7 +52,7 @@ export const authService = {
     },
 
     async removeUserSession(refreshToken: string) {
-        return await securityService.removeUserSession(refreshToken);
+        return securityService.removeUserSession(refreshToken);
     },
 
     async passwordRecovery(passwordRecoveryInputModel: PasswordRecoveryInputModel): Promise<PasswordRecoveryType | never> {

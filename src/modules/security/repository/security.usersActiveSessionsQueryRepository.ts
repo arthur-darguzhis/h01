@@ -1,10 +1,10 @@
 import {QueryMongoDbRepository} from "../../../common/repositories/QueryMongoDbRepository";
 import {UserActiveSessionViewModelType} from "../types/UserActiveSessionViewModelType";
-import {UserActiveSessionType} from "../types/UserActiveSessionType";
 import {mapUserActiveSessionToViewModel} from "../userActiveSession.mapper";
 import {UserActiveSessionModel} from "../model/UserActiveSessionModel";
+import {UserActiveSession} from "../types/UserActiveSessionType";
 
-class UsersActiveSessionsQueryRepository extends QueryMongoDbRepository<UserActiveSessionType, UserActiveSessionViewModelType> {
+class UsersActiveSessionsQueryRepository extends QueryMongoDbRepository<UserActiveSession, UserActiveSessionViewModelType> {
     async findByUserId(userId: string) {
         const activeSessions = await this.model.find({userId: userId}).lean()
         return activeSessions.map(mapUserActiveSessionToViewModel)

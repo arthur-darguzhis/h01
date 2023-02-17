@@ -1,6 +1,6 @@
 export type UserActiveSessionUpdateModelType = {
     issuedAt: number | undefined
     expireAt: number | undefined
-    IP: string
+    ip: string
     deviceName: string
 }
