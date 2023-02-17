@@ -8,7 +8,7 @@ import {usersService} from "./users-service";
 import {userQueryRepository} from "./repository/user.QueryRepository";
 import {HTTP_STATUSES} from "../../common/presentationLayer/types/HttpStatuses";
 import {validatePaginator} from "../../common/middlewares/validatePaginator";
-import {UserType} from "./types/UserType";
+import {User} from "./types/UserType";
 import {mapUserToViewModel} from "./user.mapper";
 import {PaginatorResponse} from "../auth/types/paginator/PaginatorResponse";
 import {UserViewModel} from "./types/UserViewModel";
@@ -23,7 +23,7 @@ userRouter.post('/',
     validateUser.body.password,
     checkErrorsInRequestDataMiddleware,
     async (req: RequestWithBody<UserInputModel>, res) => {
-        const newUser: UserType = await usersService.createUser(req.body)
+        const newUser: User = await usersService.createUser(req.body)
         res.status(HTTP_STATUSES.CREATED_201).json(mapUserToViewModel(newUser))
     })
 

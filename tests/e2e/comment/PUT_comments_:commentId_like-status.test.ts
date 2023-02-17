@@ -1,7 +1,7 @@
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
 import {BlogType} from "../../../src/modules/blog/types/BlogType";
 import {PostType} from "../../../src/modules/post/types/PostType";
-import {UserType} from "../../../src/modules/user/types/UserType";
+import {User} from "../../../src/modules/user/types/UserType";
 import {blogsService} from "../../../src/modules/blog/blogs-service";
 import {postsService} from "../../../src/modules/post/posts-service";
 import {usersService} from "../../../src/modules/user/users-service";
@@ -15,7 +15,7 @@ describe('PUT -> /comments/:commentId/like-status', () => {
     let blog: BlogType;
     let post: PostType
     let token1: string;
-    let user1: UserType;
+    let user1: User;
     let commentId: string;
 
     beforeAll(async () => {

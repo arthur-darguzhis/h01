@@ -8,14 +8,14 @@ import request from "supertest";
 import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
-import {UserType} from "../../../src/modules/user/types/UserType";
+import {User} from "../../../src/modules/user/types/UserType";
 import {LIKE_STATUSES} from "../../../src/modules/comment/types/LikeStatus";
 
 describe('POST -> "/posts/:postId/comments"', () => {
     let blog: BlogType;
     let post: PostType
     let token: string;
-    let user: UserType;
+    let user: User;
 
     beforeAll(async () => {
         await cleanDbBeforeTest()
