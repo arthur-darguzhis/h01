@@ -8,11 +8,6 @@ class PasswordRecoveryRepository {
         return passwordRecovery
     }
 
-    async isExists(id: string): Promise<boolean> {
-        const entity = await PasswordRecoveryModel.findOne({_id: id})
-        return !!entity;
-    }
-
     async find(id: string): Promise<PasswordRecoveryType | null> {
         return PasswordRecoveryModel.findOne({_id: id});
     }
