@@ -1,11 +1,35 @@
 import {User} from "../types/UserType";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
-import {CommandMongoDbRepository} from "../../../common/repositories/CommandMongoDbRepository";
 import {UserModel} from "../model/UserModel";
 
-class UserRepository extends CommandMongoDbRepository<User, object> {
+class UserRepository {
+    async add(user: User): Promise<User> {
+        await UserModel.create(user)
+        return user
+    }
+
+    async find(id: string): Promise<User | null> {
+        return UserModel.findOne({_id: id});
+    }
+
+    async get(id: string): Promise<User | never> {
+        const entity = await UserModel.findOne({_id: id});
+        if (!entity) throw new EntityNotFound(`User with ID: ${id} is not exists`);
+        return entity
+    }
+
+    async update(id: string, updateFilter: object): Promise<boolean> {
+        const result = await UserModel.updateOne({_id: id}, {$set: updateFilter})
+        return result.modifiedCount === 1;
+    }
+
+    async delete(id: string): Promise<boolean> {
+        const result = await UserModel.deleteOne({_id: id});
+        return result.deletedCount === 1;
+    }
+
     async findByLoginOrEmail(loginOrEmail: string): Promise<User | null> {
-        return this.model.findOne({
+        return UserModel.findOne({
             $or: [
                 {login: loginOrEmail},
                 {email: loginOrEmail}
@@ -14,7 +38,7 @@ class UserRepository extends CommandMongoDbRepository<User, object> {
     }
 
     async isExistsWithSameEmailOrLogin(email: string, login: string): Promise<boolean> {
-        const user = await this.model.findOne({
+        const user = await UserModel.findOne({
             $or: [
                 {email: email},
                 {login: login}
@@ -24,20 +48,20 @@ class UserRepository extends CommandMongoDbRepository<User, object> {
     }
 
     async getUserByEmail(email: string): Promise<User | never> {
-        const user = await this.model.findOne({email: email})
+        const user = await UserModel.findOne({email: email})
         if (!user) throw new EntityNotFound(`User with email: ${email} is not exists`)
         return user
     }
 
     async activeUser(userId: string) {
-        const result = await this.model.updateOne({_id: userId}, {$set: {isActive: true}})
+        const result = await UserModel.updateOne({_id: userId}, {$set: {isActive: true}})
         return result.modifiedCount === 1;
     }
 
     async setNewPassword(userId: string, newPasswordHash: string) {
-        const result = await this.model.updateOne({_id: userId}, {$set: {passwordHash: newPasswordHash}})
+        const result = await UserModel.updateOne({_id: userId}, {$set: {passwordHash: newPasswordHash}})
         return result.modifiedCount === 1;
     }
 }
 
-export const userRepository = new UserRepository(UserModel, 'User')
+export const userRepository = new UserRepository()
