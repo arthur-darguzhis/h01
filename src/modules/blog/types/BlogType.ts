@@ -13,11 +13,3 @@ export class Blog {
         this.createdAt = new Date().toISOString()
     }
 }
-
-// export type BlogType = {
-//     _id: string
-//     name: string,
-//     description: string,
-//     websiteUrl: string
-//     createdAt: string
-// }
