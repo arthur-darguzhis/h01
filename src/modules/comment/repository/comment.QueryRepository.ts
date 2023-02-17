@@ -4,17 +4,20 @@ import {mapCommentToViewModel} from "../comment.mapper";
 import {PaginatorResponse} from "../../auth/types/paginator/PaginatorResponse";
 import {PaginatorParams} from "../../auth/types/paginator/PaginatorParams";
 import {postQueryRepository} from "../../post/repository/post.QueryRepository";
-import {QueryMongoDbRepository} from "../../../common/repositories/QueryMongoDbRepository";
-import {CommentType} from "../types/CommentType";
 import {CommentModel} from "../model/CommentModel";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 import {likesOfCommentsRepository} from "./likesOfComments.MongoDbRepository";
 import {LIKE_STATUSES} from "../types/LikeStatus";
 
-class CommentQueryRepository extends QueryMongoDbRepository<CommentType, CommentViewModel> {
+class CommentQueryRepository {
+
+    async find(id: string): Promise<CommentViewModel | null> {
+        const comment = await CommentModel.findOne({_id: id});
+        return comment ? mapCommentToViewModel(comment) : null
+    }
 
     async get(id: string, userId = null): Promise<CommentViewModel | never> {
-        const comment = await this.model.findOne({_id: id});
+        const comment = await CommentModel.findOne({_id: id});
         if (!comment) throw new EntityNotFound(`Comment with ID: ${id} is not exists`)
 
         let myStatus = LIKE_STATUSES.NONE
@@ -37,9 +40,9 @@ class CommentQueryRepository extends QueryMongoDbRepository<CommentType, Comment
         const direction = sortDirection === 'asc' ? 1 : -1;
 
         let filter: PostCommentFilterType = {postId: post.id}
-        let count = await this.model.countDocuments(filter);
+        let count = await CommentModel.countDocuments(filter);
         const howManySkip = (pageNumber - 1) * pageSize;
-        const comments = await this.model.find(filter).sort({[sortBy]: direction}).skip(howManySkip).limit(pageSize).lean()
+        const comments = await CommentModel.find(filter).sort({[sortBy]: direction}).skip(howManySkip).limit(pageSize).lean()
 
 
         let items: CommentViewModel[];
@@ -73,4 +76,4 @@ class CommentQueryRepository extends QueryMongoDbRepository<CommentType, Comment
     }
 }
 
-export const commentQueryRepository = new CommentQueryRepository(CommentModel, mapCommentToViewModel, 'Comment')
+export const commentQueryRepository = new CommentQueryRepository()

@@ -5,20 +5,30 @@ import {PaginatorResponse} from "../../auth/types/paginator/PaginatorResponse";
 import {PaginatorParams} from "../../auth/types/paginator/PaginatorParams";
 import {blogRepository} from "../../blog/repository/blog.MongoDbRepository";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
-import {QueryMongoDbRepository} from "../../../common/repositories/QueryMongoDbRepository";
-import {Post} from "../types/PostType";
 import {PostModel} from "../types/PostModel";
 
-class PostQueryRepository extends QueryMongoDbRepository<Post, PostViewModel> {
+class PostQueryRepository {
+
+    async find(id: string): Promise<PostViewModel | null> {
+        const post = await PostModel.findOne({_id: id});
+        return post ? mapPostToViewModel(post) : null
+    }
+
+    async get(id: string): Promise<PostViewModel | never> {
+        const post = await PostModel.findOne({_id: id});
+        if (!post) throw new EntityNotFound(`Post with ID: ${id} is not exists`)
+        return mapPostToViewModel(post)
+    }
+
     async findPosts(paginatorParams: PaginatorParams): Promise<PaginatorResponse<PostViewModel>> {
         const {sortBy, sortDirection} = paginatorParams
         const pageNumber = +paginatorParams.pageNumber
         const pageSize = +paginatorParams.pageSize
 
         const direction = sortDirection === 'asc' ? 1 : -1;
-        const count = await this.model.countDocuments({});
+        const count = await PostModel.countDocuments({});
         const howManySkip = (pageNumber - 1) * pageSize;
-        const blogs = await this.model.find({}).sort({[sortBy]: direction}).skip(howManySkip).limit(pageSize).lean()
+        const blogs = await PostModel.find({}).sort({[sortBy]: direction}).skip(howManySkip).limit(pageSize).lean()
 
         return {
             "pagesCount": Math.ceil(count / pageSize),
@@ -43,9 +53,9 @@ class PostQueryRepository extends QueryMongoDbRepository<Post, PostViewModel> {
         const direction = sortDirection === 'asc' ? 1 : -1;
 
         let filter: BlogPostFilterType = {blogId: blogId}
-        let count = await this.model.countDocuments(filter);
+        let count = await PostModel.countDocuments(filter);
         const howManySkip = (pageNumber - 1) * pageSize;
-        const blogs = await this.model.find(filter).sort({[sortBy]: direction}).skip(howManySkip).limit(pageSize).lean()
+        const blogs = await PostModel.find(filter).sort({[sortBy]: direction}).skip(howManySkip).limit(pageSize).lean()
 
         return {
             "pagesCount": Math.ceil(count / pageSize),
@@ -57,4 +67,4 @@ class PostQueryRepository extends QueryMongoDbRepository<Post, PostViewModel> {
     }
 }
 
-export const postQueryRepository = new PostQueryRepository(PostModel, mapPostToViewModel, 'Post')
+export const postQueryRepository = new PostQueryRepository()

@@ -3,11 +3,20 @@ import {BlogFilterType} from "../types/BlogFilterType";
 import {mapBlogToViewModel} from "../blog.mapper";
 import {PaginatorResponse} from "../../auth/types/paginator/PaginatorResponse";
 import {BlogPaginatorParams} from "../types/BlogPaginatorParams";
-import {QueryMongoDbRepository} from "../../../common/repositories/QueryMongoDbRepository";
-import {BlogType} from "../types/BlogType";
 import {BlogModel} from "../model/BlogModel";
+import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 
-class BlogQueryRepository extends QueryMongoDbRepository<BlogType, BlogViewModel> {
+class BlogQueryRepository {
+    async find(id: string): Promise<BlogViewModel | null> {
+        const blog = await BlogModel.findOne({_id: id});
+        return blog ? mapBlogToViewModel(blog) : null
+    }
+
+    async get(id: string): Promise<BlogViewModel | never> {
+        const blog = await BlogModel.findOne({_id: id});
+        if (!blog) throw new EntityNotFound(`Blog with ID: ${id} is not exists`)
+        return mapBlogToViewModel(blog)
+    }
 
     async findBlogs(blogPaginatorParams: BlogPaginatorParams): Promise<PaginatorResponse<BlogViewModel>> {
         const {searchNameTerm, sortBy, sortDirection} = blogPaginatorParams
@@ -21,9 +30,9 @@ class BlogQueryRepository extends QueryMongoDbRepository<BlogType, BlogViewModel
 
         const direction = sortDirection === 'asc' ? 1 : -1;
 
-        const count = await this.model.countDocuments(filter);
+        const count = await BlogModel.countDocuments(filter);
         const howManySkip = (pageNumber - 1) * pageSize;
-        const blogs = await this.model.find(filter).sort({[sortBy]: direction}).skip(howManySkip).limit(pageSize).lean()
+        const blogs = await BlogModel.find(filter).sort({[sortBy]: direction}).skip(howManySkip).limit(pageSize).lean()
 
         return {
             "pagesCount": Math.ceil(count / pageSize),
@@ -35,4 +44,4 @@ class BlogQueryRepository extends QueryMongoDbRepository<BlogType, BlogViewModel
     }
 }
 
-export const blogQueryRepository = new BlogQueryRepository(BlogModel, mapBlogToViewModel, 'Blog')
+export const blogQueryRepository = new BlogQueryRepository()
