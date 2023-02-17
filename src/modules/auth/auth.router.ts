@@ -109,7 +109,7 @@ class AuthController {
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     }
 
-    async getInfoAboutCurrentUsear(req: Request, res: Response) {
+    async getInfoAboutCurrentUser(req: Request, res: Response) {
         const user = await userQueryRepository.findMe(req.user!._id);
         res.status(HTTP_STATUSES.OK_200).json(user)
     }
@@ -163,4 +163,4 @@ authRouter.post('/new-password',
     authController.userSetNewPassword)
 
 authRouter.get('/me', jwtAuthGuardMiddleware,
-    authController.getInfoAboutCurrentUsear)
+    authController.getInfoAboutCurrentUser)

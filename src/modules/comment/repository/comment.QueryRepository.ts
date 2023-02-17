@@ -48,17 +48,16 @@ class CommentQueryRepository {
         let items: CommentViewModel[];
         if (userId) {
             const commentsIdList: Array<string> = comments.map((comment) => comment._id);
-            const myReactiondOnComments = await likesOfCommentsRepository.getUserReactionOnCommentsBunch(commentsIdList, userId)
+            const userReactionsOnComments = await likesOfCommentsRepository.getUserReactionOnCommentsBunch(commentsIdList, userId)
 
             const commentIdAndReactionsList: any = []
-            myReactiondOnComments.forEach((likeData) => {
+            userReactionsOnComments.forEach((likeData) => {
                 commentIdAndReactionsList[likeData.commentId] = likeData.status;
             })
 
             items = comments.map((comment) => {
                 const likeStatus = commentIdAndReactionsList[comment._id] || LIKE_STATUSES.NONE;
-                const viewModel = mapCommentToViewModel(comment, likeStatus)
-                return viewModel;
+                return mapCommentToViewModel(comment, likeStatus)
             })
         } else {
             items = comments.map((comment) => {

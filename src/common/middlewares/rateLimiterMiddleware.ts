@@ -58,9 +58,9 @@ export const checkRateLimiterMiddleware = (req: Request, res: Response, next: Ne
     next();
 }
 
-export const setRateLimiter = (cout: number, sec: number) => {
+export const setRateLimiter = (count: number, sec: number) => {
     return (req: Request, res: Response, next: NextFunction) => {
-        const rateLimiter = RateLimiter.manager(cout, sec)
+        const rateLimiter = RateLimiter.manager(count, sec)
         rateLimiter.putData(req.ip, req.originalUrl);
         next();
     }

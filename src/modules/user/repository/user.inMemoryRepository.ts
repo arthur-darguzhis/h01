@@ -4,7 +4,7 @@ import {db} from "../../../db";
 export const userInMemoryRepository = {
     isExists(login: string, password: string): boolean {
         const user = this.findUserByLogin(login);
-        return !!(user && (user.passwordHash === btoa(password)));
+        return !!(user && (user.passwordHash === Buffer.from(password).toString("base64")));
     },
 
     findUserByLogin(login: string): User | undefined {
