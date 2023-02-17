@@ -4,9 +4,9 @@ import {CommentModel} from "../model/CommentModel";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 
 class CommentRepository {
-    async add(newEntity: CommentType): Promise<CommentType> {
-        await CommentModel.create(newEntity)
-        return newEntity
+    async add(comment: CommentType): Promise<CommentType> {
+        await CommentModel.create(comment)
+        return comment
     }
 
     async find(id: string): Promise<CommentType | null> {

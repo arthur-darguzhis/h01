@@ -1,34 +1,58 @@
-import {CommandMongoDbRepository} from "../../../common/repositories/CommandMongoDbRepository";
 import {UserActiveSession} from "../types/UserActiveSessionType";
 import {UserActiveSessionUpdateModelType} from "../types/UserActiveSessionUpdateModelType";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 import {UserActiveSessionModel} from "../model/UserActiveSessionModel";
 
-class UsersActiveSessionsRepository extends CommandMongoDbRepository<UserActiveSession, object> {
+class UsersActiveSessionsRepository {
+
+    async add(UserActiveSession: UserActiveSession): Promise<UserActiveSession> {
+        await UserActiveSessionModel.create(UserActiveSession)
+        return UserActiveSession
+    }
+
+    async find(id: string): Promise<UserActiveSession | null> {
+        return UserActiveSessionModel.findOne({_id: id});
+    }
+
+    async get(id: string): Promise<UserActiveSession | never> {
+        const entity = await UserActiveSessionModel.findOne({_id: id});
+        if (!entity) throw new EntityNotFound(`User Active Session with ID: ${id} is not exists`);
+        return entity
+    }
+
+    async update(id: string, updateFilter: object): Promise<boolean> {
+        const result = await UserActiveSessionModel.updateOne({_id: id}, {$set: updateFilter})
+        return result.modifiedCount === 1;
+    }
+
+    async delete(id: string): Promise<boolean> {
+        const result = await UserActiveSessionModel.deleteOne({_id: id});
+        return result.deletedCount === 1;
+    }
 
     async getByDeviceId(deviceId: string): Promise<UserActiveSession> {
-        const userActiveSession = await this.model.findOne({deviceId: deviceId})
+        const userActiveSession = await UserActiveSessionModel.findOne({deviceId: deviceId})
         if (!userActiveSession) throw new EntityNotFound(`There is not session for deviceId: ${deviceId}`)
         return userActiveSession
     }
 
     async deleteByDeviceId(deviceId: string): Promise<boolean> {
-        const result = await this.model.deleteOne({deviceId: deviceId})
+        const result = await UserActiveSessionModel.deleteOne({deviceId: deviceId})
         return result.deletedCount === 1
     }
 
     async updateByDeviceId(deviceId: string, userActiveSessionUpdateModel: UserActiveSessionUpdateModelType): Promise<boolean> {
-        const result = await this.model.updateOne({deviceId: deviceId}, {$set: userActiveSessionUpdateModel})
+        const result = await UserActiveSessionModel.updateOne({deviceId: deviceId}, {$set: userActiveSessionUpdateModel})
         return result.modifiedCount === 1;
     }
 
     async removeOtherDeviceSessions(userId: string, deviceId: string): Promise<void> {
-        await this.model.deleteMany({userId: userId, deviceId: {"$ne": deviceId}})
+        await UserActiveSessionModel.deleteMany({userId: userId, deviceId: {"$ne": deviceId}})
     }
 
     async deleteUserSessionByDeviceId(userId: string, deviceId: string) {
-        await this.model.deleteOne({userId: userId, deviceId: deviceId})
+        await UserActiveSessionModel.deleteOne({userId: userId, deviceId: deviceId})
     }
 }
 
-export const usersActiveSessionsRepository = new UsersActiveSessionsRepository(UserActiveSessionModel, 'User Active Session')
+export const usersActiveSessionsRepository = new UsersActiveSessionsRepository()

@@ -4,9 +4,9 @@ import {LIKE_STATUSES} from "../types/LikeStatus";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 
 class LikesOfCommentsRepository {
-    async add(newEntity: LikeOfCommentType): Promise<LikeOfCommentType> {
-        await LikeOfCommentModel.create(newEntity)
-        return newEntity
+    async add(LikeOfComment: LikeOfCommentType): Promise<LikeOfCommentType> {
+        await LikeOfCommentModel.create(LikeOfComment)
+        return LikeOfComment
     }
 
     async find(id: string): Promise<LikeOfCommentType | null> {

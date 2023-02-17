@@ -4,9 +4,9 @@ import {PostModel} from "../types/PostModel";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 
 class PostRepository {
-    async add(newEntity: Post): Promise<Post> {
-        await PostModel.create(newEntity)
-        return newEntity
+    async add(post: Post): Promise<Post> {
+        await PostModel.create(post)
+        return post
     }
 
     async find(id: string): Promise<Post | null> {
