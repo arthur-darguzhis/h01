@@ -25,6 +25,10 @@ export class RateLimiter {
         return RateLimiter.container[key]
     }
 
+    public static resetContainer(): void {
+        RateLimiter.container = {};
+    }
+
     putData(ip: any, route: any): void | never {
         if (!this.map.hasOwnProperty(ip)) {
             this.map[ip] = []
@@ -45,10 +49,6 @@ export class RateLimiter {
         }
 
         this.map[ip][route].push(new Date().getTime());
-    }
-
-    public static resetContainer(): void {
-        RateLimiter.container = {};
     }
 }
 

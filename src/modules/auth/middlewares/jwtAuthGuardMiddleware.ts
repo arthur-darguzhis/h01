@@ -18,7 +18,7 @@ export const jwtAuthGuardMiddleware = async (req: Request, res: Response, next: 
     }
 
     const userId = jwtService.getUserIdFromAccessToken(token);
-    if(!userId){
+    if (!userId) {
         return res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401);
     }
     req.user = await usersService.findUserById(userId)

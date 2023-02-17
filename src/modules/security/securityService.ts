@@ -15,7 +15,7 @@ class SecurityService {
     }
 
     async updateUserActiveSession(deviceId: string, userActiveSessionUpdateModel: UserActiveSessionUpdateModelType) {
-        return await usersActiveSessionsRepository.updateByDeviceId(deviceId,userActiveSessionUpdateModel)
+        return await usersActiveSessionsRepository.updateByDeviceId(deviceId, userActiveSessionUpdateModel)
     }
 
     async removeOtherDeviceSessions(userId: string, deviceId: string) {
