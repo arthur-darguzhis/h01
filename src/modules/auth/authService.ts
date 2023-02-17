@@ -9,7 +9,7 @@ import add from "date-fns/add";
 import bcrypt from "bcrypt";
 import {EmailConfirmationType} from "./emailConfirmation/types/EmailConfirmationType";
 import {emailConfirmationRepository} from "./emailConfirmation/repository/emailConfirmation.MongoDbRepository";
-import {securityService} from "../security/security.service";
+import {securityService} from "../security/securityService";
 import {PasswordRecoveryInputModel} from "./types/PasswordRecoveryInputModel";
 import {PasswordRecoveryType} from "./passwordRecovery/types/PasswordRecoveryType";
 import {NewPasswordRecoveryInputModel} from "./types/NewPasswordRecoveryInputModel";

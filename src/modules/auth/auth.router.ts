@@ -14,7 +14,7 @@ import {validateUser} from "../user/middlewares/validateUser";
 import {RegistrationConfirmationCodeModel} from "./types/RegistrationConfirmationCodeModel";
 import {jwtRefreshGuardMiddleware} from "./middlewares/jwtRefreshGuardMiddleware";
 import {authService} from "./authService";
-import {securityService} from "../security/security.service";
+import {securityService} from "../security/securityService";
 import {UserActiveSession} from "../security/types/UserActiveSessionType";
 import {UserActiveSessionUpdateModelType} from "../security/types/UserActiveSessionUpdateModelType";
 import {checkRateLimiterMiddleware, setRateLimiter} from "../../common/middlewares/rateLimiterMiddleware";

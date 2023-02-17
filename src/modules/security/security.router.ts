@@ -2,7 +2,7 @@ import {Router} from "express";
 import {usersActiveSessionsQueryRepository} from "./repository/security.usersActiveSessionsQueryRepository";
 import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/checkErrorsInRequestDataMiddleware";
 import {HTTP_STATUSES} from "../../common/presentationLayer/types/HttpStatuses";
-import {securityService} from "./security.service";
+import {securityService} from "./securityService";
 import {RequestWithParams} from "../../common/presentationLayer/types/RequestTypes";
 import {jwtRefreshGuardMiddleware} from "../auth/middlewares/jwtRefreshGuardMiddleware";
 import {jwtService} from "../auth/jwt/jwtService";
