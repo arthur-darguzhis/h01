@@ -1,29 +1,54 @@
-import {CommandMongoDbRepository} from "../../../common/repositories/CommandMongoDbRepository";
 import {LikeOfCommentType} from "../types/LikeOfCommentType";
 import {LikeOfCommentModel} from "../model/likeOfCommentModel";
 import {LIKE_STATUSES} from "../types/LikeStatus";
+import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 
-class LikesOfCommentsRepository extends CommandMongoDbRepository<LikeOfCommentType, { status: string }> {
+class LikesOfCommentsRepository {
+    async add(newEntity: LikeOfCommentType): Promise<LikeOfCommentType> {
+        await LikeOfCommentModel.create(newEntity)
+        return newEntity
+    }
+
+    async find(id: string): Promise<LikeOfCommentType | null> {
+        return LikeOfCommentModel.findOne({_id: id});
+    }
+
+    async get(id: string): Promise<LikeOfCommentType | never> {
+        const entity = await LikeOfCommentModel.findOne({_id: id});
+        if (!entity) throw new EntityNotFound(`Like for comment with ID: ${id} is not exists`);
+        return entity
+    }
+
+    async update(id: string, updateFilter: { status: string }): Promise<boolean> {
+        const result = await LikeOfCommentModel.updateOne({_id: id}, {$set: updateFilter})
+        return result.modifiedCount === 1;
+    }
+
+    async delete(id: string): Promise<boolean> {
+        const result = await LikeOfCommentModel.deleteOne({_id: id});
+        return result.deletedCount === 1;
+    }
+
     async findUserReactionOnTheComment(commentId: string, userId: string): Promise<LikeOfCommentType | null> {
-        return this.model.findOne({userId: userId, commentId: commentId})
+        return LikeOfCommentModel.findOne({userId: userId, commentId: commentId})
     }
 
     async updateLikeStatus(id: string, likeStatus: string): Promise<boolean> {
-        const result = await this.model.updateOne({_id: id}, {status: likeStatus})
+        const result = await LikeOfCommentModel.updateOne({_id: id}, {status: likeStatus})
         return result.modifiedCount === 1;
     }
 
     async calculateCountOfLikes(commentId: string) {
-        return this.model.countDocuments({commentId: commentId, status: LIKE_STATUSES.LIKE});
+        return LikeOfCommentModel.countDocuments({commentId: commentId, status: LIKE_STATUSES.LIKE});
     }
 
     async calculateCountOfDislikes(commentId: string) {
-        return this.model.countDocuments({commentId: commentId, status: LIKE_STATUSES.DISLIKE});
+        return LikeOfCommentModel.countDocuments({commentId: commentId, status: LIKE_STATUSES.DISLIKE});
     }
 
     async getUserReactionOnCommentsBunch(commentsIdList: Array<string>, userId: string) {
-        return this.model.find({commentId: {"$in": commentsIdList}, userId: userId}).lean();
+        return LikeOfCommentModel.find({commentId: {"$in": commentsIdList}, userId: userId}).lean();
     }
 }
 
-export const likesOfCommentsRepository = new LikesOfCommentsRepository(LikeOfCommentModel, "Like for comment")
+export const likesOfCommentsRepository = new LikesOfCommentsRepository()

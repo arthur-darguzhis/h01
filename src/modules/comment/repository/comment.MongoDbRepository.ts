@@ -1,11 +1,36 @@
 import {CommentType} from "../types/CommentType";
 import {CommentInputModel} from "../types/CommentInputModel";
-import {CommandMongoDbRepository} from "../../../common/repositories/CommandMongoDbRepository";
 import {CommentModel} from "../model/CommentModel";
+import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 
-class CommentRepository extends CommandMongoDbRepository<CommentType, CommentInputModel> {
+class CommentRepository {
+    async add(newEntity: CommentType): Promise<CommentType> {
+        await CommentModel.create(newEntity)
+        return newEntity
+    }
+
+    async find(id: string): Promise<CommentType | null> {
+        return CommentModel.findOne({_id: id});
+    }
+
+    async get(id: string): Promise<CommentType | never> {
+        const entity = await CommentModel.findOne({_id: id});
+        if (!entity) throw new EntityNotFound(`Comment with ID: ${id} is not exists`);
+        return entity
+    }
+
+    async update(id: string, updateFilter: CommentInputModel): Promise<boolean> {
+        const result = await CommentModel.updateOne({_id: id}, {$set: updateFilter})
+        return result.modifiedCount === 1;
+    }
+
+    async delete(id: string): Promise<boolean> {
+        const result = await CommentModel.deleteOne({_id: id});
+        return result.deletedCount === 1;
+    }
+
     async updateUsersComment(commentId: string, userId: string, commentInputModel: CommentInputModel): Promise<boolean> {
-        const result = await this.model.updateOne({
+        const result = await CommentModel.updateOne({
                 "_id": commentId,
                 "commentatorInfo.userId": userId
             },
@@ -16,7 +41,7 @@ class CommentRepository extends CommandMongoDbRepository<CommentType, CommentInp
     }
 
     async deleteUsersComment(commentId: string, userId: string): Promise<boolean> {
-        const result = await this.model.deleteOne({
+        const result = await CommentModel.deleteOne({
             "_id": commentId,
             "commentatorInfo.userId": userId
         })
@@ -24,7 +49,7 @@ class CommentRepository extends CommandMongoDbRepository<CommentType, CommentInp
     }
 
     async updateLikesInfo(commentId: string, likesCount: number, dislikeCount: number): Promise<boolean> {
-        const result = await this.model.updateOne(
+        const result = await CommentModel.updateOne(
             {"_id": commentId,},
             {
                 $set: {
@@ -37,4 +62,4 @@ class CommentRepository extends CommandMongoDbRepository<CommentType, CommentInp
     }
 }
 
-export const commentRepository = new CommentRepository(CommentModel, 'Comment')
+export const commentRepository = new CommentRepository()
