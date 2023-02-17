@@ -10,9 +10,9 @@ class UsersActiveSessionsQueryRepository {
     }
 
     async get(id: string): Promise<UserActiveSessionViewModelType | never> {
-        const entity = await UserActiveSessionModel.findOne({_id: id});
-        if (!entity) throw new EntityNotFound(`User Active Session with ID: ${id} is not exists`)
-        return mapUserActiveSessionToViewModel(entity)
+        const userActiveSession = await UserActiveSessionModel.findOne({_id: id});
+        if (!userActiveSession) throw new EntityNotFound(`User Active Session with ID: ${id} is not exists`)
+        return mapUserActiveSessionToViewModel(userActiveSession)
     }
 
     async findByUserId(userId: string) {
