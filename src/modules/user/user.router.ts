@@ -16,25 +16,38 @@ import {UserPaginatorParams} from "./types/UserPaginatorParams";
 
 export const userRouter = Router({})
 
+class UsersController {
+    async createUser(req: RequestWithBody<UserInputModel>, res: Response) {
+        const newUser: User = await usersService.createUser(req.body)
+        res.status(HTTP_STATUSES.CREATED_201).json(mapUserToViewModel(newUser))
+    }
+
+    async deleteUser(req: RequestWithParams<{ id: string }>, res: Response) {
+        const isUserDeleted = await usersService.deleteUser(req.params.id)
+        if (!isUserDeleted) {
+            return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+        }
+        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
+    }
+
+    async getPaginatedUserList(req: RequestWithQuery<UserPaginatorParams>, res: Response<PaginatorResponse<UserViewModel>>) {
+        const paginatedUserList = await userQueryRepository.findUsers(req.query)
+        res.status(HTTP_STATUSES.OK_200).json(paginatedUserList)
+    }
+}
+
+const usersController = new UsersController();
+
 userRouter.post('/',
     authGuardMiddleware,
     validateUser.body.login,
     validateUser.body.email,
     validateUser.body.password,
     checkErrorsInRequestDataMiddleware,
-    async (req: RequestWithBody<UserInputModel>, res) => {
-        const newUser: User = await usersService.createUser(req.body)
-        res.status(HTTP_STATUSES.CREATED_201).json(mapUserToViewModel(newUser))
-    })
+    usersController.createUser)
 
 userRouter.delete('/:id', authGuardMiddleware,
-    async (req: RequestWithParams<{ id: string }>, res) => {
-        const isUserDeleted = await usersService.deleteUser(req.params.id)
-        if (!isUserDeleted) {
-            return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
-        }
-        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
-    })
+    usersController.deleteUser)
 
 userRouter.get('/',
     authGuardMiddleware,
@@ -45,7 +58,4 @@ userRouter.get('/',
     validatePaginator.pageSize,
     validatePaginator.pageNumber,
     checkErrorsInRequestDataMiddleware,
-    async (req: RequestWithQuery<UserPaginatorParams>, res: Response<PaginatorResponse<UserViewModel>>) => {
-        const paginatedUserList = await userQueryRepository.findUsers(req.query)
-        res.status(HTTP_STATUSES.OK_200).json(paginatedUserList)
-    })
+    usersController.getPaginatedUserList)

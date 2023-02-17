@@ -28,22 +28,50 @@ import {jwtService} from "../auth/jwt/jwtService";
 
 export const postRouter = Router({})
 
-postRouter.get('/',
-    validatePost.query.sortBy,
-    validatePost.query.sortDirection,
-    validatePaginator.pageNumber,
-    validatePaginator.pageSize,
-    checkErrorsInRequestDataMiddleware,
-    async (req: RequestWithQuery<PaginatorParams>, res: Response<PaginatorResponse<PostViewModel>>) => {
+class PostController {
+
+    async createPost(req: RequestWithBody<PostInputModel>, res: Response) {
+        const newPost = await postsService.createPost(req.body);
+        res.status(HTTP_STATUSES.CREATED_201).json(mapPostToViewModel(newPost));
+    }
+
+    async getPaginatedPostsList(req: RequestWithQuery<PaginatorParams>, res: Response<PaginatorResponse<PostViewModel>>) {
         const paginatedPostList = await postQueryRepository.findPosts(req.query);
         res.status(HTTP_STATUSES.OK_200).json(paginatedPostList)
-    })
+    }
 
-postRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res) => {
-    const post = await postQueryRepository.get(req.params.id)
-    res.status(HTTP_STATUSES.OK_200).json(post)
-})
+    async getPost(req: RequestWithParams<{ id: string }>, res: Response) {
+        const post = await postQueryRepository.get(req.params.id)
+        res.status(HTTP_STATUSES.OK_200).json(post)
+    }
 
+    async updatePost(req: RequestWithParamsAndBody<{ id: string }, PostInputModel>, res: Response) {
+        await postsService.updatePost(req.params.id, req.body)
+        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
+    }
+
+    async deletePost(req: RequestWithParams<{ id: string }>, res: Response) {
+        await postsService.deletePost(req.params.id)
+        return res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
+    }
+
+    async addCommentToPost(req: RequestWithParamsAndBody<{ postId: string }, CommentInputModel>, res: Response) {
+        const newComment = await commentsService.addComment(req.params.postId, req.body, req.user!);
+        return res.status(HTTP_STATUSES.CREATED_201).json(mapCommentToViewModel(newComment));
+    }
+
+    async getPaginatedCommentsListForPost(req: RequestWithParamsAndQuery<{ postId: string }, PaginatorParams>, res: Response) {
+        let userId = null;
+        if (req.headers.authorization) {
+            const token = req.headers.authorization.split(' ')[1]
+            userId = jwtService.getUserIdFromAccessToken(token);
+        }
+        const paginatedCommentsList = await commentQueryRepository.findCommentsByPostId(req.params.postId, req.query, userId)
+        res.status(HTTP_STATUSES.OK_200).json(paginatedCommentsList);
+    }
+}
+
+const postController = new PostController()
 postRouter.post('/',
     authGuardMiddleware,
     validatePost.body.title,
@@ -51,10 +79,17 @@ postRouter.post('/',
     validatePost.body.content,
     validatePost.body.blogId,
     checkErrorsInRequestDataMiddleware,
-    async (req: RequestWithBody<PostInputModel>, res) => {
-        const newPost = await postsService.createPost(req.body);
-        res.status(HTTP_STATUSES.CREATED_201).json(mapPostToViewModel(newPost));
-    })
+    postController.createPost)
+
+postRouter.get('/',
+    validatePost.query.sortBy,
+    validatePost.query.sortDirection,
+    validatePaginator.pageNumber,
+    validatePaginator.pageSize,
+    checkErrorsInRequestDataMiddleware,
+    postController.getPaginatedPostsList)
+
+postRouter.get('/:id', postController.getPost)
 
 postRouter.put('/:id',
     authGuardMiddleware,
@@ -63,24 +98,15 @@ postRouter.put('/:id',
     validatePost.body.content,
     validatePost.body.blogId,
     checkErrorsInRequestDataMiddleware,
-    async (req: RequestWithParamsAndBody<{ id: string }, PostInputModel>, res) => {
-        await postsService.updatePost(req.params.id, req.body)
-        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
-    })
+    postController.updatePost)
 
-postRouter.delete('/:id', authGuardMiddleware, async (req: RequestWithParams<{ id: string }>, res) => {
-    await postsService.deletePost(req.params.id)
-    return res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
-})
+postRouter.delete('/:id', authGuardMiddleware, postController.deletePost)
 
 postRouter.post('/:postId/comments',
     jwtAuthGuardMiddleware,
     validateComment.body.content,
     checkErrorsInRequestDataMiddleware,
-    async (req: RequestWithParamsAndBody<{ postId: string }, CommentInputModel>, res) => {
-        const newComment = await commentsService.addComment(req.params.postId, req.body, req.user!);
-        return res.status(HTTP_STATUSES.CREATED_201).json(mapCommentToViewModel(newComment));
-    })
+    postController.addCommentToPost)
 
 postRouter.get('/:postId/comments',
     validateComment.query.sortBy,
@@ -88,12 +114,4 @@ postRouter.get('/:postId/comments',
     validatePaginator.pageSize,
     validatePaginator.pageNumber,
     checkErrorsInRequestDataMiddleware,
-    async (req: RequestWithParamsAndQuery<{ postId: string }, PaginatorParams>, res) => {
-        let userId = null;
-        if (req.headers.authorization) {
-            const token = req.headers.authorization.split(' ')[1]
-            userId = jwtService.getUserIdFromAccessToken(token);
-        }
-        const paginatedCommentsList = await commentQueryRepository.findCommentsByPostId(req.params.postId, req.query, userId)
-        res.status(HTTP_STATUSES.OK_200).json(paginatedCommentsList);
-    })
+    postController.getPaginatedCommentsListForPost)

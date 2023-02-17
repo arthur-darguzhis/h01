@@ -27,6 +27,45 @@ import {PaginatorParams} from "../auth/types/paginator/PaginatorParams";
 
 export const blogRouter = Router({})
 
+class BlogController {
+    async getPaginatedBlogList(req: RequestWithQuery<BlogPaginatorParams>, res: Response<PaginatorResponse<BlogViewModel>>) {
+        const PaginatedBlogList = await blogQueryRepository.findBlogs(req.query);
+        res.status(HTTP_STATUSES.OK_200).json(PaginatedBlogList)
+    }
+
+    async getBlog(req: RequestWithParams<{ id: string }>, res: Response) {
+        const blog = await blogQueryRepository.get(req.params.id)
+        res.status(HTTP_STATUSES.OK_200).json(blog)
+    }
+
+    async getPaginatedPostListByPost(req: RequestWithParamsAndQuery<{ id: string }, PaginatorParams>, res: Response) {
+        const paginatedPostList = await postQueryRepository.findPostsByBlogId(req.params.id, req.query);
+        res.status(HTTP_STATUSES.OK_200).json(paginatedPostList)
+    }
+
+    async createPostInBlog(req: RequestWithParamsAndBody<{ id: string }, BlogPostInputModel>, res: Response) {
+        const newPost = await postsService.createPostInBlog(req.params.id, req.body);
+        res.status(HTTP_STATUSES.CREATED_201).json(mapPostToViewModel(newPost));
+    }
+
+    async createBlog(req: RequestWithBody<BlogInputModel>, res: Response) {
+        const newBlog = await blogsService.createBlog(req.body);
+        res.status(HTTP_STATUSES.CREATED_201).json(mapBlogToViewModel(newBlog));
+    }
+
+    async updateBlog(req: RequestWithParamsAndBody<{ id: string }, BlogInputModel>, res: Response) {
+        await blogsService.updateBlog(req.params.id, req.body)
+        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
+    }
+
+    async deleteBlog(req: RequestWithParams<{ id: string }>, res: Response) {
+        await blogsService.deleteBlog(req.params.id)
+        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
+    }
+}
+
+const blogController = new BlogController()
+
 blogRouter.get('/',
     validateBlog.query.searchNameTerm,
     validateBlog.query.sortBy,
@@ -34,15 +73,9 @@ blogRouter.get('/',
     validatePaginator.pageSize,
     validatePaginator.pageNumber,
     checkErrorsInRequestDataMiddleware,
-    async (req: RequestWithQuery<BlogPaginatorParams>, res: Response<PaginatorResponse<BlogViewModel>>) => {
-        const PaginatedBlogList = await blogQueryRepository.findBlogs(req.query);
-        res.status(HTTP_STATUSES.OK_200).json(PaginatedBlogList)
-    })
+    blogController.getPaginatedBlogList)
 
-blogRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res) => {
-    const blog = await blogQueryRepository.get(req.params.id)
-    res.status(HTTP_STATUSES.OK_200).json(blog)
-})
+blogRouter.get('/:id', blogController.getBlog)
 
 blogRouter.get('/:id/posts',
     validatePost.query.sortBy,
@@ -50,10 +83,7 @@ blogRouter.get('/:id/posts',
     validatePaginator.pageSize,
     validatePaginator.pageNumber,
     checkErrorsInRequestDataMiddleware,
-    async (req: RequestWithParamsAndQuery<{ id: string }, PaginatorParams>, res) => {
-        const paginatedPostList = await postQueryRepository.findPostsByBlogId(req.params.id, req.query);
-        res.status(HTTP_STATUSES.OK_200).json(paginatedPostList)
-    })
+    blogController.getPaginatedPostListByPost)
 
 blogRouter.post('/',
     authGuardMiddleware,
@@ -61,10 +91,7 @@ blogRouter.post('/',
     validateBlog.body.description,
     validateBlog.body.websiteUrl,
     checkErrorsInRequestDataMiddleware,
-    async (req: RequestWithBody<BlogInputModel>, res) => {
-        const newBlog = await blogsService.createBlog(req.body);
-        res.status(HTTP_STATUSES.CREATED_201).json(mapBlogToViewModel(newBlog));
-    })
+    blogController.createBlog)
 
 
 blogRouter.post('/:id/posts',
@@ -73,10 +100,7 @@ blogRouter.post('/:id/posts',
     validatePost.body.shortDescription,
     validatePost.body.content,
     checkErrorsInRequestDataMiddleware,
-    async (req: RequestWithParamsAndBody<{ id: string }, BlogPostInputModel>, res) => {
-        const newPost = await postsService.createPostInBlog(req.params.id, req.body);
-        res.status(HTTP_STATUSES.CREATED_201).json(mapPostToViewModel(newPost));
-    })
+    blogController.createPostInBlog)
 
 blogRouter.put('/:id',
     authGuardMiddleware,
@@ -84,12 +108,6 @@ blogRouter.put('/:id',
     validateBlog.body.description,
     validateBlog.body.websiteUrl,
     checkErrorsInRequestDataMiddleware,
-    async (req: RequestWithParamsAndBody<{ id: string }, BlogInputModel>, res) => {
-        await blogsService.updateBlog(req.params.id, req.body)
-        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
-    })
+    blogController.updateBlog)
 
-blogRouter.delete('/:id', authGuardMiddleware, async (req: RequestWithParams<{ id: string }>, res) => {
-    await blogsService.deleteBlog(req.params.id)
-    res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
-})
+blogRouter.delete('/:id', authGuardMiddleware, blogController.deleteBlog)
