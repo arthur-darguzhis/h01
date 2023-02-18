@@ -3,7 +3,7 @@ import {CommentInputModel} from "../types/CommentInputModel";
 import {CommentModel} from "../model/CommentModel";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 
-class CommentRepository {
+export class CommentRepository {
     async add(comment: CommentType): Promise<CommentType> {
         await CommentModel.create(comment)
         return comment

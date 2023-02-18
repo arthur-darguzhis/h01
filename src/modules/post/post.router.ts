@@ -17,7 +17,7 @@ import {validatePaginator} from "../../common/middlewares/validatePaginator";
 import {CommentInputModel} from "../comment/types/CommentInputModel";
 import {validateComment} from "../comment/middlewares/validateComment";
 import {jwtAuthGuardMiddleware} from "../auth/middlewares/jwtAuthGuardMiddleware";
-import {commentsService} from "../comment/commentsService";
+import {CommentsService} from "../comment/commentsService";
 import {commentQueryRepository} from "../comment/repository/comment.QueryRepository";
 import {mapCommentToViewModel} from "../comment/comment.mapper";
 import {mapPostToViewModel} from "./post.mapper";
@@ -29,6 +29,11 @@ import {jwtService} from "../auth/jwt/jwtService";
 export const postRouter = Router({})
 
 class PostController {
+    private commentsService: CommentsService
+
+    constructor() {
+        this.commentsService = new CommentsService();
+    }
 
     async createPost(req: RequestWithBody<PostInputModel>, res: Response) {
         const newPost = await postsService.createPost(req.body);
@@ -56,7 +61,7 @@ class PostController {
     }
 
     async addCommentToPost(req: RequestWithParamsAndBody<{ postId: string }, CommentInputModel>, res: Response) {
-        const newComment = await commentsService.addComment(req.params.postId, req.body, req.user!);
+        const newComment = await this.commentsService.addComment(req.params.postId, req.body, req.user!);
         return res.status(HTTP_STATUSES.CREATED_201).json(mapCommentToViewModel(newComment));
     }
 
@@ -79,7 +84,7 @@ postRouter.post('/',
     validatePost.body.content,
     validatePost.body.blogId,
     checkErrorsInRequestDataMiddleware,
-    postController.createPost)
+    postController.createPost.bind(postController))
 
 postRouter.get('/',
     validatePost.query.sortBy,
@@ -87,7 +92,7 @@ postRouter.get('/',
     validatePaginator.pageNumber,
     validatePaginator.pageSize,
     checkErrorsInRequestDataMiddleware,
-    postController.getPaginatedPostsList)
+    postController.getPaginatedPostsList.bind(postController))
 
 postRouter.get('/:id', postController.getPost)
 
@@ -98,7 +103,7 @@ postRouter.put('/:id',
     validatePost.body.content,
     validatePost.body.blogId,
     checkErrorsInRequestDataMiddleware,
-    postController.updatePost)
+    postController.updatePost.bind(postController))
 
 postRouter.delete('/:id', authGuardMiddleware, postController.deletePost)
 
@@ -106,7 +111,7 @@ postRouter.post('/:postId/comments',
     jwtAuthGuardMiddleware,
     validateComment.body.content,
     checkErrorsInRequestDataMiddleware,
-    postController.addCommentToPost)
+    postController.addCommentToPost.bind(postController))
 
 postRouter.get('/:postId/comments',
     validateComment.query.sortBy,
@@ -114,4 +119,4 @@ postRouter.get('/:postId/comments',
     validatePaginator.pageSize,
     validatePaginator.pageNumber,
     checkErrorsInRequestDataMiddleware,
-    postController.getPaginatedCommentsListForPost)
+    postController.getPaginatedCommentsListForPost.bind(postController))

@@ -2,15 +2,23 @@ import {CommentType} from "./types/CommentType";
 import {ObjectId} from "mongodb";
 import {CommentInputModel} from "./types/CommentInputModel";
 import {User} from "../user/types/UserType";
-import {commentRepository} from "./repository/comment.MongoDbRepository";
-import {postRepository} from "../post/repository/post.MongoDbRepository";
+import {CommentRepository} from "./repository/comment.MongoDbRepository";
+import {PostRepository} from "../post/repository/post.MongoDbRepository";
 import {Forbidden} from "../../common/exceptions/Forbidden";
 import {likesOfCommentsRepository} from "./repository/likesOfComments.MongoDbRepository";
 import {LikeOfComment} from "./types/LikeOfCommentType";
 
-class CommentsService {
+export class CommentsService {
+    private commentRepository: CommentRepository;
+    private postRepository: PostRepository;
+
+    constructor() {
+        this.commentRepository = new CommentRepository();
+        this.postRepository = new PostRepository();
+    }
+
     async addComment(postId: string, commentInputModel: CommentInputModel, currentUser: User): Promise<CommentType> {
-        const post = await postRepository.get(postId);
+        const post = await this.postRepository.get(postId);
 
         const newComment: CommentType = {
             _id: new ObjectId().toString(),
@@ -27,29 +35,29 @@ class CommentsService {
             }
         }
 
-        return await commentRepository.add(newComment);
+        return await this.commentRepository.add(newComment);
     }
 
     async updateUsersComment(commentId: string, userId: string, commentInputModel: CommentInputModel): Promise<boolean | never> {
-        const comment = await commentRepository.get(commentId)
+        const comment = await this.commentRepository.get(commentId)
 
         if (comment.commentatorInfo.userId !== userId) {
             throw new Forbidden("You can update only your comments")
         }
-        return await commentRepository.updateUsersComment(commentId, userId, commentInputModel)
+        return await this.commentRepository.updateUsersComment(commentId, userId, commentInputModel)
     }
 
     async deleteUsersComment(commentId: string, userId: string): Promise<boolean | never> {
-        const comment = await commentRepository.get(commentId)
+        const comment = await this.commentRepository.get(commentId)
 
         if (comment.commentatorInfo.userId !== userId) {
             throw new Forbidden("You can delete only your comments")
         }
-        return await commentRepository.deleteUsersComment(commentId, userId)
+        return await this.commentRepository.deleteUsersComment(commentId, userId)
     }
 
     async processLikeStatus(userId: string, commentId: string, likeStatus: string): Promise<boolean | never> {
-        const comment = await commentRepository.get(commentId)
+        const comment = await this.commentRepository.get(commentId)
         const userReaction = await likesOfCommentsRepository.findUserReactionOnTheComment(commentId, userId)
 
         if (!userReaction) {
@@ -74,7 +82,7 @@ class CommentsService {
     async updateLikesAndDislikesCountInComment(commentId: string) {
         const likesCount = await likesOfCommentsRepository.calculateCountOfLikes(commentId);
         const dislikesCount = await likesOfCommentsRepository.calculateCountOfDislikes(commentId);
-        await commentRepository.updateLikesInfo(commentId, likesCount, dislikesCount)
+        await this.commentRepository.updateLikesInfo(commentId, likesCount, dislikesCount)
     }
 }
 
