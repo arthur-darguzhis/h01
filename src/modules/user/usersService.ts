@@ -4,14 +4,16 @@ import {UserRepository, userRepository} from "./repository/user.MongoDbRepositor
 import bcrypt from 'bcrypt'
 import {emailsManager} from "../../common/managers/email/emailsManager";
 import {UnprocessableEntity} from "../../common/exceptions/UnprocessableEntity";
-import {emailConfirmationRepository} from "../auth/emailConfirmation/repository/emailConfirmation.MongoDbRepository";
+import {EmailConfirmationRepository} from "../auth/emailConfirmation/repository/emailConfirmation.MongoDbRepository";
 import {EmailConfirmation} from "../auth/emailConfirmation/types/EmailConfirmation";
 
 export class UsersService {
     public userRepository: UserRepository;
+    public emailConfirmationRepository: EmailConfirmationRepository;
 
     constructor() {
         this.userRepository = new UserRepository()
+        this.emailConfirmationRepository = new EmailConfirmationRepository()
     }
 
     async createUser(userInputModel: UserInputModel): Promise<User> {
@@ -50,7 +52,7 @@ export class UsersService {
     }
 
     async confirmEmail(code: string): Promise<true | never> {
-        const emailConfirmation = await emailConfirmationRepository.findByConfirmationCode(code);
+        const emailConfirmation = await this.emailConfirmationRepository.findByConfirmationCode(code);
         if (!emailConfirmation) {
             throw new UnprocessableEntity('The confirmation code is invalid')
         }
@@ -78,15 +80,15 @@ export class UsersService {
         if (!user) {
             throw new UnprocessableEntity('The email is not in the database confirmed')
         }
-        const emailConfirmation = await emailConfirmationRepository.getByUserId(user._id);
+        const emailConfirmation = await this.emailConfirmationRepository.getByUserId(user._id);
         if (user.isActive || emailConfirmation.isConfirmed) {
             throw new UnprocessableEntity('The email is already confirmed')
         }
 
         const newEmailConfirmation = new EmailConfirmation(user._id)
 
-        await emailConfirmationRepository.delete(emailConfirmation._id);
-        await emailConfirmationRepository.add(newEmailConfirmation);
+        await this.emailConfirmationRepository.delete(emailConfirmation._id);
+        await this.emailConfirmationRepository.add(newEmailConfirmation);
 
         emailsManager.sendRegistrationConfirmationLetter(user, newEmailConfirmation)
 
@@ -94,7 +96,7 @@ export class UsersService {
     }
 
     async confirmEmailConfirmationCode(emailConfirmationId: string): Promise<boolean> {
-        return await emailConfirmationRepository.update(emailConfirmationId, {isConfirmed: true})
+        return await this.emailConfirmationRepository.update(emailConfirmationId, {isConfirmed: true})
     }
 
     async activateUser(userId: string): Promise<boolean> {
