@@ -9,7 +9,7 @@ import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
 import {User} from "../../../src/modules/user/types/UserType";
-import {LIKE_STATUSES} from "../../../src/modules/comment/types/LikeStatus";
+import {LikeOfComment} from "../../../src/modules/comment/types/LikeOfCommentType";
 
 describe('POST -> "/posts/:postId/comments"', () => {
     let blog: Blog;
@@ -105,7 +105,7 @@ describe('POST -> "/posts/:postId/comments"', () => {
             "likesInfo": {
                 "dislikesCount": 0,
                 "likesCount": 0,
-                "myStatus": LIKE_STATUSES.NONE,
+                "myStatus": LikeOfComment.LIKE_STATUS_OPTIONS.NONE,
             },
         })
     })

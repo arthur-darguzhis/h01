@@ -5,9 +5,8 @@ import {User} from "../user/types/UserType";
 import {commentRepository} from "./repository/comment.MongoDbRepository";
 import {postRepository} from "../post/repository/post.MongoDbRepository";
 import {Forbidden} from "../../common/exceptions/Forbidden";
-import {LikeStatus} from "./types/LikeStatus";
 import {likesOfCommentsRepository} from "./repository/likesOfComments.MongoDbRepository";
-import {LikeOfCommentType} from "./types/LikeOfCommentType";
+import {LikeOfComment} from "./types/LikeOfCommentType";
 
 class CommentsService {
     async addComment(postId: string, commentInputModel: CommentInputModel, currentUser: User): Promise<CommentType> {
@@ -49,18 +48,17 @@ class CommentsService {
         return await commentRepository.deleteUsersComment(commentId, userId)
     }
 
-    async processLikeStatus(userId: string, commentId: string, likeStatus: LikeStatus): Promise<boolean | never> {
+    async processLikeStatus(userId: string, commentId: string, likeStatus: string): Promise<boolean | never> {
         const comment = await commentRepository.get(commentId)
         const userReaction = await likesOfCommentsRepository.findUserReactionOnTheComment(commentId, userId)
 
         if (!userReaction) {
-            const newUserReactionOnComment: LikeOfCommentType = {
-                _id: new ObjectId().toString(),
-                userId: userId,
-                commentId: commentId,
-                status: likeStatus,
-                createdAt: new Date().toISOString()
-            }
+            const newUserReactionOnComment = new LikeOfComment(
+                userId,
+                commentId,
+                likeStatus,
+            )
+
             await likesOfCommentsRepository.add(newUserReactionOnComment)
         } else {
             const previousLikeStatus = userReaction.status

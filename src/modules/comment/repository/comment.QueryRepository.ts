@@ -6,7 +6,7 @@ import {postQueryRepository} from "../../post/repository/post.QueryRepository";
 import {CommentModel} from "../model/CommentModel";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 import {likesOfCommentsRepository} from "./likesOfComments.MongoDbRepository";
-import {LIKE_STATUSES} from "../types/LikeStatus";
+import {LikeOfComment} from "../types/LikeOfCommentType";
 
 class CommentQueryRepository {
 
@@ -19,7 +19,7 @@ class CommentQueryRepository {
         const comment = await CommentModel.findOne({_id: id});
         if (!comment) throw new EntityNotFound(`Comment with ID: ${id} is not exists`)
 
-        let myStatus = LIKE_STATUSES.NONE
+        let myStatus = LikeOfComment.LIKE_STATUS_OPTIONS.NONE
         if (userId) {
             const myReaction = await likesOfCommentsRepository.findUserReactionOnTheComment(comment._id, userId)
             if (myReaction) {
@@ -55,7 +55,7 @@ class CommentQueryRepository {
             })
 
             items = comments.map((comment) => {
-                const likeStatus = commentIdAndReactionsList[comment._id] || LIKE_STATUSES.NONE;
+                const likeStatus = commentIdAndReactionsList[comment._id] || LikeOfComment.LIKE_STATUS_OPTIONS.NONE;
                 return mapCommentToViewModel(comment, likeStatus)
             })
         } else {

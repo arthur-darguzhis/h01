@@ -4,7 +4,7 @@ import {BlogInputModel} from "../../../src/modules/blog/types/BlogInputModel";
 import request from "supertest";
 import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";
-import {cleanDbBeforeTest} from "../../../src/common/testing/cleanDbBeforeTest";
+import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
 
 describe('PUT -> "/blogs/:id"', () => {
     let blog: Blog;
@@ -16,7 +16,6 @@ describe('PUT -> "/blogs/:id"', () => {
 
     beforeAll(async () => {
         await cleanDbBeforeTest()
-        // await mongoose.connection.dropDatabase()
 
         blog = await blogsService.createBlog({
             name: 'first blog',
@@ -26,7 +25,7 @@ describe('PUT -> "/blogs/:id"', () => {
     })
 
     afterAll(async () => {
-        // await mongoose.disconnect();
+        await closeTestMongooseConnection()
     })
 
     it('Should return error if auth credentials are incorrect. Status 401', async () => {

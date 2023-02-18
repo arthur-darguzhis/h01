@@ -9,7 +9,7 @@ import {CommentInputModel} from "../../../src/modules/comment/types/CommentInput
 import {Blog} from "../../../src/modules/blog/types/BlogType";
 import {Post} from "../../../src/modules/post/types/PostType";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
-import {LIKE_STATUSES} from "../../../src/modules/comment/types/LikeStatus";
+import {LikeOfComment} from "../../../src/modules/comment/types/LikeOfCommentType";
 
 describe('PUT -> /comments/:commentId', () => {
     let blog: Blog;
@@ -150,7 +150,7 @@ describe('PUT -> /comments/:commentId', () => {
             "likesInfo": {
                 "dislikesCount": 0,
                 "likesCount": 0,
-                "myStatus": LIKE_STATUSES.NONE,
+                "myStatus": LikeOfComment.LIKE_STATUS_OPTIONS.NONE,
             },
         })
     })

@@ -1,8 +1,8 @@
 import {CommentType} from "./types/CommentType";
 import {CommentViewModel} from "./types/CommentViewModel";
-import {LIKE_STATUSES} from "./types/LikeStatus";
+import {LikeOfComment} from "./types/LikeOfCommentType";
 
-export const mapCommentToViewModel = (comment: CommentType, myStatus: string = LIKE_STATUSES.NONE): CommentViewModel => {
+export const mapCommentToViewModel = (comment: CommentType, myStatus: string = LikeOfComment.LIKE_STATUS_OPTIONS.NONE): CommentViewModel => {
     return {
         id: comment._id,
         content: comment.content,

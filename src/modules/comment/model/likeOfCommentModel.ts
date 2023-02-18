@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import {LikeOfCommentType} from "../types/LikeOfCommentType";
+import {LikeOfComment} from "../types/LikeOfCommentType";
 
-const likeOfCommentSchema = new mongoose.Schema<LikeOfCommentType>({
+const likeOfCommentSchema = new mongoose.Schema<LikeOfComment>({
     _id: {type: String, required: true},
     userId: {type: String, required: true},
     commentId: {type: String, required: true},

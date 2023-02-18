@@ -9,7 +9,7 @@ import {LoginInputModel} from "../../../src/modules/auth/types/LoginInputModel";
 import request from "supertest";
 import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";
-import {LIKE_STATUSES} from "../../../src/modules/comment/types/LikeStatus";
+import {LikeOfComment} from "../../../src/modules/comment/types/LikeOfCommentType";
 
 describe('PUT -> /comments/:commentId/like-status', () => {
     let blog: Blog;
@@ -83,7 +83,7 @@ describe('PUT -> /comments/:commentId/like-status', () => {
         await request(app).put('/comments/63d11d1562ede10be4f024ad/like-status')
             .auth(token1, {type: "bearer"})
             .send({
-                "likeStatus": LIKE_STATUSES.LIKE
+                "likeStatus": LikeOfComment.LIKE_STATUS_OPTIONS.LIKE
             }).expect(HTTP_STATUSES.NOT_FOUND_404)
     })
 
@@ -91,7 +91,7 @@ describe('PUT -> /comments/:commentId/like-status', () => {
         await request(app).put('/comments/' + commentId + '/like-status')
             .auth(token1, {type: "bearer"})
             .send({
-                "likeStatus": LIKE_STATUSES.LIKE
+                "likeStatus": LikeOfComment.LIKE_STATUS_OPTIONS.LIKE
             }).expect(HTTP_STATUSES.NO_CONTENT_204);
 
         const commentsResponse = await request(app).get('/comments/' + commentId)
@@ -110,7 +110,7 @@ describe('PUT -> /comments/:commentId/like-status', () => {
                 "likesInfo": {
                     "likesCount": 1,
                     "dislikesCount": 0,
-                    "myStatus": LIKE_STATUSES.LIKE
+                    "myStatus": LikeOfComment.LIKE_STATUS_OPTIONS.LIKE
                 }
             }
         )
@@ -136,7 +136,7 @@ describe('PUT -> /comments/:commentId/like-status', () => {
         await request(app).put('/comments/' + commentId + '/like-status')
             .auth(token1, {type: "bearer"})
             .send({
-                "likeStatus": LIKE_STATUSES.DISLIKE
+                "likeStatus": LikeOfComment.LIKE_STATUS_OPTIONS.DISLIKE
             }).expect(HTTP_STATUSES.NO_CONTENT_204)
 
         const commentsResponse = await request(app).get('/comments/' + commentId)
@@ -155,7 +155,7 @@ describe('PUT -> /comments/:commentId/like-status', () => {
                 "likesInfo": {
                     "likesCount": 0,
                     "dislikesCount": 1,
-                    "myStatus": LIKE_STATUSES.DISLIKE
+                    "myStatus": LikeOfComment.LIKE_STATUS_OPTIONS.DISLIKE
                 }
             }
         )
@@ -165,7 +165,7 @@ describe('PUT -> /comments/:commentId/like-status', () => {
         await request(app).put('/comments/' + commentId + '/like-status')
             .auth(token1, {type: "bearer"})
             .send({
-                "likeStatus": LIKE_STATUSES.NONE
+                "likeStatus": LikeOfComment.LIKE_STATUS_OPTIONS.NONE
             }).expect(HTTP_STATUSES.NO_CONTENT_204)
 
         const commentsResponse = await request(app).get('/comments/' + commentId)
@@ -184,7 +184,7 @@ describe('PUT -> /comments/:commentId/like-status', () => {
                 "likesInfo": {
                     "likesCount": 0,
                     "dislikesCount": 0,
-                    "myStatus": LIKE_STATUSES.NONE
+                    "myStatus": LikeOfComment.LIKE_STATUS_OPTIONS.NONE
                 }
             }
         )

@@ -1,8 +1,8 @@
 import {body} from "express-validator";
-import {LIKE_STATUSES} from "../types/LikeStatus";
+import {LikeOfComment} from "../types/LikeOfCommentType";
 
 export const validateLikeStatus = {
     body: {
-        likeStatus: body('likeStatus').isIn(Object.values(LIKE_STATUSES))
+        likeStatus: body('likeStatus').isIn(Object.values(LikeOfComment.LIKE_STATUS_OPTIONS))
     }
 }
