@@ -1,6 +1,6 @@
 import {Response, Router} from "express";
 import {RequestWithParams, RequestWithParamsAndBody} from "../../common/presentationLayer/types/RequestTypes";
-import {commentQueryRepository} from "./repository/comment.QueryRepository";
+import {CommentQueryRepository} from "./repository/comment.QueryRepository";
 import {HTTP_STATUSES} from "../../common/presentationLayer/types/HttpStatuses";
 import {CommentInputModel} from "./types/CommentInputModel";
 import {CommentsService} from "./commentsService";
@@ -15,9 +15,11 @@ export const commentRouter = Router({})
 
 class CommentController {
     private commentsService: CommentsService
+    private commentQueryRepository: CommentQueryRepository
 
     constructor() {
         this.commentsService = new CommentsService()
+        this.commentQueryRepository = new CommentQueryRepository()
     }
 
     async getComment(req: RequestWithParams<{ commentId: string }>, res: Response) {
@@ -26,7 +28,7 @@ class CommentController {
             const token = req.headers.authorization.split(' ')[1]
             userId = jwtService.getUserIdFromAccessToken(token);
         }
-        const comment = await commentQueryRepository.get(req.params.commentId, userId)
+        const comment = await this.commentQueryRepository.get(req.params.commentId, userId)
         res.status(HTTP_STATUSES.OK_200).json(comment)
     }
 

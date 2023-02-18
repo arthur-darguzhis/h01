@@ -3,7 +3,7 @@ import {mapUserActiveSessionToViewModel} from "../userActiveSession.mapper";
 import {UserActiveSessionModel} from "../model/UserActiveSessionModel";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 
-class UsersActiveSessionsQueryRepository {
+export class UsersActiveSessionsQueryRepository {
     async find(id: string): Promise<UserActiveSessionViewModelType | null> {
         const userActiveSession = await UserActiveSessionModel.findOne({_id: id});
         return userActiveSession ? mapUserActiveSessionToViewModel(userActiveSession) : null
@@ -20,5 +20,3 @@ class UsersActiveSessionsQueryRepository {
         return activeSessions.map(mapUserActiveSessionToViewModel)
     }
 }
-
-export const usersActiveSessionsQueryRepository = new UsersActiveSessionsQueryRepository()

@@ -5,16 +5,18 @@ import {User} from "../user/types/UserType";
 import {CommentRepository} from "./repository/comment.MongoDbRepository";
 import {PostRepository} from "../post/repository/post.MongoDbRepository";
 import {Forbidden} from "../../common/exceptions/Forbidden";
-import {likesOfCommentsRepository} from "./repository/likesOfComments.MongoDbRepository";
+import {LikesOfCommentsRepository} from "./repository/likesOfComments.MongoDbRepository";
 import {LikeOfComment} from "./types/LikeOfCommentType";
 
 export class CommentsService {
     private commentRepository: CommentRepository;
     private postRepository: PostRepository;
+    private likesOfCommentsRepository: LikesOfCommentsRepository;
 
     constructor() {
         this.commentRepository = new CommentRepository();
         this.postRepository = new PostRepository();
+        this.likesOfCommentsRepository = new LikesOfCommentsRepository()
     }
 
     async addComment(postId: string, commentInputModel: CommentInputModel, currentUser: User): Promise<CommentType> {
@@ -58,7 +60,7 @@ export class CommentsService {
 
     async processLikeStatus(userId: string, commentId: string, likeStatus: string): Promise<boolean | never> {
         const comment = await this.commentRepository.get(commentId)
-        const userReaction = await likesOfCommentsRepository.findUserReactionOnTheComment(commentId, userId)
+        const userReaction = await this.likesOfCommentsRepository.findUserReactionOnTheComment(commentId, userId)
 
         if (!userReaction) {
             const newUserReactionOnComment = new LikeOfComment(
@@ -67,23 +69,21 @@ export class CommentsService {
                 likeStatus,
             )
 
-            await likesOfCommentsRepository.add(newUserReactionOnComment)
+            await this.likesOfCommentsRepository.add(newUserReactionOnComment)
         } else {
             const previousLikeStatus = userReaction.status
             if (previousLikeStatus === likeStatus) {
                 return true;
             }
-            await likesOfCommentsRepository.updateLikeStatus(userReaction._id, likeStatus)
+            await this.likesOfCommentsRepository.updateLikeStatus(userReaction._id, likeStatus)
         }
         await this.updateLikesAndDislikesCountInComment(comment._id)
         return true;
     }
 
     async updateLikesAndDislikesCountInComment(commentId: string) {
-        const likesCount = await likesOfCommentsRepository.calculateCountOfLikes(commentId);
-        const dislikesCount = await likesOfCommentsRepository.calculateCountOfDislikes(commentId);
+        const likesCount = await this.likesOfCommentsRepository.calculateCountOfLikes(commentId);
+        const dislikesCount = await this.likesOfCommentsRepository.calculateCountOfDislikes(commentId);
         await this.commentRepository.updateLikesInfo(commentId, likesCount, dislikesCount)
     }
 }
-
-export const commentsService = new CommentsService()

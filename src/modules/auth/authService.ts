@@ -5,15 +5,25 @@ import {User} from "../user/types/UserType";
 import {emailsManager} from "../../common/managers/email/emailsManager";
 import bcrypt from "bcrypt";
 import {EmailConfirmation} from "./emailConfirmation/types/EmailConfirmation";
-import {emailConfirmationRepository} from "./emailConfirmation/repository/emailConfirmation.MongoDbRepository";
-import {securityService} from "../security/securityService";
+import {EmailConfirmationRepository} from "./emailConfirmation/repository/emailConfirmation.MongoDbRepository";
+import {SecurityService} from "../security/securityService";
 import {PasswordRecoveryInputModel} from "./types/PasswordRecoveryInputModel";
 import {PasswordRecovery} from "./passwordRecovery/types/PasswordRecoveryType";
 import {NewPasswordRecoveryInputModel} from "./types/NewPasswordRecoveryInputModel";
-import {passwordRecoveryRepository} from "./passwordRecovery/passwordRecoveryRepository";
+import {PasswordRecoveryRepository} from "./passwordRecovery/passwordRecoveryRepository";
 import {UnprocessableEntity} from "../../common/exceptions/UnprocessableEntity";
 
 class AuthService {
+    private securityService: SecurityService
+    private passwordRecoveryRepository: PasswordRecoveryRepository
+    private emailConfirmationRepository: EmailConfirmationRepository
+
+    constructor() {
+        this.securityService = new SecurityService();
+        this.passwordRecoveryRepository = new PasswordRecoveryRepository();
+        this.emailConfirmationRepository = new EmailConfirmationRepository();
+    }
+
     async registerNewUser(userInputModel: UserInputModel): Promise<[user: User, emailConfirmation: EmailConfirmation] | never> {
         const isUserExists = await userRepository.isExistsWithSameEmailOrLogin(userInputModel.email, userInputModel.login);
         if (isUserExists) {
@@ -32,7 +42,7 @@ class AuthService {
 
         emailsManager.sendRegistrationConfirmationLetter(newUser, emailConfirmation)
         await userRepository.add(newUser);
-        await emailConfirmationRepository.add(emailConfirmation)
+        await this.emailConfirmationRepository.add(emailConfirmation)
 
         return [newUser, emailConfirmation];
     }
@@ -42,7 +52,7 @@ class AuthService {
     }
 
     async removeUserSession(refreshToken: string) {
-        return securityService.removeUserSession(refreshToken);
+        return this.securityService.removeUserSession(refreshToken);
     }
 
     async passwordRecovery(passwordRecoveryInputModel: PasswordRecoveryInputModel): Promise<PasswordRecovery | never> {
@@ -50,13 +60,13 @@ class AuthService {
 
         const passwordRecovery = new PasswordRecovery(user._id)
         emailsManager.sendPasswordRecoveryLetter(user, passwordRecovery)
-        await passwordRecoveryRepository.add(passwordRecovery);
+        await this.passwordRecoveryRepository.add(passwordRecovery);
         return passwordRecovery
     }
 
     async setNewPassword(newPasswordRecoveryInputModel: NewPasswordRecoveryInputModel): Promise<PasswordRecovery> {
         const {newPassword, recoveryCode,} = newPasswordRecoveryInputModel
-        const passwordRecovery = await passwordRecoveryRepository.getByCode(recoveryCode)
+        const passwordRecovery = await this.passwordRecoveryRepository.getByCode(recoveryCode)
 
         if (passwordRecovery.expirationDate < new Date().getTime()) {
             throw new UnprocessableEntity('The password recovery code is expired');

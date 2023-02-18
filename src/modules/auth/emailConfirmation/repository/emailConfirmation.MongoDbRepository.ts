@@ -2,7 +2,7 @@ import {EntityNotFound} from "../../../../common/exceptions/EntityNotFound";
 import {EmailConfirmation} from "../types/EmailConfirmation";
 import {EmailConfirmationModel} from "../model/EmailConfirmationModel";
 
-class EmailConfirmationRepository {
+export class EmailConfirmationRepository {
     async add(emailConfirmation: EmailConfirmation): Promise<EmailConfirmation> {
         await EmailConfirmationModel.create(emailConfirmation)
         return emailConfirmation

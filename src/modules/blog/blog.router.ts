@@ -10,9 +10,9 @@ import {BlogInputModel} from "./types/BlogInputModel";
 import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/checkErrorsInRequestDataMiddleware";
 import {authGuardMiddleware} from "../auth/middlewares/authGuardMiddleware";
 import {blogsService} from "./blogsService";
-import {blogQueryRepository} from "./repository/blog.QueryRepository";
+import {BlogQueryRepository} from "./repository/blog.QueryRepository";
 import {HTTP_STATUSES} from "../../common/presentationLayer/types/HttpStatuses";
-import {postQueryRepository} from "../post/repository/post.QueryRepository";
+import {PostQueryRepository} from "../post/repository/post.QueryRepository";
 import {validatePaginator} from "../../common/middlewares/validatePaginator";
 import {validateBlog} from "./middlewares/validateBlog";
 import {validatePost} from "../post/middlewares/validatePost";
@@ -28,18 +28,26 @@ import {PaginatorParams} from "../auth/types/paginator/PaginatorParams";
 export const blogRouter = Router({})
 
 class BlogController {
+    private postQueryRepository: PostQueryRepository
+    private blogQueryRepository: BlogQueryRepository
+
+    constructor() {
+        this.postQueryRepository = new PostQueryRepository()
+        this.blogQueryRepository = new BlogQueryRepository()
+    }
+
     async getPaginatedBlogList(req: RequestWithQuery<BlogPaginatorParams>, res: Response<PaginatorResponse<BlogViewModel>>) {
-        const PaginatedBlogList = await blogQueryRepository.findBlogs(req.query);
+        const PaginatedBlogList = await this.blogQueryRepository.findBlogs(req.query);
         res.status(HTTP_STATUSES.OK_200).json(PaginatedBlogList)
     }
 
     async getBlog(req: RequestWithParams<{ id: string }>, res: Response) {
-        const blog = await blogQueryRepository.get(req.params.id)
+        const blog = await this.blogQueryRepository.get(req.params.id)
         res.status(HTTP_STATUSES.OK_200).json(blog)
     }
 
     async getPaginatedPostListByPost(req: RequestWithParamsAndQuery<{ id: string }, PaginatorParams>, res: Response) {
-        const paginatedPostList = await postQueryRepository.findPostsByBlogId(req.params.id, req.query);
+        const paginatedPostList = await this.postQueryRepository.findPostsByBlogId(req.params.id, req.query);
         res.status(HTTP_STATUSES.OK_200).json(paginatedPostList)
     }
 
@@ -73,9 +81,9 @@ blogRouter.get('/',
     validatePaginator.pageSize,
     validatePaginator.pageNumber,
     checkErrorsInRequestDataMiddleware,
-    blogController.getPaginatedBlogList)
+    blogController.getPaginatedBlogList.bind(blogController))
 
-blogRouter.get('/:id', blogController.getBlog)
+blogRouter.get('/:id', blogController.getBlog.bind(blogController))
 
 blogRouter.get('/:id/posts',
     validatePost.query.sortBy,
@@ -83,7 +91,7 @@ blogRouter.get('/:id/posts',
     validatePaginator.pageSize,
     validatePaginator.pageNumber,
     checkErrorsInRequestDataMiddleware,
-    blogController.getPaginatedPostListByPost)
+    blogController.getPaginatedPostListByPost.bind(blogController))
 
 blogRouter.post('/',
     authGuardMiddleware,
@@ -91,7 +99,7 @@ blogRouter.post('/',
     validateBlog.body.description,
     validateBlog.body.websiteUrl,
     checkErrorsInRequestDataMiddleware,
-    blogController.createBlog)
+    blogController.createBlog.bind(blogController))
 
 
 blogRouter.post('/:id/posts',
@@ -100,7 +108,7 @@ blogRouter.post('/:id/posts',
     validatePost.body.shortDescription,
     validatePost.body.content,
     checkErrorsInRequestDataMiddleware,
-    blogController.createPostInBlog)
+    blogController.createPostInBlog.bind(blogController))
 
 blogRouter.put('/:id',
     authGuardMiddleware,
@@ -108,6 +116,6 @@ blogRouter.put('/:id',
     validateBlog.body.description,
     validateBlog.body.websiteUrl,
     checkErrorsInRequestDataMiddleware,
-    blogController.updateBlog)
+    blogController.updateBlog.bind(blogController))
 
-blogRouter.delete('/:id', authGuardMiddleware, blogController.deleteBlog)
+blogRouter.delete('/:id', authGuardMiddleware, blogController.deleteBlog.bind(blogController))

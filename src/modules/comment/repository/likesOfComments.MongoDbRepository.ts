@@ -2,7 +2,7 @@ import {LikeOfComment} from "../types/LikeOfCommentType";
 import {LikeOfCommentModel} from "../model/likeOfCommentModel";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 
-class LikesOfCommentsRepository {
+export class LikesOfCommentsRepository {
     async add(likeOfComment: LikeOfComment): Promise<LikeOfComment> {
         await LikeOfCommentModel.create(likeOfComment)
         return likeOfComment
@@ -55,5 +55,3 @@ class LikesOfCommentsRepository {
         return LikeOfCommentModel.find({commentId: {"$in": commentsIdList}, userId: userId}).lean();
     }
 }
-
-export const likesOfCommentsRepository = new LikesOfCommentsRepository()

@@ -3,7 +3,7 @@ import {UserActiveSessionUpdateModelType} from "../types/UserActiveSessionUpdate
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 import {UserActiveSessionModel} from "../model/UserActiveSessionModel";
 
-class UsersActiveSessionsRepository {
+export class UsersActiveSessionsRepository {
 
     async add(UserActiveSession: UserActiveSession): Promise<UserActiveSession> {
         await UserActiveSessionModel.create(UserActiveSession)
@@ -54,5 +54,3 @@ class UsersActiveSessionsRepository {
         await UserActiveSessionModel.deleteOne({userId: userId, deviceId: deviceId})
     }
 }
-
-export const usersActiveSessionsRepository = new UsersActiveSessionsRepository()

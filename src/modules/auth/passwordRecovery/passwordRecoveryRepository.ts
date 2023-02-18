@@ -2,7 +2,7 @@ import {PasswordRecovery} from "./types/PasswordRecoveryType";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 import {PasswordRecoveryModel} from "./model/PasswordRecoveryModel";
 
-class PasswordRecoveryRepository {
+export class PasswordRecoveryRepository {
     async add(passwordRecovery: PasswordRecovery): Promise<PasswordRecovery> {
         await PasswordRecoveryModel.create(passwordRecovery)
         return passwordRecovery
@@ -34,5 +34,3 @@ class PasswordRecoveryRepository {
         return passwordRecovery;
     }
 }
-
-export const passwordRecoveryRepository = new PasswordRecoveryRepository();

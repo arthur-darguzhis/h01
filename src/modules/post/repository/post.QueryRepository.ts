@@ -6,7 +6,7 @@ import {blogRepository} from "../../blog/repository/blog.MongoDbRepository";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 import {PostModel} from "../types/PostModel";
 
-class PostQueryRepository {
+export class PostQueryRepository {
 
     async find(id: string): Promise<PostViewModel | null> {
         const post = await PostModel.findOne({_id: id});
@@ -65,5 +65,3 @@ class PostQueryRepository {
         }
     }
 }
-
-export const postQueryRepository = new PostQueryRepository()

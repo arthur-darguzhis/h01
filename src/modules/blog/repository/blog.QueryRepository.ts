@@ -5,7 +5,7 @@ import {BlogPaginatorParams} from "../types/BlogPaginatorParams";
 import {BlogModel} from "../model/BlogModel";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 
-class BlogQueryRepository {
+export class BlogQueryRepository {
     async find(id: string): Promise<BlogViewModel | null> {
         const blog = await BlogModel.findOne({_id: id});
         return blog ? mapBlogToViewModel(blog) : null

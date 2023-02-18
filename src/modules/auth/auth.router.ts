@@ -7,14 +7,14 @@ import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/check
 import {validateLogin} from "./middlewares/validateLogin";
 import {jwtService} from "./jwt/jwtService";
 import {jwtAuthGuardMiddleware} from "./middlewares/jwtAuthGuardMiddleware";
-import {userQueryRepository} from "../user/repository/user.QueryRepository";
+import {UserQueryRepository} from "../user/repository/user.QueryRepository";
 import {LoginSuccessViewModel} from "./types/LoginSuccessViewModel";
 import {UserInputModel} from "../user/types/UserInputModel";
 import {validateUser} from "../user/middlewares/validateUser";
 import {RegistrationConfirmationCodeModel} from "./types/RegistrationConfirmationCodeModel";
 import {jwtRefreshGuardMiddleware} from "./middlewares/jwtRefreshGuardMiddleware";
 import {authService} from "./authService";
-import {securityService} from "../security/securityService";
+import {SecurityService} from "../security/securityService";
 import {UserActiveSession} from "../security/types/UserActiveSessionType";
 import {UserActiveSessionUpdateModelType} from "../security/types/UserActiveSessionUpdateModelType";
 import {checkRateLimiterMiddleware, setRateLimiter} from "../../common/middlewares/rateLimiterMiddleware";
@@ -25,6 +25,14 @@ import {body} from "express-validator";
 export const authRouter = Router({});
 
 class AuthController {
+    userQueryRepository: UserQueryRepository;
+    securityService: SecurityService;
+
+    constructor() {
+        this.userQueryRepository = new UserQueryRepository()
+        this.securityService = new SecurityService()
+    }
+
     async registerNewUser(req: RequestWithBody<UserInputModel>, res: Response) {
         await authService.registerNewUser(req.body);
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
@@ -58,7 +66,7 @@ class AuthController {
             req.headers["user-agent"] || '',
             user._id,
         )
-        await securityService.registerUserActiveSession(userActiveSession)
+        await this.securityService.registerUserActiveSession(userActiveSession)
 
         res.status(HTTP_STATUSES.OK_200)
             .cookie('refreshToken', refreshToken, {httpOnly: true, secure: true, maxAge: 20 * 1000})
@@ -82,7 +90,7 @@ class AuthController {
             deviceName: req.headers["user-agent"] || '',
         }
 
-        await securityService.updateUserActiveSession(deviceId, userActiveSessionUpdateModel)
+        await this.securityService.updateUserActiveSession(deviceId, userActiveSessionUpdateModel)
 
         res.status(HTTP_STATUSES.OK_200)
             .cookie('refreshToken', refreshToken, {httpOnly: true, secure: true, maxAge: 20 * 1000})
@@ -110,7 +118,7 @@ class AuthController {
     }
 
     async getInfoAboutCurrentUser(req: Request, res: Response) {
-        const user = await userQueryRepository.findMe(req.user!._id);
+        const user = await this.userQueryRepository.findMe(req.user!._id);
         res.status(HTTP_STATUSES.OK_200).json(user)
     }
 }
@@ -123,44 +131,44 @@ authRouter.post('/registration',
     validateUser.body.login,
     validateUser.body.password,
     checkErrorsInRequestDataMiddleware,
-    authController.registerNewUser)
+    authController.registerNewUser.bind(authController))
 
 authRouter.post('/registration-confirmation',
     setRateLimiter(5, 10),
-    authController.userConfirmEmail)
+    authController.userConfirmEmail.bind(authController))
 
 authRouter.post('/registration-email-resending',
     setRateLimiter(5, 10),
     validateUser.body.email,
     checkErrorsInRequestDataMiddleware,
-    authController.userResentConfirmEmail)
+    authController.userResentConfirmEmail.bind(authController))
 
 authRouter.post('/login',
     setRateLimiter(5, 10),
     validateLogin.body.loginOrEmail,
     validateLogin.body.password,
     checkErrorsInRequestDataMiddleware,
-    authController.userLogin)
+    authController.userLogin.bind(authController))
 
-authRouter.post('/refresh-token', jwtRefreshGuardMiddleware, authController.refreshToken)
+authRouter.post('/refresh-token', jwtRefreshGuardMiddleware, authController.refreshToken.bind(authController))
 
 authRouter.post('/logout',
     jwtRefreshGuardMiddleware,
-    authController.userLogout
+    authController.userLogout.bind(authController)
 )
 
 authRouter.post('/password-recovery',
     setRateLimiter(5, 10),
     validateUser.body.email,
     checkErrorsInRequestDataMiddleware,
-    authController.userRequestPasswordRecovery)
+    authController.userRequestPasswordRecovery.bind(authController))
 
 authRouter.post('/new-password',
     setRateLimiter(5, 10),
     body('newPassword').trim().isLength({min: 6, max: 20}),
     body('recoveryCode').trim().isLength({min: 15}),
     checkErrorsInRequestDataMiddleware,
-    authController.userSetNewPassword)
+    authController.userSetNewPassword.bind(authController))
 
 authRouter.get('/me', jwtAuthGuardMiddleware,
-    authController.getInfoAboutCurrentUser)
+    authController.getInfoAboutCurrentUser.bind(authController))

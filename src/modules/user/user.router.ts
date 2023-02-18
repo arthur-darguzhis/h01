@@ -5,7 +5,7 @@ import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/check
 import {authGuardMiddleware} from "../auth/middlewares/authGuardMiddleware";
 import {validateUser} from "./middlewares/validateUser";
 import {UsersService} from "./usersService";
-import {userQueryRepository} from "./repository/user.QueryRepository";
+import {UserQueryRepository} from "./repository/user.QueryRepository";
 import {HTTP_STATUSES} from "../../common/presentationLayer/types/HttpStatuses";
 import {validatePaginator} from "../../common/middlewares/validatePaginator";
 import {User} from "./types/UserType";
@@ -18,9 +18,11 @@ export const userRouter = Router({})
 
 class UsersController {
     private userService: UsersService
+    private userQueryRepository: UserQueryRepository
 
     constructor() {
         this.userService = new UsersService();
+        this.userQueryRepository = new UserQueryRepository();
     }
 
     async createUser(req: RequestWithBody<UserInputModel>, res: Response) {
@@ -37,7 +39,7 @@ class UsersController {
     }
 
     async getPaginatedUserList(req: RequestWithQuery<UserPaginatorParams>, res: Response<PaginatorResponse<UserViewModel>>) {
-        const paginatedUserList = await userQueryRepository.findUsers(req.query)
+        const paginatedUserList = await this.userQueryRepository.findUsers(req.query)
         res.status(HTTP_STATUSES.OK_200).json(paginatedUserList)
     }
 }

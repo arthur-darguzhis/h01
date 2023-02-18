@@ -6,7 +6,7 @@ import {UserPaginatorParams} from "../types/UserPaginatorParams";
 import {UserModel} from "../model/UserModel";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 
-class UserQueryRepository {
+export class UserQueryRepository {
     async find(id: string): Promise<UserViewModel | null> {
         const user = await UserModel.findOne({_id: id});
         return user ? mapUserToViewModel(user) : null
@@ -54,5 +54,3 @@ class UserQueryRepository {
         }
     }
 }
-
-export const userQueryRepository = new UserQueryRepository()

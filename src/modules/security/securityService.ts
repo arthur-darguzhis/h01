@@ -1,37 +1,41 @@
-import {usersActiveSessionsRepository} from "./repository/security.usersActiveSessionsRepository";
+import {UsersActiveSessionsRepository,} from "./repository/security.usersActiveSessionsRepository";
 import {UserActiveSession} from "./types/UserActiveSessionType";
 import {jwtService} from "../auth/jwt/jwtService";
 import {UserActiveSessionUpdateModelType} from "./types/UserActiveSessionUpdateModelType";
 import {Forbidden} from "../../common/exceptions/Forbidden";
 
-class SecurityService {
+export class SecurityService {
+    private usersActiveSessionsRepository: UsersActiveSessionsRepository
+
+    constructor() {
+        this.usersActiveSessionsRepository = new UsersActiveSessionsRepository();
+    }
+
     async registerUserActiveSession(session: UserActiveSession) {
-        await usersActiveSessionsRepository.add(session)
+        await this.usersActiveSessionsRepository.add(session)
     }
 
     async removeUserSession(refreshToken: string): Promise<boolean> {
         const decodedRefreshToken = jwtService.decodeRefreshJWT(refreshToken);
-        return usersActiveSessionsRepository.deleteByDeviceId(decodedRefreshToken!.deviceId)
+        return this.usersActiveSessionsRepository.deleteByDeviceId(decodedRefreshToken!.deviceId)
     }
 
     async updateUserActiveSession(deviceId: string, userActiveSessionUpdateModel: UserActiveSessionUpdateModelType) {
-        return await usersActiveSessionsRepository.updateByDeviceId(deviceId, userActiveSessionUpdateModel)
+        return await this.usersActiveSessionsRepository.updateByDeviceId(deviceId, userActiveSessionUpdateModel)
     }
 
     async removeOtherDeviceSessions(userId: string, deviceId: string) {
-        return await usersActiveSessionsRepository.removeOtherDeviceSessions(userId, deviceId)
+        return await this.usersActiveSessionsRepository.removeOtherDeviceSessions(userId, deviceId)
     }
 
     async removeUserSessionsByDeviceId(userId: string, deviceId: string): Promise<true | never> {
-        const userActiveSession = await usersActiveSessionsRepository.getByDeviceId(deviceId);
+        const userActiveSession = await this.usersActiveSessionsRepository.getByDeviceId(deviceId);
 
         if (userActiveSession.userId !== userId) {
             throw new Forbidden("Unable to delete session")
         }
 
-        await usersActiveSessionsRepository.deleteUserSessionByDeviceId(userId, deviceId)
+        await this.usersActiveSessionsRepository.deleteUserSessionByDeviceId(userId, deviceId)
         return true;
     }
 }
-
-export const securityService = new SecurityService()
