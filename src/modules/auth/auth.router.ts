@@ -1,6 +1,6 @@
 import {Request, Response, Router} from "express";
 import {RequestWithBody} from "../../common/presentationLayer/types/RequestTypes";
-import {usersService} from "../user/usersService";
+import {UsersService} from "../user/usersService";
 import {HTTP_STATUSES} from "../../common/presentationLayer/types/HttpStatuses";
 import {LoginInputModel} from "./types/LoginInputModel";
 import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/checkErrorsInRequestDataMiddleware";
@@ -13,7 +13,7 @@ import {UserInputModel} from "../user/types/UserInputModel";
 import {validateUser} from "../user/middlewares/validateUser";
 import {RegistrationConfirmationCodeModel} from "./types/RegistrationConfirmationCodeModel";
 import {jwtRefreshGuardMiddleware} from "./middlewares/jwtRefreshGuardMiddleware";
-import {authService} from "./authService";
+import {AuthService} from "./authService";
 import {SecurityService} from "../security/securityService";
 import {UserActiveSession} from "../security/types/UserActiveSessionType";
 import {UserActiveSessionUpdateModelType} from "../security/types/UserActiveSessionUpdateModelType";
@@ -27,29 +27,33 @@ export const authRouter = Router({});
 class AuthController {
     userQueryRepository: UserQueryRepository;
     securityService: SecurityService;
+    authService: AuthService
+    usersService: UsersService
 
     constructor() {
         this.userQueryRepository = new UserQueryRepository()
         this.securityService = new SecurityService()
+        this.authService = new AuthService()
+        this.usersService = new UsersService()
     }
 
     async registerNewUser(req: RequestWithBody<UserInputModel>, res: Response) {
-        await authService.registerNewUser(req.body);
+        await this.authService.registerNewUser(req.body);
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
     }
 
     async userConfirmEmail(req: RequestWithBody<RegistrationConfirmationCodeModel>, res: Response) {
-        await usersService.confirmEmail(req.body.code);
+        await this.usersService.confirmEmail(req.body.code);
         return res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     }
 
     async userResentConfirmEmail(req: RequestWithBody<{ email: string }>, res: Response) {
-        await usersService.resendConfirmEmail(req.body.email)
+        await this.usersService.resendConfirmEmail(req.body.email)
         return res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     }
 
     async userLogin(req: RequestWithBody<LoginInputModel>, res: Response<LoginSuccessViewModel>) {
-        const user = await usersService.checkCredentials(req.body.loginOrEmail, req.body.password)
+        const user = await this.usersService.checkCredentials(req.body.loginOrEmail, req.body.password)
         if (!user || !user.isActive) {
             return res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401);
         }
@@ -98,13 +102,13 @@ class AuthController {
     }
 
     async userLogout(req: Request, res: Response) {
-        await authService.removeUserSession(req.cookies.refreshToken)
+        await this.authService.removeUserSession(req.cookies.refreshToken)
         res.clearCookie('refreshToken').sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     }
 
     async userRequestPasswordRecovery(req: RequestWithBody<PasswordRecoveryInputModel>, res: Response) {
         try {
-            await authService.passwordRecovery(req.body)
+            await this.authService.passwordRecovery(req.body)
         } catch (err) {
             console.log('silent exception for prevent user\'s email detection');
         }
@@ -113,7 +117,7 @@ class AuthController {
     }
 
     async userSetNewPassword(req: RequestWithBody<NewPasswordRecoveryInputModel>, res: Response) {
-        await authService.setNewPassword(req.body)
+        await this.authService.setNewPassword(req.body)
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     }
 

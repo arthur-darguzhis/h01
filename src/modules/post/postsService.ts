@@ -5,7 +5,7 @@ import {BlogPostInputModel} from "../blog/types/BlogPostInputModel";
 import {ObjectId} from "mongodb";
 import {Post} from "./types/PostType";
 
-class PostsService {
+export class PostsService {
     async createPost(postInputModel: PostInputModel): Promise<Post> {
         const blog = await blogRepository.get(postInputModel.blogId);
 

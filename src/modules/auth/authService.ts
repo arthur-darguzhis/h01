@@ -13,7 +13,7 @@ import {NewPasswordRecoveryInputModel} from "./types/NewPasswordRecoveryInputMod
 import {PasswordRecoveryRepository} from "./passwordRecovery/passwordRecoveryRepository";
 import {UnprocessableEntity} from "../../common/exceptions/UnprocessableEntity";
 
-class AuthService {
+export class AuthService {
     private securityService: SecurityService
     private passwordRecoveryRepository: PasswordRecoveryRepository
     private emailConfirmationRepository: EmailConfirmationRepository

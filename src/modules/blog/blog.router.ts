@@ -9,14 +9,14 @@ import {
 import {BlogInputModel} from "./types/BlogInputModel";
 import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/checkErrorsInRequestDataMiddleware";
 import {authGuardMiddleware} from "../auth/middlewares/authGuardMiddleware";
-import {blogsService} from "./blogsService";
+import {BlogsService} from "./blogsService";
 import {BlogQueryRepository} from "./repository/blog.QueryRepository";
 import {HTTP_STATUSES} from "../../common/presentationLayer/types/HttpStatuses";
 import {PostQueryRepository} from "../post/repository/post.QueryRepository";
 import {validatePaginator} from "../../common/middlewares/validatePaginator";
 import {validateBlog} from "./middlewares/validateBlog";
 import {validatePost} from "../post/middlewares/validatePost";
-import {postsService} from "../post/postsService";
+import {PostsService} from "../post/postsService";
 import {BlogPostInputModel} from "./types/BlogPostInputModel";
 import {mapPostToViewModel} from "../post/post.mapper";
 import {mapBlogToViewModel} from "./blog.mapper";
@@ -30,10 +30,14 @@ export const blogRouter = Router({})
 class BlogController {
     private postQueryRepository: PostQueryRepository
     private blogQueryRepository: BlogQueryRepository
+    private blogsService: BlogsService
+    private postsService: PostsService
 
     constructor() {
         this.postQueryRepository = new PostQueryRepository()
         this.blogQueryRepository = new BlogQueryRepository()
+        this.blogsService = new BlogsService()
+        this.postsService = new PostsService()
     }
 
     async getPaginatedBlogList(req: RequestWithQuery<BlogPaginatorParams>, res: Response<PaginatorResponse<BlogViewModel>>) {
@@ -52,22 +56,22 @@ class BlogController {
     }
 
     async createPostInBlog(req: RequestWithParamsAndBody<{ id: string }, BlogPostInputModel>, res: Response) {
-        const newPost = await postsService.createPostInBlog(req.params.id, req.body);
+        const newPost = await this.postsService.createPostInBlog(req.params.id, req.body);
         res.status(HTTP_STATUSES.CREATED_201).json(mapPostToViewModel(newPost));
     }
 
     async createBlog(req: RequestWithBody<BlogInputModel>, res: Response) {
-        const newBlog = await blogsService.createBlog(req.body);
+        const newBlog = await this.blogsService.createBlog(req.body);
         res.status(HTTP_STATUSES.CREATED_201).json(mapBlogToViewModel(newBlog));
     }
 
     async updateBlog(req: RequestWithParamsAndBody<{ id: string }, BlogInputModel>, res: Response) {
-        await blogsService.updateBlog(req.params.id, req.body)
+        await this.blogsService.updateBlog(req.params.id, req.body)
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     }
 
     async deleteBlog(req: RequestWithParams<{ id: string }>, res: Response) {
-        await blogsService.deleteBlog(req.params.id)
+        await this.blogsService.deleteBlog(req.params.id)
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     }
 }

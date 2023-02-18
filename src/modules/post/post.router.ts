@@ -10,7 +10,6 @@ import {PostQueryRepository} from "./repository/post.QueryRepository";
 import {PostInputModel} from "./types/PostInputModel";
 import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/checkErrorsInRequestDataMiddleware";
 import {authGuardMiddleware} from "../auth/middlewares/authGuardMiddleware";
-import {postsService} from "./postsService";
 import {HTTP_STATUSES} from "../../common/presentationLayer/types/HttpStatuses";
 import {validatePost} from "./middlewares/validatePost";
 import {validatePaginator} from "../../common/middlewares/validatePaginator";
@@ -25,6 +24,7 @@ import {PaginatorResponse} from "../auth/types/paginator/PaginatorResponse";
 import {PostViewModel} from "./types/PostViewModel";
 import {PaginatorParams} from "../auth/types/paginator/PaginatorParams";
 import {jwtService} from "../auth/jwt/jwtService";
+import {PostsService} from "./postsService";
 
 export const postRouter = Router({})
 
@@ -32,15 +32,17 @@ class PostController {
     private commentsService: CommentsService
     private commentQueryRepository: CommentQueryRepository
     private postQueryRepository: PostQueryRepository
+    private postsService: PostsService
 
     constructor() {
         this.commentsService = new CommentsService();
         this.commentQueryRepository = new CommentQueryRepository();
         this.postQueryRepository = new PostQueryRepository()
+        this.postsService = new PostsService()
     }
 
     async createPost(req: RequestWithBody<PostInputModel>, res: Response) {
-        const newPost = await postsService.createPost(req.body);
+        const newPost = await this.postsService.createPost(req.body);
         res.status(HTTP_STATUSES.CREATED_201).json(mapPostToViewModel(newPost));
     }
 
@@ -55,12 +57,12 @@ class PostController {
     }
 
     async updatePost(req: RequestWithParamsAndBody<{ id: string }, PostInputModel>, res: Response) {
-        await postsService.updatePost(req.params.id, req.body)
+        await this.postsService.updatePost(req.params.id, req.body)
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     }
 
     async deletePost(req: RequestWithParams<{ id: string }>, res: Response) {
-        await postsService.deletePost(req.params.id)
+        await this.postsService.deletePost(req.params.id)
         return res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     }
 

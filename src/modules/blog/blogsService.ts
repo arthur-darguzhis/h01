@@ -2,7 +2,7 @@ import {BlogInputModel} from "./types/BlogInputModel";
 import {Blog} from "./types/BlogType";
 import {blogRepository} from "./repository/blog.MongoDbRepository";
 
-class BlogsService {
+export class BlogsService {
     async createBlog(blogInputModel: BlogInputModel): Promise<Blog> {
         const newBlog = new Blog(
             blogInputModel.name,
