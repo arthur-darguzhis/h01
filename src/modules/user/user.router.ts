@@ -4,7 +4,7 @@ import {UserInputModel} from "./types/UserInputModel";
 import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/checkErrorsInRequestDataMiddleware";
 import {authGuardMiddleware} from "../auth/middlewares/authGuardMiddleware";
 import {validateUser} from "./middlewares/validateUser";
-import {usersService} from "./usersService";
+import {UsersService} from "./usersService";
 import {userQueryRepository} from "./repository/user.QueryRepository";
 import {HTTP_STATUSES} from "../../common/presentationLayer/types/HttpStatuses";
 import {validatePaginator} from "../../common/middlewares/validatePaginator";
@@ -17,13 +17,19 @@ import {UserPaginatorParams} from "./types/UserPaginatorParams";
 export const userRouter = Router({})
 
 class UsersController {
+    private userService: UsersService
+
+    constructor() {
+        this.userService = new UsersService();
+    }
+
     async createUser(req: RequestWithBody<UserInputModel>, res: Response) {
-        const newUser: User = await usersService.createUser(req.body)
+        const newUser: User = await this.userService.createUser(req.body)
         res.status(HTTP_STATUSES.CREATED_201).json(mapUserToViewModel(newUser))
     }
 
     async deleteUser(req: RequestWithParams<{ id: string }>, res: Response) {
-        const isUserDeleted = await usersService.deleteUser(req.params.id)
+        const isUserDeleted = await this.userService.deleteUser(req.params.id)
         if (!isUserDeleted) {
             return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
         }
@@ -44,10 +50,10 @@ userRouter.post('/',
     validateUser.body.email,
     validateUser.body.password,
     checkErrorsInRequestDataMiddleware,
-    usersController.createUser)
+    usersController.createUser.bind(usersController))
 
 userRouter.delete('/:id', authGuardMiddleware,
-    usersController.deleteUser)
+    usersController.deleteUser.bind(usersController))
 
 userRouter.get('/',
     authGuardMiddleware,
@@ -58,4 +64,4 @@ userRouter.get('/',
     validatePaginator.pageSize,
     validatePaginator.pageNumber,
     checkErrorsInRequestDataMiddleware,
-    usersController.getPaginatedUserList)
+    usersController.getPaginatedUserList.bind(usersController))

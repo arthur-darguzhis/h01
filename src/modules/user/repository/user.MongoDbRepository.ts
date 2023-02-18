@@ -2,7 +2,7 @@ import {User} from "../types/UserType";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 import {UserModel} from "../model/UserModel";
 
-class UserRepository {
+export class UserRepository {
     async add(user: User): Promise<User> {
         await UserModel.create(user)
         return user

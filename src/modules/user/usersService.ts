@@ -1,13 +1,19 @@
 import {UserInputModel} from "./types/UserInputModel";
 import {User} from "./types/UserType";
-import {userRepository} from "./repository/user.MongoDbRepository";
+import {UserRepository, userRepository} from "./repository/user.MongoDbRepository";
 import bcrypt from 'bcrypt'
 import {emailsManager} from "../../common/managers/email/emailsManager";
 import {UnprocessableEntity} from "../../common/exceptions/UnprocessableEntity";
 import {emailConfirmationRepository} from "../auth/emailConfirmation/repository/emailConfirmation.MongoDbRepository";
 import {EmailConfirmation} from "../auth/emailConfirmation/types/EmailConfirmation";
 
-class UsersService {
+export class UsersService {
+    public userRepository: UserRepository;
+
+    constructor() {
+        this.userRepository = new UserRepository()
+    }
+
     async createUser(userInputModel: UserInputModel): Promise<User> {
         const passwordHash = await this._generatePasswordHash(userInputModel.password)
 
