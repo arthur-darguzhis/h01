@@ -1,5 +1,6 @@
-import {blogsService} from "../../../src/modules/blog/blogsService";
-import {postsService} from "../../../src/modules/post/postsService";
+import {container} from "../../../src/common/compositon-root";
+import {BlogsService} from "../../../src/modules/blog/blogsService";
+import {PostsService} from "../../../src/modules/post/postsService";
 import {UsersService} from "../../../src/modules/user/usersService";
 import {LoginInputModel} from "../../../src/modules/auth/types/LoginInputModel";
 import request from "supertest";
@@ -8,7 +9,9 @@ import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpSta
 import {Blog} from "../../../src/modules/blog/types/BlogType";
 import {Post} from "../../../src/modules/post/types/PostType";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
-import {container} from "../../../src/common/compositon-root";
+
+const blogsService = container.resolve(BlogsService)
+const postsService = container.resolve(PostsService)
 
 describe('DELETE -> /comments/:commentId', () => {
     let blog: Blog;

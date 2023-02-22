@@ -1,8 +1,8 @@
+import {container} from "../../../common/compositon-root";
 import {NextFunction, Request, Response} from "express";
 import {HTTP_STATUSES} from "../../../common/presentationLayer/types/HttpStatuses";
 import {jwtService} from "../jwt/jwtService";
 import {UsersService} from "../../user/usersService";
-import {container} from "../../../common/compositon-root";
 
 export const jwtAuthGuardMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     //Почему здесь authorization а не authentification? (по тому что JWT токен не про аутентификацию он про авторизацию когда нас идентифицировали и уже выдали паспорт этот паспорт и есть наш JWT токен с его помощью мы авторизируемся на какие то дейсвтия. мы проверяем что наш пользователь авторизирован для оставления коммента или других действий.)

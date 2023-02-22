@@ -1,9 +1,9 @@
+import {container} from "../../common/compositon-root";
 import {Router} from "express";
 import {jwtAuthGuardMiddleware} from "../auth/middlewares/jwtAuthGuardMiddleware";
 import {validateComment} from "./middlewares/validateComment";
 import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/checkErrorsInRequestDataMiddleware";
 import {validateLikeStatus} from "./middlewares/validateLikeStatus";
-import {container} from "../../common/compositon-root";
 import {CommentController} from "./commentController";
 
 export const commentRouter = Router({})

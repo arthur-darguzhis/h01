@@ -1,3 +1,4 @@
+import {container} from "../../common/compositon-root";
 import {Router} from "express";
 import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/checkErrorsInRequestDataMiddleware";
 import {authGuardMiddleware} from "../auth/middlewares/authGuardMiddleware";
@@ -5,7 +6,6 @@ import {validatePost} from "./middlewares/validatePost";
 import {validatePaginator} from "../../common/middlewares/validatePaginator";
 import {validateComment} from "../comment/middlewares/validateComment";
 import {jwtAuthGuardMiddleware} from "../auth/middlewares/jwtAuthGuardMiddleware";
-import {container} from "../../common/compositon-root";
 import {PostController} from "./postController";
 
 export const postRouter = Router({})

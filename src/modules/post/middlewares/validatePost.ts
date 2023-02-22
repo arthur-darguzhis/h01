@@ -1,8 +1,8 @@
+import {container} from "../../../common/compositon-root";
 import {body, query} from "express-validator";
 import {BlogQueryRepository} from "../../blog/repository/blog.QueryRepository";
 import {sortDirections} from "../../auth/types/paginator/SortDirections";
 import {InvalidValue} from "../../../common/exceptions/InvalidValue";
-import {container} from "../../../common/compositon-root";
 
 const blogQueryRepository = container.resolve(BlogQueryRepository)
 

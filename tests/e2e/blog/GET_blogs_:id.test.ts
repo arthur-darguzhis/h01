@@ -1,9 +1,12 @@
-import {blogsService} from "../../../src/modules/blog/blogsService";
+import {container} from "../../../src/common/compositon-root";
+import {BlogsService} from "../../../src/modules/blog/blogsService";
 import {Blog} from "../../../src/modules/blog/types/BlogType";
 import request from "supertest";
 import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
+
+const blogsService = container.resolve(BlogsService)
 
 describe('GET -> "/blogs/:id"', () => {
     let blog: Blog;

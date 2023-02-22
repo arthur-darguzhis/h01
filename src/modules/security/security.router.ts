@@ -1,7 +1,7 @@
+import {container} from "../../common/compositon-root";
 import {Router} from "express";
 import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/checkErrorsInRequestDataMiddleware";
 import {jwtRefreshGuardMiddleware} from "../auth/middlewares/jwtRefreshGuardMiddleware";
-import {container} from "../../common/compositon-root";
 import {DeviceSessionsController} from "./deviceSessionsController";
 
 export const securityRouter = Router({})

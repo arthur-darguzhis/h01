@@ -1,9 +1,12 @@
+import {container} from "../../../src/common/compositon-root";
 import request from "supertest";
 import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";
 import {LoginInputModel} from "../../../src/modules/auth/types/LoginInputModel";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
-import {usersService} from "../../../src/modules/user/usersService";
+import {UsersService} from "../../../src/modules/user/usersService";
+
+const usersService = container.resolve(UsersService);
 
 describe('DELETE -> "/security/devices"', () => {
     let cookies1user: string;

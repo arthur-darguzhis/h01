@@ -1,13 +1,18 @@
+import {container} from "../../../src/common/compositon-root";
 import {Blog} from "../../../src/modules/blog/types/BlogType";
 import {Post} from "../../../src/modules/post/types/PostType";
-import {blogsService} from "../../../src/modules/blog/blogsService";
-import {postsService} from "../../../src/modules/post/postsService";
+import {BlogsService} from "../../../src/modules/blog/blogsService";
+import {PostsService} from "../../../src/modules/post/postsService";
 import request from "supertest";
 import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
-import {usersService} from "../../../src/modules/user/usersService";
+import {UsersService} from "../../../src/modules/user/usersService";
 import {LoginInputModel} from "../../../src/modules/auth/types/LoginInputModel";
+
+const blogsService = container.resolve(BlogsService)
+const postsService = container.resolve(PostsService)
+const usersService = container.resolve(UsersService)
 
 describe('GET -> "/posts/:postId/comments"', () => {
     let blog: Blog;

@@ -1,8 +1,8 @@
+import {container} from "../../../common/compositon-root";
 import {NextFunction, Request, Response} from "express";
 import {HTTP_STATUSES} from "../../../common/presentationLayer/types/HttpStatuses";
 import {jwtService} from "../jwt/jwtService";
 import {UsersService} from "../../user/usersService";
-import {container} from "../../../common/compositon-root";
 
 const usersService = container.resolve(UsersService)
 

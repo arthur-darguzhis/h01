@@ -1,3 +1,4 @@
+import {container} from "../../common/compositon-root";
 import {Router} from "express";
 import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/checkErrorsInRequestDataMiddleware";
 import {validateLogin} from "./middlewares/validateLogin";
@@ -6,7 +7,6 @@ import {validateUser} from "../user/middlewares/validateUser";
 import {jwtRefreshGuardMiddleware} from "./middlewares/jwtRefreshGuardMiddleware";
 import {checkRateLimiterMiddleware, setRateLimiter} from "../../common/middlewares/rateLimiterMiddleware";
 import {body} from "express-validator";
-import {container} from "../../common/compositon-root";
 import {AuthController} from "./authController";
 
 export const authRouter = Router({});

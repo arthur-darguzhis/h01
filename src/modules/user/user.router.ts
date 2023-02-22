@@ -1,9 +1,9 @@
+import {container} from "../../common/compositon-root";
 import {Router} from "express";
 import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/checkErrorsInRequestDataMiddleware";
 import {authGuardMiddleware} from "../auth/middlewares/authGuardMiddleware";
 import {validateUser} from "./middlewares/validateUser";
 import {validatePaginator} from "../../common/middlewares/validatePaginator";
-import {container} from "../../common/compositon-root";
 import {UsersController} from "./user.controller";
 
 export const userRouter = Router({})

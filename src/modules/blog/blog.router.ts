@@ -1,10 +1,10 @@
+import {container} from "../../common/compositon-root";
 import {Router} from "express";
 import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/checkErrorsInRequestDataMiddleware";
 import {authGuardMiddleware} from "../auth/middlewares/authGuardMiddleware";
 import {validatePaginator} from "../../common/middlewares/validatePaginator";
 import {validateBlog} from "./middlewares/validateBlog";
 import {validatePost} from "../post/middlewares/validatePost";
-import {container} from "../../common/compositon-root";
 import {BlogController} from "./blogController";
 
 export const blogRouter = Router({})
