@@ -4,7 +4,9 @@ import {PaginatorResponse} from "../../auth/types/paginator/PaginatorResponse";
 import {BlogPaginatorParams} from "../types/BlogPaginatorParams";
 import {BlogModel} from "../model/BlogModel";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
+import {injectable} from "inversify";
 
+@injectable()
 export class BlogQueryRepository {
     async find(id: string): Promise<BlogViewModel | null> {
         const blog = await BlogModel.findOne({_id: id});

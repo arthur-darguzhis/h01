@@ -5,7 +5,9 @@ import {PaginatorParams} from "../../auth/types/paginator/PaginatorParams";
 import {blogRepository} from "../../blog/repository/blog.MongoDbRepository";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 import {PostModel} from "../types/PostModel";
+import {injectable} from "inversify";
 
+@injectable()
 export class PostQueryRepository {
 
     async find(id: string): Promise<PostViewModel | null> {

@@ -4,7 +4,9 @@ import {settings} from "../../../settings";
 import {InvalidValue} from "../../../common/exceptions/InvalidValue";
 import {v4 as uuidv4} from "uuid";
 import {UnprocessableEntity} from "../../../common/exceptions/UnprocessableEntity";
+import {injectable} from "inversify";
 
+@injectable()
 export class JwtService {
     createAuthJWT(user: User): string {
         return jwt.sign({userId: user._id}, settings.JWT_AUTH_SECRET, {expiresIn: '10m'})

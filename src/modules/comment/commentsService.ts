@@ -7,7 +7,9 @@ import {PostRepository} from "../post/repository/post.MongoDbRepository";
 import {Forbidden} from "../../common/exceptions/Forbidden";
 import {LikesOfCommentsRepository} from "./repository/likesOfComments.MongoDbRepository";
 import {LikeOfComment} from "./types/LikeOfCommentType";
+import {injectable} from "inversify";
 
+@injectable()
 export class CommentsService {
     private commentRepository: CommentRepository;
     private postRepository: PostRepository;

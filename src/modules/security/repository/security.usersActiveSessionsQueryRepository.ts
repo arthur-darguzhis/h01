@@ -2,7 +2,9 @@ import {UserActiveSessionViewModelType} from "../types/UserActiveSessionViewMode
 import {mapUserActiveSessionToViewModel} from "../userActiveSession.mapper";
 import {UserActiveSessionModel} from "../model/UserActiveSessionModel";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
+import {injectable} from "inversify";
 
+@injectable()
 export class UsersActiveSessionsQueryRepository {
     async find(id: string): Promise<UserActiveSessionViewModelType | null> {
         const userActiveSession = await UserActiveSessionModel.findOne({_id: id});

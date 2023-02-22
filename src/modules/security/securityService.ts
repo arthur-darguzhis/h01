@@ -1,14 +1,16 @@
 import {UsersActiveSessionsRepository,} from "./repository/security.usersActiveSessionsRepository";
 import {UserActiveSession} from "./types/UserActiveSessionType";
-import {jwtService} from "../auth/jwt/jwtService";
+import {JwtService} from "../auth/jwt/jwtService";
 import {UserActiveSessionUpdateModelType} from "./types/UserActiveSessionUpdateModelType";
 import {Forbidden} from "../../common/exceptions/Forbidden";
+import {injectable} from "inversify";
 
+@injectable()
 export class SecurityService {
-    private usersActiveSessionsRepository: UsersActiveSessionsRepository
-
-    constructor() {
-        this.usersActiveSessionsRepository = new UsersActiveSessionsRepository();
+    constructor(
+        protected usersActiveSessionsRepository: UsersActiveSessionsRepository,
+        protected jwtService: JwtService
+    ) {
     }
 
     async registerUserActiveSession(session: UserActiveSession) {
@@ -16,7 +18,7 @@ export class SecurityService {
     }
 
     async removeUserSession(refreshToken: string): Promise<boolean> {
-        const decodedRefreshToken = jwtService.decodeRefreshJWT(refreshToken);
+        const decodedRefreshToken = this.jwtService.decodeRefreshJWT(refreshToken);
         return this.usersActiveSessionsRepository.deleteByDeviceId(decodedRefreshToken!.deviceId)
     }
 

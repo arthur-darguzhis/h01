@@ -1,55 +1,14 @@
-import {Response, Router} from "express";
-import {RequestWithParams, RequestWithParamsAndBody} from "../../common/presentationLayer/types/RequestTypes";
-import {CommentQueryRepository} from "./repository/comment.QueryRepository";
-import {HTTP_STATUSES} from "../../common/presentationLayer/types/HttpStatuses";
-import {CommentInputModel} from "./types/CommentInputModel";
-import {CommentsService} from "./commentsService";
+import {Router} from "express";
 import {jwtAuthGuardMiddleware} from "../auth/middlewares/jwtAuthGuardMiddleware";
 import {validateComment} from "./middlewares/validateComment";
 import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/checkErrorsInRequestDataMiddleware";
-import {LikeInputModel} from "./types/LikeInputModel";
 import {validateLikeStatus} from "./middlewares/validateLikeStatus";
-import {jwtService} from "../auth/jwt/jwtService";
+import {container} from "../../common/compositon-root";
+import {CommentController} from "./commentController";
 
 export const commentRouter = Router({})
 
-class CommentController {
-    private commentsService: CommentsService
-    private commentQueryRepository: CommentQueryRepository
-
-    constructor() {
-        this.commentsService = new CommentsService()
-        this.commentQueryRepository = new CommentQueryRepository()
-    }
-
-    async getComment(req: RequestWithParams<{ commentId: string }>, res: Response) {
-        let userId = null;
-        if (req.headers.authorization) {
-            const token = req.headers.authorization.split(' ')[1]
-            userId = jwtService.getUserIdFromAccessToken(token);
-        }
-        const comment = await this.commentQueryRepository.get(req.params.commentId, userId)
-        res.status(HTTP_STATUSES.OK_200).json(comment)
-    }
-
-    async updateComment(req: RequestWithParamsAndBody<{ id: string }, CommentInputModel>, res: Response) {
-        const commentInputModel: CommentInputModel = {content: req.body.content};
-        await this.commentsService.updateUsersComment(req.params.id, req.user!._id, commentInputModel)
-        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
-    }
-
-    async deleteComment(req: RequestWithParams<{ id: string }>, res: Response) {
-        await this.commentsService.deleteUsersComment(req.params.id, req.user!._id)
-        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
-    }
-
-    async processLikeStatus(req: RequestWithParamsAndBody<{ id: string }, LikeInputModel>, res: Response) {
-        await this.commentsService.processLikeStatus(req.user!._id, req.params.id, req.body.likeStatus);
-        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
-    }
-}
-
-const commentController = new CommentController();
+const commentController = container.resolve(CommentController);
 
 commentRouter.get('/:commentId', commentController.getComment.bind(commentController))
 

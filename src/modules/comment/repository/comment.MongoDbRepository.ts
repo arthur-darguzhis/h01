@@ -2,7 +2,9 @@ import {CommentType} from "../types/CommentType";
 import {CommentInputModel} from "../types/CommentInputModel";
 import {CommentModel} from "../model/CommentModel";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
+import {injectable} from "inversify";
 
+@injectable()
 export class CommentRepository {
     async add(comment: CommentType): Promise<CommentType> {
         await CommentModel.create(comment)
