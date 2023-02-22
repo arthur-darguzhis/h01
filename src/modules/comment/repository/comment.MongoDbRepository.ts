@@ -63,5 +63,3 @@ export class CommentRepository {
         return result.modifiedCount === 1;
     }
 }
-
-export const commentRepository = new CommentRepository()

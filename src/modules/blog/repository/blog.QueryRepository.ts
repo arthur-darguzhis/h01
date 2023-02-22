@@ -44,5 +44,3 @@ export class BlogQueryRepository {
         }
     }
 }
-
-export const blogQueryRepository = new BlogQueryRepository()

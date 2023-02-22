@@ -40,5 +40,3 @@ export class EmailConfirmationRepository {
         return emailConfirmation
     }
 }
-
-export const emailConfirmationRepository = new EmailConfirmationRepository()

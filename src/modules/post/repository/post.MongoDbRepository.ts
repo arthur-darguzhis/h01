@@ -31,5 +31,3 @@ export class PostRepository {
         return result.deletedCount === 1;
     }
 }
-
-export const postRepository = new PostRepository();

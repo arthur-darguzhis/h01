@@ -6,7 +6,6 @@ import {injectable} from "inversify";
 
 @injectable()
 export class UsersActiveSessionsRepository {
-
     async add(UserActiveSession: UserActiveSession): Promise<UserActiveSession> {
         await UserActiveSessionModel.create(UserActiveSession)
         return UserActiveSession
