@@ -1,7 +1,9 @@
 import {PasswordRecovery} from "./types/PasswordRecoveryType";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 import {PasswordRecoveryModel} from "./model/PasswordRecoveryModel";
+import {injectable} from "inversify";
 
+@injectable()
 export class PasswordRecoveryRepository {
     async add(passwordRecovery: PasswordRecovery): Promise<PasswordRecovery> {
         await PasswordRecoveryModel.create(passwordRecovery)

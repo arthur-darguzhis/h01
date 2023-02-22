@@ -2,7 +2,9 @@ import {PostInputModel} from "../types/PostInputModel";
 import {Post} from "../types/PostType";
 import {PostModel} from "../types/PostModel";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
+import {injectable} from "inversify";
 
+@injectable()
 export class PostRepository {
     async add(post: Post): Promise<Post> {
         await PostModel.create(post)
@@ -29,5 +31,3 @@ export class PostRepository {
         return result.deletedCount === 1;
     }
 }
-
-export const postRepository = new PostRepository();

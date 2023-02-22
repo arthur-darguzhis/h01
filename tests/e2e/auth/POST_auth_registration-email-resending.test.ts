@@ -1,15 +1,20 @@
 import request from "supertest";
 import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";
-import {usersService} from "../../../src/modules/user/usersService";
+import {UsersService} from "../../../src/modules/user/usersService";
 import {UserInputModel} from "../../../src/modules/user/types/UserInputModel";
-import {authService} from "../../../src/modules/auth/authService";
+import {AuthService} from "../../../src/modules/auth/authService";
 import {
-    emailConfirmationRepository
+    EmailConfirmationRepository,
 } from "../../../src/modules/auth/emailConfirmation/repository/emailConfirmation.MongoDbRepository";
 import {EmailConfirmation} from "../../../src/modules/auth/emailConfirmation/types/EmailConfirmation";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
 import {RateLimiter} from "../../../src/common/middlewares/rateLimiterMiddleware";
+import {container} from "../../../src/common/compositon-root";
+
+const authService = container.resolve(AuthService)
+const usersService = container.resolve(UsersService)
+const emailConfirmationRepository = container.resolve(EmailConfirmationRepository)
 
 describe('POST => /auth/registration-email-resending', () => {
 

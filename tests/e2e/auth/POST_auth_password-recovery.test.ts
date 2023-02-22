@@ -2,8 +2,11 @@ import request from "supertest";
 import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
-import {authService} from "../../../src/modules/auth/authService";
+import {AuthService} from "../../../src/modules/auth/authService";
 import {RateLimiter} from "../../../src/common/middlewares/rateLimiterMiddleware";
+import {container} from "../../../src/common/compositon-root";
+
+const authService = container.resolve(AuthService)
 
 describe('POST => /auth/password-recovery', () => {
     beforeAll(async () => {

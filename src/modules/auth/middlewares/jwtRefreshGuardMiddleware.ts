@@ -1,7 +1,10 @@
+import {container} from "../../../common/compositon-root";
 import {NextFunction, Request, Response} from "express";
 import {HTTP_STATUSES} from "../../../common/presentationLayer/types/HttpStatuses";
 import {jwtService} from "../jwt/jwtService";
-import {usersService} from "../../user/usersService";
+import {UsersService} from "../../user/usersService";
+
+const usersService = container.resolve(UsersService)
 
 export const jwtRefreshGuardMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     if (!req.cookies || !req.cookies.refreshToken || req.cookies.refreshToken === '') {

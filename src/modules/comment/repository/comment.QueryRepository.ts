@@ -7,14 +7,14 @@ import {CommentModel} from "../model/CommentModel";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 import {LikesOfCommentsRepository} from "./likesOfComments.MongoDbRepository";
 import {LikeOfComment} from "../types/LikeOfCommentType";
+import {injectable} from "inversify";
 
+@injectable()
 export class CommentQueryRepository {
-    private postQueryRepository: PostQueryRepository
-    private likesOfCommentsRepository: LikesOfCommentsRepository;
-
-    constructor() {
-        this.postQueryRepository = new PostQueryRepository()
-        this.likesOfCommentsRepository = new LikesOfCommentsRepository()
+    constructor(
+        protected postQueryRepository: PostQueryRepository,
+        protected likesOfCommentsRepository: LikesOfCommentsRepository
+    ) {
     }
 
     async find(id: string): Promise<CommentViewModel | null> {

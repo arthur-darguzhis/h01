@@ -1,7 +1,9 @@
 import {LikeOfComment} from "../types/LikeOfCommentType";
 import {LikeOfCommentModel} from "../model/likeOfCommentModel";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
+import {injectable} from "inversify";
 
+@injectable()
 export class LikesOfCommentsRepository {
     async add(likeOfComment: LikeOfComment): Promise<LikeOfComment> {
         await LikeOfCommentModel.create(likeOfComment)

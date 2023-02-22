@@ -1,8 +1,11 @@
+import {container} from "../../../src/common/compositon-root";
 import request from "supertest";
 import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";
-import {blogsService} from "../../../src/modules/blog/blogsService";
+import {BlogsService} from "../../../src/modules/blog/blogsService";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
+
+const blogsService = container.resolve(BlogsService)
 
 describe('GET -> "/blogs"', () => {
     beforeAll(async () => {

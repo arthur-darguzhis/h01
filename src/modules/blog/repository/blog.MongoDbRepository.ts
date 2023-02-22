@@ -2,7 +2,9 @@ import {BlogInputModel} from "../types/BlogInputModel";
 import {Blog} from "../types/BlogType";
 import {BlogModel} from "../model/BlogModel";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
+import {injectable} from "inversify";
 
+@injectable()
 export class BlogRepository {
     async add(blog: Blog): Promise<Blog> {
         await BlogModel.create(blog)
@@ -34,5 +36,3 @@ export class BlogRepository {
         return result.deletedCount === 1;
     }
 }
-
-export const blogRepository = new BlogRepository()

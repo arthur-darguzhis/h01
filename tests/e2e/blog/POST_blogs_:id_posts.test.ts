@@ -1,10 +1,13 @@
+import {container} from "../../../src/common/compositon-root";
 import {Blog} from "../../../src/modules/blog/types/BlogType";
-import {blogsService} from "../../../src/modules/blog/blogsService";
+import {BlogsService} from "../../../src/modules/blog/blogsService";
 import request from "supertest";
 import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";
 import {PostInputModel} from "../../../src/modules/post/types/PostInputModel";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
+
+const blogsService = container.resolve(BlogsService)
 
 describe('PUT -> "/blogs/:id/posts"', () => {
     let blog: Blog;

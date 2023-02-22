@@ -2,9 +2,10 @@ import {UserActiveSession} from "../types/UserActiveSessionType";
 import {UserActiveSessionUpdateModelType} from "../types/UserActiveSessionUpdateModelType";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 import {UserActiveSessionModel} from "../model/UserActiveSessionModel";
+import {injectable} from "inversify";
 
+@injectable()
 export class UsersActiveSessionsRepository {
-
     async add(UserActiveSession: UserActiveSession): Promise<UserActiveSession> {
         await UserActiveSessionModel.create(UserActiveSession)
         return UserActiveSession

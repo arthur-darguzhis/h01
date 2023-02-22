@@ -1,6 +1,7 @@
-import {blogsService} from "../../../src/modules/blog/blogsService";
-import {postsService} from "../../../src/modules/post/postsService";
-import {usersService} from "../../../src/modules/user/usersService";
+import {container} from "../../../src/common/compositon-root";
+import {BlogsService} from "../../../src/modules/blog/blogsService";
+import {PostsService} from "../../../src/modules/post/postsService";
+import {UsersService} from "../../../src/modules/user/usersService";
 import {LoginInputModel} from "../../../src/modules/auth/types/LoginInputModel";
 import request from "supertest";
 import {app} from "../../../src/server";
@@ -9,6 +10,9 @@ import {Blog} from "../../../src/modules/blog/types/BlogType";
 import {Post} from "../../../src/modules/post/types/PostType";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
 
+const blogsService = container.resolve(BlogsService)
+const postsService = container.resolve(PostsService)
+
 describe('DELETE -> /comments/:commentId', () => {
     let blog: Blog;
     let post: Post;
@@ -16,6 +20,7 @@ describe('DELETE -> /comments/:commentId', () => {
     let commentId: string;
     let someUserToken: string;
     let someUserCommentId: string;
+    const usersService = container.resolve(UsersService)
 
     beforeAll(async () => {
         await cleanDbBeforeTest()

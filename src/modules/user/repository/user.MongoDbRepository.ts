@@ -1,7 +1,9 @@
 import {User} from "../types/UserType";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 import {UserModel} from "../model/UserModel";
+import {injectable} from "inversify";
 
+@injectable()
 export class UserRepository {
     async add(user: User): Promise<User> {
         await UserModel.create(user)
@@ -63,5 +65,3 @@ export class UserRepository {
         return result.modifiedCount === 1;
     }
 }
-
-export const userRepository = new UserRepository()

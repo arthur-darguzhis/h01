@@ -1,11 +1,15 @@
+import {container} from "../../../src/common/compositon-root";
 import request from "supertest";
 import {app} from "../../../src/server";
 import {HTTP_STATUSES} from "../../../src/common/presentationLayer/types/HttpStatuses";
 import {Post} from "../../../src/modules/post/types/PostType";
 import {cleanDbBeforeTest, closeTestMongooseConnection} from "../../../src/common/testing/cleanDbBeforeTest";
 import {Blog} from "../../../src/modules/blog/types/BlogType";
-import {blogsService} from "../../../src/modules/blog/blogsService";
-import {postsService} from "../../../src/modules/post/postsService";
+import {BlogsService} from "../../../src/modules/blog/blogsService";
+import {PostsService} from "../../../src/modules/post/postsService";
+
+const blogsService = container.resolve(BlogsService)
+const postsService = container.resolve(PostsService)
 
 describe('DELETE -> "/posts/:id"', () => {
     let blog: Blog;

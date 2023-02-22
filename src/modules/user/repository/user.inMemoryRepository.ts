@@ -1,6 +1,7 @@
 import {User} from "../types/UserType";
 import {db} from "../../../db";
 
+
 export const userInMemoryRepository = {
     isExists(login: string, password: string): boolean {
         const user = this.findUserByLogin(login);

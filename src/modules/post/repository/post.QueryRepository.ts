@@ -2,11 +2,17 @@ import {PostViewModel} from "../types/PostViewModel";
 import {mapPostToViewModel} from "../post.mapper";
 import {PaginatorResponse} from "../../auth/types/paginator/PaginatorResponse";
 import {PaginatorParams} from "../../auth/types/paginator/PaginatorParams";
-import {blogRepository} from "../../blog/repository/blog.MongoDbRepository";
+import {BlogRepository} from "../../blog/repository/blog.MongoDbRepository";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 import {PostModel} from "../types/PostModel";
+import {injectable} from "inversify";
 
+@injectable()
 export class PostQueryRepository {
+    constructor(
+        protected blogRepository: BlogRepository
+    ) {
+    }
 
     async find(id: string): Promise<PostViewModel | null> {
         const post = await PostModel.findOne({_id: id});
@@ -45,7 +51,7 @@ export class PostQueryRepository {
         const pageNumber = +paginatorParams.pageNumber
         const pageSize = +paginatorParams.pageSize
 
-        if (!await blogRepository.isExists(blogId)) {
+        if (!await this.blogRepository.isExists(blogId)) {
             throw new EntityNotFound(`Blog with ID: ${blogId} is not exists`)
         }
 
