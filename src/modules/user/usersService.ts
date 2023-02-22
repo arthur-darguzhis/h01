@@ -1,19 +1,19 @@
 import {UserInputModel} from "./types/UserInputModel";
 import {User} from "./types/UserType";
-import {UserRepository, userRepository} from "./repository/user.MongoDbRepository";
+import {UserRepository} from "./repository/user.MongoDbRepository";
 import bcrypt from 'bcrypt'
 import {emailsManager} from "../../common/managers/email/emailsManager";
 import {UnprocessableEntity} from "../../common/exceptions/UnprocessableEntity";
 import {EmailConfirmationRepository} from "../auth/emailConfirmation/repository/emailConfirmation.MongoDbRepository";
 import {EmailConfirmation} from "../auth/emailConfirmation/types/EmailConfirmation";
+import {injectable} from "inversify";
 
+@injectable()
 export class UsersService {
-    public userRepository: UserRepository;
-    public emailConfirmationRepository: EmailConfirmationRepository;
-
-    constructor() {
-        this.userRepository = new UserRepository()
-        this.emailConfirmationRepository = new EmailConfirmationRepository()
+    constructor(
+        protected userRepository: UserRepository,
+        protected emailConfirmationRepository: EmailConfirmationRepository
+    ) {
     }
 
     async createUser(userInputModel: UserInputModel): Promise<User> {
@@ -26,19 +26,19 @@ export class UsersService {
             true,
         )
 
-        return await userRepository.add(newUser);
+        return await this.userRepository.add(newUser);
     }
 
     async findUserById(id: string): Promise<User | null> {
-        return userRepository.find(id);
+        return this.userRepository.find(id);
     }
 
     async deleteUser(id: string): Promise<boolean> {
-        return userRepository.delete(id)
+        return this.userRepository.delete(id)
     }
 
     async checkCredentials(loginOrEmail: string, password: string): Promise<User | false> {
-        const user = await userRepository.findByLoginOrEmail(loginOrEmail)
+        const user = await this.userRepository.findByLoginOrEmail(loginOrEmail)
         if (!user) return false;
 
         const areCredentialValid = await bcrypt.compare(password, user.passwordHash);
@@ -57,7 +57,7 @@ export class UsersService {
             throw new UnprocessableEntity('The confirmation code is invalid')
         }
 
-        const user = await userRepository.get(emailConfirmation.userId);
+        const user = await this.userRepository.get(emailConfirmation.userId);
 
         if (user.isActive || emailConfirmation.isConfirmed) {
             throw new UnprocessableEntity('The email is already confirmed')
@@ -76,7 +76,7 @@ export class UsersService {
     }
 
     async resendConfirmEmail(email: string): Promise<true | never> {
-        const user = await userRepository.findByLoginOrEmail(email);
+        const user = await this.userRepository.findByLoginOrEmail(email);
         if (!user) {
             throw new UnprocessableEntity('The email is not in the database confirmed')
         }
@@ -100,8 +100,6 @@ export class UsersService {
     }
 
     async activateUser(userId: string): Promise<boolean> {
-        return await userRepository.activeUser(userId)
+        return await this.userRepository.activeUser(userId)
     }
 }
-
-export const usersService = new UsersService()

@@ -1,50 +1,14 @@
-import {Response, Router} from "express";
-import {RequestWithBody, RequestWithParams, RequestWithQuery} from "../../common/presentationLayer/types/RequestTypes";
-import {UserInputModel} from "./types/UserInputModel";
+import {Router} from "express";
 import {checkErrorsInRequestDataMiddleware} from "../../common/middlewares/checkErrorsInRequestDataMiddleware";
 import {authGuardMiddleware} from "../auth/middlewares/authGuardMiddleware";
 import {validateUser} from "./middlewares/validateUser";
-import {UsersService} from "./usersService";
-import {UserQueryRepository} from "./repository/user.QueryRepository";
-import {HTTP_STATUSES} from "../../common/presentationLayer/types/HttpStatuses";
 import {validatePaginator} from "../../common/middlewares/validatePaginator";
-import {User} from "./types/UserType";
-import {mapUserToViewModel} from "./user.mapper";
-import {PaginatorResponse} from "../auth/types/paginator/PaginatorResponse";
-import {UserViewModel} from "./types/UserViewModel";
-import {UserPaginatorParams} from "./types/UserPaginatorParams";
+import {container} from "../../common/compositon-root";
+import {UsersController} from "./user.controller";
 
 export const userRouter = Router({})
 
-class UsersController {
-    private userService: UsersService
-    private userQueryRepository: UserQueryRepository
-
-    constructor() {
-        this.userService = new UsersService();
-        this.userQueryRepository = new UserQueryRepository();
-    }
-
-    async createUser(req: RequestWithBody<UserInputModel>, res: Response) {
-        const newUser: User = await this.userService.createUser(req.body)
-        res.status(HTTP_STATUSES.CREATED_201).json(mapUserToViewModel(newUser))
-    }
-
-    async deleteUser(req: RequestWithParams<{ id: string }>, res: Response) {
-        const isUserDeleted = await this.userService.deleteUser(req.params.id)
-        if (!isUserDeleted) {
-            return res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
-        }
-        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
-    }
-
-    async getPaginatedUserList(req: RequestWithQuery<UserPaginatorParams>, res: Response<PaginatorResponse<UserViewModel>>) {
-        const paginatedUserList = await this.userQueryRepository.findUsers(req.query)
-        res.status(HTTP_STATUSES.OK_200).json(paginatedUserList)
-    }
-}
-
-const usersController = new UsersController();
+const usersController = container.resolve(UsersController);
 
 userRouter.post('/',
     authGuardMiddleware,

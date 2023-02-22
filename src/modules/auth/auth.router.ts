@@ -25,16 +25,15 @@ import {body} from "express-validator";
 export const authRouter = Router({});
 
 class AuthController {
-    userQueryRepository: UserQueryRepository;
     securityService: SecurityService;
     authService: AuthService
-    usersService: UsersService
 
-    constructor() {
-        this.userQueryRepository = new UserQueryRepository()
+    constructor(
+        protected usersService: UsersService,
+        protected userQueryRepository: UserQueryRepository
+    ) {
         this.securityService = new SecurityService()
         this.authService = new AuthService()
-        this.usersService = new UsersService()
     }
 
     async registerNewUser(req: RequestWithBody<UserInputModel>, res: Response) {

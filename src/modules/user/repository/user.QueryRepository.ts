@@ -5,7 +5,9 @@ import {PaginatorResponse} from "../../auth/types/paginator/PaginatorResponse";
 import {UserPaginatorParams} from "../types/UserPaginatorParams";
 import {UserModel} from "../model/UserModel";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
+import {injectable} from "inversify";
 
+@injectable()
 export class UserQueryRepository {
     async find(id: string): Promise<UserViewModel | null> {
         const user = await UserModel.findOne({_id: id});
