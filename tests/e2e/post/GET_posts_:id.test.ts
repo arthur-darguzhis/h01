@@ -41,7 +41,7 @@ describe('GET -> "/blogs/:id"', () => {
             }
         )
         const getPostResponse = await request(app)
-            .get('/posts/'+post._id)
+            .get('/posts/' + post._id)
             .expect(HTTP_STATUSES.OK_200)
 
         expect(getPostResponse.body).toEqual(
@@ -52,7 +52,13 @@ describe('GET -> "/blogs/:id"', () => {
                 content: 'some content',
                 blogId: blog._id,
                 blogName: blog.name,
-                createdAt: expect.any(String)
+                createdAt: expect.any(String),
+                extendedLikesInfo: {
+                    dislikesCount: 0,
+                    likesCount: 0,
+                    myStatus: "None",
+                    newestLikes: expect.any(Array),
+                },
             }
         )
     })

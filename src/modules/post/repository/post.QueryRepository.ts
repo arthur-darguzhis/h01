@@ -4,13 +4,16 @@ import {PaginatorResponse} from "../../auth/types/paginator/PaginatorResponse";
 import {PaginatorParams} from "../../auth/types/paginator/PaginatorParams";
 import {BlogRepository} from "../../blog/repository/blog.MongoDbRepository";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
-import {PostModel} from "../types/PostModel";
+import {PostModel} from "../model/PostModel";
 import {injectable} from "inversify";
+import {LikeOfComment} from "../../comment/types/LikeOfCommentType";
+import {LikesOfPostsRepository} from "./likesOfPostsRepository";
 
 @injectable()
 export class PostQueryRepository {
     constructor(
-        protected blogRepository: BlogRepository
+        protected blogRepository: BlogRepository,
+        protected likesOfPostsRepository: LikesOfPostsRepository
     ) {
     }
 
@@ -19,10 +22,19 @@ export class PostQueryRepository {
         return post ? mapPostToViewModel(post) : null
     }
 
-    async get(id: string): Promise<PostViewModel | never> {
-        const post = await PostModel.findOne({_id: id});
+    async get(id: string, userId = null): Promise<PostViewModel | never> {
+        const post = await PostModel.findOne({_id: id}).lean();
         if (!post) throw new EntityNotFound(`Post with ID: ${id} is not exists`)
-        return mapPostToViewModel(post)
+
+        let myStatus = LikeOfComment.LIKE_STATUS_OPTIONS.NONE
+        if (userId) {
+            const myReaction = await this.likesOfPostsRepository.findUserReactionOnThePost(post._id, userId)
+            if (myReaction) {
+                myStatus = myReaction.status
+            }
+        }
+
+        return mapPostToViewModel(post, myStatus)
     }
 
     async findPosts(paginatorParams: PaginatorParams): Promise<PaginatorResponse<PostViewModel>> {
@@ -40,6 +52,7 @@ export class PostQueryRepository {
             "page": pageNumber,
             "pageSize": pageSize,
             "totalCount": count,
+            // @ts-ignore
             "items": blogs.map(mapPostToViewModel)
         }
     }
@@ -67,6 +80,7 @@ export class PostQueryRepository {
             "page": pageNumber,
             "pageSize": pageSize,
             "totalCount": count,
+            // @ts-ignore
             "items": blogs.map(mapPostToViewModel)
         }
     }

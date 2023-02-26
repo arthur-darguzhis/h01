@@ -73,7 +73,6 @@ export class PostsService {
                 postId,
                 likeStatus,
             )
-
             await this.likesOfPostsRepository.add(newUserReactionOnPost)
         } else {
             const previousLikeStatus = userReaction.status
@@ -83,11 +82,11 @@ export class PostsService {
             await this.likesOfPostsRepository.updateLikeStatus(userReaction._id, likeStatus)
         }
 
-        await this.updateLikesAndDislikesCOuntInPost(postId)
+        await this.updateLikesAndDislikesCountInPost(postId)
         return true;
     }
 
-    async updateLikesAndDislikesCOuntInPost(postId: string) {
+    async updateLikesAndDislikesCountInPost(postId: string) {
         const likesCount = await this.likesOfPostsRepository.calculateCountOfLikes(postId);
         const dislikesCount = await this.likesOfPostsRepository.calculateCountOfDislikes(postId);
         const newestLikes = await this.likesOfPostsRepository.getNewestLikesOnThePost(postId);

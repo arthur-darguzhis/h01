@@ -70,7 +70,7 @@ describe('PUT -> /posts/:postId/like-status', () => {
     });
 
     it('Return status 400. When the inputModel has incorrect values', async () => {
-        await request(app).put('/comments/' + post._id + '/like-status')
+        await request(app).put('/posts/' + post._id + '/like-status')
             .auth(token, {type: "bearer"})
             .send({
                 "likeStatus": 'asdf'
@@ -78,7 +78,7 @@ describe('PUT -> /posts/:postId/like-status', () => {
     });
 
     it('Return status 404. Should return error if "post" with :id from uri param is not found', async () => {
-        await request(app).put('/comments/63d11d1562ede10be4f024ad/like-status')
+        await request(app).put('/posts/63d11d1562ede10be4f024ad/like-status')
             .auth(token, {type: "bearer"})
             .send({
                 "likeStatus": LikeOfComment.LIKE_STATUS_OPTIONS.LIKE
@@ -93,54 +93,90 @@ describe('PUT -> /posts/:postId/like-status', () => {
                 "likeStatus": LikeOfComment.LIKE_STATUS_OPTIONS.LIKE
             }).expect(HTTP_STATUSES.NO_CONTENT_204);
 
-        const commentsResponse = await request(app).get('/posts/' + post._id)
+        const postResponse = await request(app).get('/posts/' + post._id)
             .auth(token, {type: "bearer"})
             .expect(HTTP_STATUSES.OK_200);
 
-        expect(commentsResponse.body).toEqual(
+        expect(postResponse.body).toEqual(
             {
                 "id": expect.any(String),
-                "content": "this is a sample of a correct comment that can be saved",
-                "commentatorInfo": {
-                    "userId": user._id,
-                    "userLogin": "user",
-                },
+                title: 'Управление состоянием в React',
+                shortDescription: 'Все мы прекрасно знаем что построить полноценный стор на react context достаточно тяжело',
+                content: 'Буквально каждую конференцию мы слышим от спикеров, а вы знаете как работают контексты? а вы знаете что каждый ваш слушатель перерисовывает ваш умный компонент (useContext) Пора решить эту проблему раз и на всегда!',
+                blogId: blog._id,
+                blogName: blog.name,
                 "createdAt": expect.any(String),
-                "likesInfo": {
+                "extendedLikesInfo": {
                     "likesCount": 1,
                     "dislikesCount": 0,
                     "myStatus": LikeOfComment.LIKE_STATUS_OPTIONS.LIKE,
-                    "newestLikes": {
+                    "newestLikes": [{
                         "addedAt": expect.any(String),
-                        "userId": expect.any(String),
-                        "login": expect.any(String)
-                    }
+                        "userId": user._id,
+                        "login": user.login
+                    }]
                 }
             }
         )
     });
-    // it('Return status 204. When the inputModel is correct and user make "dislike" operation', () => {});
-    // it('Return status 204. When the inputModel is correct and user make "none" operation', () => {});
-    //
-    // it('Return status 200. And pagination of posts with post', async () => {
-    // const commentsResponse = await request(app).get('/comments/' + commentId)
-    //             .expect(HTTP_STATUSES.OK_200);
-    //
-    //         expect(commentsResponse.body).toEqual(
-    //             {
-    //                 "id": expect.any(String),
-    //                 "content": "this is a sample of a correct comment that can be saved",
-    //                 "commentatorInfo": {
-    //                     "userId": user._id,
-    //                     "userLogin": "user1",
-    //                 },
-    //                 "createdAt": expect.any(String),
-    //                 "likesInfo": {
-    //                     "likesCount": 0,
-    //                     "dislikesCount": 0,
-    //                     "myStatus": "None"
-    //                 }
-    //             }
-    //         )
-    // })
+
+    it('Return status 204. When the inputModel is correct and user make "dislike" operation', async () => {
+        await request(app).put('/posts/' + post._id + '/like-status')
+            .auth(token, {type: "bearer"})
+            .send({
+                "likeStatus": LikeOfComment.LIKE_STATUS_OPTIONS.DISLIKE
+            }).expect(HTTP_STATUSES.NO_CONTENT_204);
+
+        const postResponse = await request(app).get('/posts/' + post._id)
+            .auth(token, {type: "bearer"})
+            .expect(HTTP_STATUSES.OK_200);
+
+        expect(postResponse.body).toEqual(
+            {
+                "id": expect.any(String),
+                title: 'Управление состоянием в React',
+                shortDescription: 'Все мы прекрасно знаем что построить полноценный стор на react context достаточно тяжело',
+                content: 'Буквально каждую конференцию мы слышим от спикеров, а вы знаете как работают контексты? а вы знаете что каждый ваш слушатель перерисовывает ваш умный компонент (useContext) Пора решить эту проблему раз и на всегда!',
+                blogId: blog._id,
+                blogName: blog.name,
+                "createdAt": expect.any(String),
+                "extendedLikesInfo": {
+                    "likesCount": 0,
+                    "dislikesCount": 1,
+                    "myStatus": LikeOfComment.LIKE_STATUS_OPTIONS.DISLIKE,
+                    "newestLikes": []
+                }
+            }
+        )
+    });
+
+    it('Return status 204. When the inputModel is correct and user make "none" operation', async () => {
+        await request(app).put('/posts/' + post._id + '/like-status')
+            .auth(token, {type: "bearer"})
+            .send({
+                "likeStatus": LikeOfComment.LIKE_STATUS_OPTIONS.NONE
+            }).expect(HTTP_STATUSES.NO_CONTENT_204);
+
+        const postResponse = await request(app).get('/posts/' + post._id)
+            .auth(token, {type: "bearer"})
+            .expect(HTTP_STATUSES.OK_200);
+
+        expect(postResponse.body).toEqual(
+            {
+                "id": expect.any(String),
+                title: 'Управление состоянием в React',
+                shortDescription: 'Все мы прекрасно знаем что построить полноценный стор на react context достаточно тяжело',
+                content: 'Буквально каждую конференцию мы слышим от спикеров, а вы знаете как работают контексты? а вы знаете что каждый ваш слушатель перерисовывает ваш умный компонент (useContext) Пора решить эту проблему раз и на всегда!',
+                blogId: blog._id,
+                blogName: blog.name,
+                "createdAt": expect.any(String),
+                "extendedLikesInfo": {
+                    "likesCount": 0,
+                    "dislikesCount": 0,
+                    "myStatus": LikeOfComment.LIKE_STATUS_OPTIONS.NONE,
+                    "newestLikes": []
+                }
+            }
+        )
+    });
 })

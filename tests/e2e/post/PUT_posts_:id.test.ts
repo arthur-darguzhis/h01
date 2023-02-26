@@ -109,6 +109,12 @@ describe('PUT -> "/posts/:id"', () => {
                 "blogId": expect.any(String),
                 "blogName": "1 blog",
                 "createdAt": expect.any(String),
+                extendedLikesInfo: {
+                    dislikesCount: 0,
+                    likesCount: 0,
+                    myStatus: "None",
+                    newestLikes: expect.any(Array),
+                },
             }
         )
     })

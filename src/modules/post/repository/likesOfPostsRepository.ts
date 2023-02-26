@@ -1,7 +1,6 @@
 import {injectable} from "inversify";
 import {LikeOfPost} from "../types/LikeOfPost";
 import {LikeOfPostModel} from "../model/LikeOfPostModel";
-import {LikeOfCommentModel} from "../../comment/model/likeOfCommentModel";
 import {LikeOfComment} from "../../comment/types/LikeOfCommentType";
 
 @injectable()
@@ -12,7 +11,7 @@ export class LikesOfPostsRepository {
     }
 
     async updateLikeStatus(id: string, likeStatus: string): Promise<boolean> {
-        const result = await LikeOfCommentModel.updateOne({_id: id}, {status: likeStatus})
+        const result = await LikeOfPostModel.updateOne({_id: id}, {status: likeStatus})
         return result.modifiedCount === 1;
     }
 

@@ -73,7 +73,13 @@ describe('POST -> "/posts"', () => {
             content: 'Буквально каждую конференцию мы слышим от спикеров, а вы знаете как работают контексты? а вы знаете что каждый ваш слушатель перерисовывает ваш умный компонент (useContext) Пора решить эту проблему раз и на всегда!',
             blogId: blog._id,
             blogName: blog.name,
-            createdAt: expect.any(String)
+            createdAt: expect.any(String),
+            extendedLikesInfo: {
+                dislikesCount: 0,
+                likesCount: 0,
+                myStatus: "None",
+                newestLikes: expect.any(Array),
+            },
         })
     })
 
