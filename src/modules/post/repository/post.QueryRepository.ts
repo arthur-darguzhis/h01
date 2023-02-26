@@ -60,7 +60,7 @@ export class PostQueryRepository {
 
             items = posts.map((post) => {
                 const likeStatus = postsIdAndReactionsList[post._id] || LikeOfComment.LIKE_STATUS_OPTIONS.NONE;
-                return mapPostToViewModel(post)
+                return mapPostToViewModel(post, likeStatus)
             })
         } else {
             items = posts.map((post) => {
@@ -109,7 +109,7 @@ export class PostQueryRepository {
 
             items = posts.map((post) => {
                 const likeStatus = postsIdAndReactionsList[post._id] || LikeOfComment.LIKE_STATUS_OPTIONS.NONE;
-                return mapPostToViewModel(post)
+                return mapPostToViewModel(post, likeStatus)
             })
         } else {
             items = posts.map((post) => {
