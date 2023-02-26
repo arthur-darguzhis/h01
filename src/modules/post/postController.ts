@@ -37,7 +37,12 @@ export class PostController {
     }
 
     async getPaginatedPostsList(req: RequestWithQuery<PaginatorParams>, res: Response<PaginatorResponse<PostViewModel>>) {
-        const paginatedPostList = await this.postQueryRepository.findPosts(req.query);
+        let userId = null;
+        if (req.headers.authorization) {
+            const token = req.headers.authorization.split(' ')[1]
+            userId = jwtService.getUserIdFromAccessToken(token);
+        }
+        const paginatedPostList = await this.postQueryRepository.findPosts(req.query, userId);
         res.status(HTTP_STATUSES.OK_200).json(paginatedPostList)
     }
 

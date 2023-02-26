@@ -37,7 +37,7 @@ export class PostQueryRepository {
         return mapPostToViewModel(post, myStatus)
     }
 
-    async findPosts(paginatorParams: PaginatorParams): Promise<PaginatorResponse<PostViewModel>> {
+    async findPosts(paginatorParams: PaginatorParams, userId = null): Promise<PaginatorResponse<PostViewModel>> {
         const {sortBy, sortDirection} = paginatorParams
         const pageNumber = +paginatorParams.pageNumber
         const pageSize = +paginatorParams.pageSize
@@ -45,21 +45,42 @@ export class PostQueryRepository {
         const direction = sortDirection === 'asc' ? 1 : -1;
         const count = await PostModel.countDocuments({});
         const howManySkip = (pageNumber - 1) * pageSize;
-        const blogs = await PostModel.find({}).sort({[sortBy]: direction}).skip(howManySkip).limit(pageSize).lean()
+        const posts = await PostModel.find({}).sort({[sortBy]: direction}).skip(howManySkip).limit(pageSize).lean()
+
+        let items: PostViewModel[];
+        if (userId) {
+
+            const postsIdList: Array<string> = posts.map((post) => post._id);
+            const userReactionsOnComments = await this.likesOfPostsRepository.getUserReactionOnPostsBunch(postsIdList, userId)
+
+            const postsIdAndReactionsList: any = []
+            userReactionsOnComments.forEach((likeData) => {
+                postsIdAndReactionsList[likeData.postId] = likeData.status;
+            })
+
+            items = posts.map((post) => {
+                const likeStatus = postsIdAndReactionsList[post._id] || LikeOfComment.LIKE_STATUS_OPTIONS.NONE;
+                return mapPostToViewModel(post)
+            })
+        } else {
+            items = posts.map((post) => {
+                return mapPostToViewModel(post)
+            })
+        }
 
         return {
             "pagesCount": Math.ceil(count / pageSize),
             "page": pageNumber,
             "pageSize": pageSize,
             "totalCount": count,
-            // @ts-ignore
-            "items": blogs.map(mapPostToViewModel)
+            "items": items
         }
     }
 
     async findPostsByBlogId(
         blogId: string,
-        paginatorParams: PaginatorParams): Promise<PaginatorResponse<PostViewModel>> {
+        paginatorParams: PaginatorParams,
+        userId = null): Promise<PaginatorResponse<PostViewModel>> {
         const {sortBy, sortDirection} = paginatorParams;
         const pageNumber = +paginatorParams.pageNumber
         const pageSize = +paginatorParams.pageSize
@@ -73,15 +94,35 @@ export class PostQueryRepository {
         let filter = {blogId: blogId}
         let count = await PostModel.countDocuments(filter);
         const howManySkip = (pageNumber - 1) * pageSize;
-        const blogs = await PostModel.find(filter).sort({[sortBy]: direction}).skip(howManySkip).limit(pageSize).lean()
+        const posts = await PostModel.find(filter).sort({[sortBy]: direction}).skip(howManySkip).limit(pageSize).lean()
+
+        let items: PostViewModel[];
+        if (userId) {
+
+            const postsIdList: Array<string> = posts.map((post) => post._id);
+            const userReactionsOnComments = await this.likesOfPostsRepository.getUserReactionOnPostsBunch(postsIdList, userId)
+
+            const postsIdAndReactionsList: any = []
+            userReactionsOnComments.forEach((likeData) => {
+                postsIdAndReactionsList[likeData.postId] = likeData.status;
+            })
+
+            items = posts.map((post) => {
+                const likeStatus = postsIdAndReactionsList[post._id] || LikeOfComment.LIKE_STATUS_OPTIONS.NONE;
+                return mapPostToViewModel(post)
+            })
+        } else {
+            items = posts.map((post) => {
+                return mapPostToViewModel(post)
+            })
+        }
 
         return {
             "pagesCount": Math.ceil(count / pageSize),
             "page": pageNumber,
             "pageSize": pageSize,
             "totalCount": count,
-            // @ts-ignore
-            "items": blogs.map(mapPostToViewModel)
+            "items": items
         }
     }
 }

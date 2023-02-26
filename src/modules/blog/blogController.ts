@@ -20,6 +20,7 @@ import {mapPostToViewModel} from "../post/post.mapper";
 import {BlogInputModel} from "./types/BlogInputModel";
 import {mapBlogToViewModel} from "./blog.mapper";
 import {injectable} from "inversify";
+import {jwtService} from "../auth/jwt/jwtService";
 
 @injectable()
 export class BlogController {
@@ -42,7 +43,13 @@ export class BlogController {
     }
 
     async getPaginatedPostListByPost(req: RequestWithParamsAndQuery<{ id: string }, PaginatorParams>, res: Response) {
-        const paginatedPostList = await this.postQueryRepository.findPostsByBlogId(req.params.id, req.query);
+        let userId = null;
+        if (req.headers.authorization) {
+            const token = req.headers.authorization.split(' ')[1]
+            userId = jwtService.getUserIdFromAccessToken(token);
+        }
+
+        const paginatedPostList = await this.postQueryRepository.findPostsByBlogId(req.params.id, req.query, userId);
         res.status(HTTP_STATUSES.OK_200).json(paginatedPostList)
     }
 
