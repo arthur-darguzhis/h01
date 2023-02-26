@@ -40,7 +40,7 @@ export class LikesOfPostsRepository {
                 status: LikeOfPost.LIKE_STATUS_OPTIONS.LIKE
             })
             .select('-_id addedAt userId login')
-            .sort({createdAt: "desc"})
+            .sort({addedAt: "desc"})
             .limit(3).lean()
     }
 
