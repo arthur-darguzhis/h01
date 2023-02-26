@@ -1,6 +1,6 @@
 import {PostInputModel} from "../types/PostInputModel";
 import {Post} from "../types/PostType";
-import {PostModel} from "../types/PostModel";
+import {PostModel} from "../model/PostModel";
 import {EntityNotFound} from "../../../common/exceptions/EntityNotFound";
 import {injectable} from "inversify";
 
@@ -29,5 +29,19 @@ export class PostRepository {
     async delete(id: string): Promise<boolean> {
         const result = await PostModel.deleteOne({_id: id});
         return result.deletedCount === 1;
+    }
+
+    async updateLikesInfo(postId: string, likesCount: number, dislikeCount: number, newestLikes: any): Promise<boolean> {
+        const result = await PostModel.updateOne(
+            {"_id": postId,},
+            {
+                $set: {
+                    "extendedLikesInfo.likesCount": likesCount,
+                    "extendedLikesInfo.dislikesCount": dislikeCount,
+                    "extendedLikesInfo.newestLikes": newestLikes,
+                }
+            }
+        )
+        return result.modifiedCount === 1;
     }
 }

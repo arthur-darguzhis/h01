@@ -7,6 +7,7 @@ import {validatePaginator} from "../../common/middlewares/validatePaginator";
 import {validateComment} from "../comment/middlewares/validateComment";
 import {jwtAuthGuardMiddleware} from "../auth/middlewares/jwtAuthGuardMiddleware";
 import {PostController} from "./postController";
+import {validateLikeStatus} from "../comment/middlewares/validateLikeStatus";
 
 export const postRouter = Router({})
 
@@ -39,6 +40,13 @@ postRouter.put('/:id',
     validatePost.body.blogId,
     checkErrorsInRequestDataMiddleware,
     postController.updatePost.bind(postController))
+
+
+postRouter.put('/:id/like-status',
+    jwtAuthGuardMiddleware,
+    validateLikeStatus.body.likeStatus,
+    checkErrorsInRequestDataMiddleware,
+    postController.processLikeStatus.bind(postController))
 
 postRouter.delete('/:id', authGuardMiddleware, postController.deletePost.bind(postController))
 

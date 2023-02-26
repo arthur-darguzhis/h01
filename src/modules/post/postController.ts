@@ -20,6 +20,7 @@ import {PostViewModel} from "./types/PostViewModel";
 import {CommentInputModel} from "../comment/types/CommentInputModel";
 import {mapCommentToViewModel} from "../comment/comment.mapper";
 import {jwtService} from "../auth/jwt/jwtService";
+import {LikeInputModel} from "../comment/types/LikeInputModel";
 
 @injectable()
 export class PostController {
@@ -41,12 +42,22 @@ export class PostController {
     }
 
     async getPost(req: RequestWithParams<{ id: string }>, res: Response) {
-        const post = await this.postQueryRepository.get(req.params.id)
+        let userId = null;
+        if (req.headers.authorization) {
+            const token = req.headers.authorization.split(' ')[1]
+            userId = jwtService.getUserIdFromAccessToken(token);
+        }
+        const post = await this.postQueryRepository.get(req.params.id, userId)
         res.status(HTTP_STATUSES.OK_200).json(post)
     }
 
     async updatePost(req: RequestWithParamsAndBody<{ id: string }, PostInputModel>, res: Response) {
         await this.postsService.updatePost(req.params.id, req.body)
+        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
+    }
+
+    async processLikeStatus(req: RequestWithParamsAndBody<{ id: string }, LikeInputModel>, res: Response) {
+        await this.postsService.processLikeStatus(req.user!._id, req.user!.login, req.params.id, req.body.likeStatus)
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
     }
 

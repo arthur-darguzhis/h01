@@ -30,6 +30,7 @@ import {PostController} from "../modules/post/postController";
 import {BlogController} from "../modules/blog/blogController";
 import {CommentController} from "../modules/comment/commentController";
 import {DeviceSessionsController} from "../modules/security/deviceSessionsController";
+import {LikesOfPostsRepository} from "../modules/post/repository/likesOfPostsRepository";
 
 export const container = new Container();
 
@@ -42,7 +43,7 @@ container.bind(PostRepository).to(PostRepository);
 container.bind(UsersActiveSessionsRepository).to(UsersActiveSessionsRepository);
 container.bind(BlogRepository).to(BlogRepository);
 container.bind(PasswordRecoveryRepository).to(PasswordRecoveryRepository);
-
+container.bind(LikesOfPostsRepository).to(LikesOfPostsRepository);
 
 //QueryRepositories
 container.bind(UserQueryRepository).to(UserQueryRepository);

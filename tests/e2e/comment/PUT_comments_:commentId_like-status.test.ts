@@ -19,8 +19,8 @@ const usersService = container.resolve(UsersService)
 describe('PUT -> /comments/:commentId/like-status', () => {
     let blog: Blog;
     let post: Post
-    let token1: string;
-    let user1: User;
+    let token: string;
+    let user: User;
     let commentId: string;
 
     beforeAll(async () => {
@@ -41,14 +41,14 @@ describe('PUT -> /comments/:commentId/like-status', () => {
 
         post = await postsService.createPost(postInputModel)
 
-        user1 = await usersService.createUser({
-            "login": "user1",
+        user = await usersService.createUser({
+            "login": "user",
             "password": "123456",
-            "email": "user1@test.test"
+            "email": "user@test.test"
         })
 
         const logInputModel: LoginInputModel = {
-            "loginOrEmail": "user1",
+            "loginOrEmail": "user",
             "password": "123456"
         }
 
@@ -56,11 +56,11 @@ describe('PUT -> /comments/:commentId/like-status', () => {
             .post('/auth/login')
             .send(logInputModel)
             .expect(HTTP_STATUSES.OK_200)
-        token1 = responseWithToken.body.accessToken;
+        token = responseWithToken.body.accessToken;
 
         const postCommentResponse = await request(app)
             .post('/posts/' + post._id + '/comments')
-            .auth(token1, {type: "bearer"})
+            .auth(token, {type: "bearer"})
             .send({content: 'this is a sample of a correct comment that can be saved'})
             .expect(HTTP_STATUSES.CREATED_201)
 
@@ -78,7 +78,7 @@ describe('PUT -> /comments/:commentId/like-status', () => {
 
     it('Return status 400. When the inputModel has incorrect values', async () => {
         await request(app).put('/comments/' + commentId + '/like-status')
-            .auth(token1, {type: "bearer"})
+            .auth(token, {type: "bearer"})
             .send({
                 "likeStatus": 'asdf'
             }).expect(HTTP_STATUSES.BAD_REQUEST_400)
@@ -86,7 +86,7 @@ describe('PUT -> /comments/:commentId/like-status', () => {
 
     it('Return status 404. When comment with specified id doesn\'t exists', async () => {
         await request(app).put('/comments/63d11d1562ede10be4f024ad/like-status')
-            .auth(token1, {type: "bearer"})
+            .auth(token, {type: "bearer"})
             .send({
                 "likeStatus": LikeOfComment.LIKE_STATUS_OPTIONS.LIKE
             }).expect(HTTP_STATUSES.NOT_FOUND_404)
@@ -94,13 +94,13 @@ describe('PUT -> /comments/:commentId/like-status', () => {
 
     it('Return status 204. When the inputModel is correct and user make "like" operation', async () => {
         await request(app).put('/comments/' + commentId + '/like-status')
-            .auth(token1, {type: "bearer"})
+            .auth(token, {type: "bearer"})
             .send({
                 "likeStatus": LikeOfComment.LIKE_STATUS_OPTIONS.LIKE
             }).expect(HTTP_STATUSES.NO_CONTENT_204);
 
         const commentsResponse = await request(app).get('/comments/' + commentId)
-            .auth(token1, {type: "bearer"})
+            .auth(token, {type: "bearer"})
             .expect(HTTP_STATUSES.OK_200);
 
         expect(commentsResponse.body).toEqual(
@@ -108,8 +108,8 @@ describe('PUT -> /comments/:commentId/like-status', () => {
                 "id": expect.any(String),
                 "content": "this is a sample of a correct comment that can be saved",
                 "commentatorInfo": {
-                    "userId": user1._id,
-                    "userLogin": "user1",
+                    "userId": user._id,
+                    "userLogin": "user",
                 },
                 "createdAt": expect.any(String),
                 "likesInfo": {
@@ -124,7 +124,7 @@ describe('PUT -> /comments/:commentId/like-status', () => {
     it('Return status 200. And pagination of created post with comments', async () => {
         const postsCommentsPaginatorResponse = await request(app)
             .get('/posts/' + post._id + '/comments')
-            .auth(token1, {type: "bearer"})
+            .auth(token, {type: "bearer"})
             .expect(HTTP_STATUSES.OK_200)
 
         expect(postsCommentsPaginatorResponse.body.items.length).toBe(1)
@@ -139,13 +139,13 @@ describe('PUT -> /comments/:commentId/like-status', () => {
 
     it('Return status 204. When the inputModel is correct and user make "dislike" operation', async () => {
         await request(app).put('/comments/' + commentId + '/like-status')
-            .auth(token1, {type: "bearer"})
+            .auth(token, {type: "bearer"})
             .send({
                 "likeStatus": LikeOfComment.LIKE_STATUS_OPTIONS.DISLIKE
             }).expect(HTTP_STATUSES.NO_CONTENT_204)
 
         const commentsResponse = await request(app).get('/comments/' + commentId)
-            .auth(token1, {type: "bearer"})
+            .auth(token, {type: "bearer"})
             .expect(HTTP_STATUSES.OK_200);
 
         expect(commentsResponse.body).toEqual(
@@ -153,8 +153,8 @@ describe('PUT -> /comments/:commentId/like-status', () => {
                 "id": expect.any(String),
                 "content": "this is a sample of a correct comment that can be saved",
                 "commentatorInfo": {
-                    "userId": user1._id,
-                    "userLogin": "user1",
+                    "userId": user._id,
+                    "userLogin": "user",
                 },
                 "createdAt": expect.any(String),
                 "likesInfo": {
@@ -166,15 +166,15 @@ describe('PUT -> /comments/:commentId/like-status', () => {
         )
     })
 
-    it('Return status 204. When the inputModel is correct and user make "reset" operation', async () => {
+    it('Return status 204. When the inputModel is correct and user make "none" operation', async () => {
         await request(app).put('/comments/' + commentId + '/like-status')
-            .auth(token1, {type: "bearer"})
+            .auth(token, {type: "bearer"})
             .send({
                 "likeStatus": LikeOfComment.LIKE_STATUS_OPTIONS.NONE
             }).expect(HTTP_STATUSES.NO_CONTENT_204)
 
         const commentsResponse = await request(app).get('/comments/' + commentId)
-            .auth(token1, {type: "bearer"})
+            .auth(token, {type: "bearer"})
             .expect(HTTP_STATUSES.OK_200);
 
         expect(commentsResponse.body).toEqual(
@@ -182,8 +182,8 @@ describe('PUT -> /comments/:commentId/like-status', () => {
                 "id": expect.any(String),
                 "content": "this is a sample of a correct comment that can be saved",
                 "commentatorInfo": {
-                    "userId": user1._id,
-                    "userLogin": "user1",
+                    "userId": user._id,
+                    "userLogin": "user",
                 },
                 "createdAt": expect.any(String),
                 "likesInfo": {
