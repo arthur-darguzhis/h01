@@ -20,7 +20,7 @@ export class JwtService {
         try {
             return jwt.verify(token, settings.JWT_AUTH_SECRET);
         } catch (err) {
-            throw new InvalidValue('refresh JWT is invalid');
+            throw new InvalidValue('auth JWT is invalid');
         }
     }
 
